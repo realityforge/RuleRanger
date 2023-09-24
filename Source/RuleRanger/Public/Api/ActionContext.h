@@ -28,4 +28,6 @@ class RULERANGER_API UActionContext : public UObject
     // failures as well as info, warning and error messages
     // TODO: This will also provide context. i.e. is the action applied due to explicit
     // call, import, reimport or save action?
+    // TODO: Also some processes we want to provide "linting" and just generate warnings
+    // while in some scenarios we want to auto-apply fixes.
 };

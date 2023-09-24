@@ -33,6 +33,12 @@ class RULERANGER_API UObjectMatcherBase : public UObject
     GENERATED_BODY()
 
 public:
+    /**
+     * Inspect the object and return true if the object should be matched.
+     *
+     * @param Object the object to test.
+     * @return true if the asset is a match, false otherwise.
+     */
     UFUNCTION(BlueprintNativeEvent, Category = "Rule Ranger")
     bool Test(UObject* Object);
 };

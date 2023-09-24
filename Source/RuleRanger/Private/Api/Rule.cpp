@@ -11,6 +11,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "Api/RuleBase.h"
+#include "Api/Rule.h"
+#include "Api/ActionBase.h"
+#include "Api/ObjectMatcherBase.h"
 
-void URuleBase::Apply_Implementation(UActionContext* ActionContext, UObject* Object) {}
+void URule::Apply_Implementation(UActionContext* ActionContext, UObject* Object)
+{
+    for (const TObjectPtr<UObjectMatcherBase> Matcher : Matchers)
+    {
+        if (!Matcher->Test(Object))
+        {
+            return;
+        }
+    }
+
+    for (const TObjectPtr<UActionBase> Action : Actions)
+    {
+        Action->Apply(ActionContext, Object);
+        if (!bContinueOnError && ActionContext->InErrorState())
+        {
+            return;
+        }
+    }
+}

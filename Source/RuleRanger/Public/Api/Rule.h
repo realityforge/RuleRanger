@@ -14,7 +14,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RuleBase.generated.h"
+#include "Rule.generated.h"
 
 class UActionContext;
 class UActionBase;
@@ -23,13 +23,8 @@ class UObjectMatcherBase;
 /**
  * The object that binds one or more matchers with one or more actions.
  */
-UCLASS(Abstract,
-       AutoExpandCategories = ("Rule Ranger"),
-       DisplayName = "Rule Base",
-       Blueprintable,
-       BlueprintType,
-       CollapseCategories)
-class RULERANGER_API URuleBase : public UObject
+UCLASS(AutoExpandCategories = ("Rule Ranger"), Blueprintable, BlueprintType, CollapseCategories)
+class RULERANGER_API URule : public UObject
 {
     GENERATED_BODY()
 

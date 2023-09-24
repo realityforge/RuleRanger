@@ -12,3 +12,8 @@
  * limitations under the License.
  */
 #include "Api/ActionContext.h"
+
+bool UActionContext::InErrorState()
+{
+    return false;
+}

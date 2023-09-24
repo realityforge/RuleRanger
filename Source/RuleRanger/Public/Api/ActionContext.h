@@ -24,6 +24,15 @@ class RULERANGER_API UActionContext : public UObject
 {
     GENERATED_BODY()
 
+public:
+    /**
+     * Return true if the ActionContext is in the "error" state.
+     * This means that one of the error methods have been invoked.
+     *
+     * @return true if the ActionContext is in the "error" state, otherwise false.
+     */
+    bool InErrorState();
+
     // TODO: In the future this will provider the ability to pass back validation
     // failures as well as info, warning and error messages
     // TODO: This will also provide context. i.e. is the action applied due to explicit

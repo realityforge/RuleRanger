@@ -30,4 +30,6 @@ class RULERANGER_API UActionContext : public UObject
     // call, import, reimport or save action?
     // TODO: Also some processes we want to provide "linting" and just generate warnings
     // while in some scenarios we want to auto-apply fixes.
+    // TODO: Also provide access to flag indicating whether there are any fatal errors
+    // (and thus can skip further actions until earlier errors addressed)
 };

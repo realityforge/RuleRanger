@@ -11,9 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "Api/ActionContext.h"
+#include "Api/RuleRangerAction.h"
 
-bool UActionContext::InErrorState()
-{
-    return false;
-}
+void URuleRangerAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) {}

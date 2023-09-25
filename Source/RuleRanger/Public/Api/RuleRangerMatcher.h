@@ -15,20 +15,19 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
-#include "ObjectMatcherBase.generated.h"
+#include "RuleRangerMatcher.generated.h"
 
 /**
  * Base class used to match against an object to determine whether a rule should be applied to the object.
  */
 UCLASS(Abstract,
        AutoExpandCategories = ("Rule Ranger"),
-       DisplayName = "Object Matcher Base",
        Blueprintable,
        BlueprintType,
        CollapseCategories,
        DefaultToInstanced,
        EditInlineNew)
-class RULERANGER_API UObjectMatcherBase : public UObject
+class RULERANGER_API URuleRangerMatcher : public UObject
 {
     GENERATED_BODY()
 

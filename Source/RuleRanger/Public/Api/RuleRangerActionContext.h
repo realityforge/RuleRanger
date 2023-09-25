@@ -14,13 +14,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ActionContext.generated.h"
+#include "RuleRangerActionContext.generated.h"
 
 /**
  * Context object passed to an action so that the action can be provided context.
  */
 UCLASS()
-class RULERANGER_API UActionContext : public UObject
+class RULERANGER_API URuleRangerActionContext : public UObject
 {
     GENERATED_BODY()
 

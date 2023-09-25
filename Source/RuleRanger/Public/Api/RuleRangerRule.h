@@ -14,17 +14,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Rule.generated.h"
+#include "RuleRangerRule.generated.h"
 
-class UActionContext;
-class UActionBase;
-class UObjectMatcherBase;
+class URuleRangerActionContext;
+class URuleRangerAction;
+class URuleRangerMatcher;
 
 /**
  * The object that binds one or more matchers with one or more actions.
  */
 UCLASS(AutoExpandCategories = ("Rule Ranger"), Blueprintable, BlueprintType, CollapseCategories)
-class RULERANGER_API URule : public UObject
+class RULERANGER_API URuleRangerRule : public UObject
 {
     GENERATED_BODY()
 
@@ -40,11 +40,11 @@ public:
 
     /** The matchers that an object MUST match before this rule is applied. */
     UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn))
-    TArray<TObjectPtr<UObjectMatcherBase>> Matchers;
+    TArray<TObjectPtr<URuleRangerMatcher>> Matchers;
 
     /** The actions that will be applied if the object is matched by the rule. */
     UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn))
-    TArray<TObjectPtr<UActionBase>> Actions;
+    TArray<TObjectPtr<URuleRangerAction>> Actions;
 
     /**
      * Priority used to order rules when multiple apply to the same ObjectType.
@@ -90,5 +90,5 @@ public:
      * @param Object the object to apply the actions to.
      */
     UFUNCTION(BlueprintNativeEvent, Category = "Rule Ranger")
-    void Apply(UActionContext* ActionContext, UObject* Object);
+    void Apply(URuleRangerActionContext* ActionContext, UObject* Object);
 };

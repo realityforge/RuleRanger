@@ -11,13 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "Api/Rule.h"
-#include "Api/ActionBase.h"
-#include "Api/ObjectMatcherBase.h"
+#include "Api/RuleRangerRule.h"
+#include "Api/RuleRangerAction.h"
+#include "Api/RuleRangerActionContext.h"
+#include "Api/RuleRangerMatcher.h"
 
-void URule::Apply_Implementation(UActionContext* ActionContext, UObject* Object)
+void URuleRangerRule::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
 {
-    for (const TObjectPtr<UObjectMatcherBase> Matcher : Matchers)
+    for (const TObjectPtr<URuleRangerMatcher> Matcher : Matchers)
     {
         if (!Matcher->Test(Object))
         {
@@ -25,7 +26,7 @@ void URule::Apply_Implementation(UActionContext* ActionContext, UObject* Object)
         }
     }
 
-    for (const TObjectPtr<UActionBase> Action : Actions)
+    for (const TObjectPtr<URuleRangerAction> Action : Actions)
     {
         Action->Apply(ActionContext, Object);
         if (!bContinueOnError && ActionContext->InErrorState())

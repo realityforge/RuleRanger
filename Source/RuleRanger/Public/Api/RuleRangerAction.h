@@ -13,9 +13,10 @@
  */
 #pragma once
 
-#include "ActionContext.h"
 #include "CoreMinimal.h"
-#include "ActionBase.generated.h"
+#include "RuleRangerAction.generated.h"
+
+class URuleRangerActionContext;
 
 /**
  * Base class used to apply an action to an object.
@@ -23,13 +24,12 @@
  */
 UCLASS(Abstract,
        AutoExpandCategories = ("Rule Ranger"),
-       DisplayName = "Action Base",
        Blueprintable,
        BlueprintType,
        CollapseCategories,
        DefaultToInstanced,
        EditInlineNew)
-class RULERANGER_API UActionBase : public UObject
+class RULERANGER_API URuleRangerAction : public UObject
 {
     GENERATED_BODY()
 
@@ -41,5 +41,5 @@ public:
      * @param Object the object to apply the action to.
      */
     UFUNCTION(BlueprintNativeEvent)
-    void Apply(UActionContext* ActionContext, UObject* Object);
+    void Apply(URuleRangerActionContext* ActionContext, UObject* Object);
 };

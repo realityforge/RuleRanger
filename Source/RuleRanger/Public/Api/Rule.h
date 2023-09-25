@@ -47,6 +47,12 @@ public:
     TArray<TObjectPtr<UActionBase>> Actions;
 
     /**
+     * Priority used to order rules when multiple apply to the same ObjectType.
+     */
+    UPROPERTY(EditAnywhere, Category = "Rule Ranger")
+    uint32 Priority{ 1000 };
+
+    /**
      * True to apply this rule when importing an asset initially.
      */
     UPROPERTY(EditAnywhere, Category = "Rule Ranger")

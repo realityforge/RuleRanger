@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 #include "RuleRanger.h"
+#include "Api/Logging.h"
 
 #define LOCTEXT_NAMESPACE "FRuleRangerModule"
 

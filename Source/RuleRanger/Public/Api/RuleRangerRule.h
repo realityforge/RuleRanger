@@ -23,7 +23,7 @@ class URuleRangerMatcher;
 /**
  * The object that binds one or more matchers with one or more actions.
  */
-UCLASS(AutoExpandCategories = ("Rule Ranger"), Blueprintable, BlueprintType, CollapseCategories)
+UCLASS(AutoExpandCategories = ("Rule Ranger"), Blueprintable, BlueprintType, CollapseCategories, EditInlineNew)
 class RULERANGER_API URuleRangerRule : public UObject
 {
     GENERATED_BODY()
@@ -39,7 +39,7 @@ public:
     TArray<FString> ObjectTypes;
 
     /** The matchers that an object MUST match before this rule is applied. */
-    UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn))
+    UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn, E))
     TArray<TObjectPtr<URuleRangerMatcher>> Matchers;
 
     /** The actions that will be applied if the object is matched by the rule. */
@@ -49,38 +49,38 @@ public:
     /**
      * Priority used to order rules when multiple apply to the same ObjectType.
      */
-    UPROPERTY(EditAnywhere, Category = "Rule Ranger")
-    uint32 Priority{ 1000 };
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn))
+    int32 Priority{ 1000 };
 
     /**
      * True to apply this rule when importing an asset initially.
      */
-    UPROPERTY(EditAnywhere, Category = "Rule Ranger")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn))
     bool bApplyOnImport{ true };
 
     /**
      * True to apply this rule when reimporting an asset.
      */
-    UPROPERTY(EditAnywhere, Category = "Rule Ranger")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn))
     bool bApplyOnReimport{ true };
 
     /**
      * True to apply this rule when the asset is validated.
      */
-    UPROPERTY(EditAnywhere, Category = "Rule Ranger")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn))
     bool bApplyOnValidate{ true };
 
     /**
      * True to apply this rule when explicitly requested from the editor UI.
      */
-    UPROPERTY(EditAnywhere, Category = "Rule Ranger")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn))
     bool bApplyOnDemand{ true };
 
     /**
      * A flag that controls whether the presence of an error will result in subsequent actions being skipped if an error
      * is detected.
      */
-    UPROPERTY(EditAnywhere, Category = "Rule Ranger")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn))
     bool bContinueOnError{ false };
 
     /**

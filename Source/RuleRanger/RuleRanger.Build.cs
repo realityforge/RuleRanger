@@ -23,6 +23,6 @@ public class RuleRanger : ModuleRules
 		PrivateIncludePaths.AddRange(new string[] { });
 		PublicDependencyModuleNames.AddRange(new[] { "Core" });
 		PrivateDependencyModuleNames.AddRange(new[] { "CoreUObject", "Engine", "Slate", "SlateCore" });
-		DynamicallyLoadedModuleNames.AddRange( new string[] { } );
+		DynamicallyLoadedModuleNames.AddRange(new string[] { });
 	}
 }

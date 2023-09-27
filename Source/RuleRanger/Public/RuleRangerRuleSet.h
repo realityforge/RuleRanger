@@ -32,6 +32,10 @@ public:
     UPROPERTY(EditDefaultsOnly, Category = "Rule Ranger")
     FText Description;
 
+    /** The base content directory to which the RuleSet applies. */
+    UPROPERTY(EditDefaultsOnly, Category = "Rule Ranger", meta = (ContentDir))
+    FDirectoryPath Dir{ TEXT("") };
+
     /** A set of rules to be applied to different types. */
     UPROPERTY(EditDefaultsOnly, Category = "Rules", meta = (AllowAbstract = "false", DisplayThumbnail = "false"))
     TArray<TObjectPtr<URuleRangerRule>> Rules;

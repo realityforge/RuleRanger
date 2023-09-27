@@ -33,7 +33,7 @@ class RULERANGER_API UOrMatcher : public URuleRangerMatcher
 
 public:
     /** The matchers to perform logical or operation on. */
-    UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn, E))
+    UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn))
     TArray<TObjectPtr<URuleRangerMatcher>> Matchers;
 
     virtual bool Test_Implementation(UObject* Object) override;

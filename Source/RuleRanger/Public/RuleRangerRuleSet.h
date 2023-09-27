@@ -29,7 +29,7 @@ class RULERANGER_API URuleRangerRuleSet : public UDataAsset
 
 public:
     /** A description of the rule set. */
-    UPROPERTY(EditDefaultsOnly, Category = "Default")
+    UPROPERTY(EditDefaultsOnly, Category = "Rule Ranger")
     FText Description;
 
     /** A set of rules to be applied to different types. */

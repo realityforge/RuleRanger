@@ -11,10 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "Api/RuleRangerRule.h"
-#include "Api/RuleRangerAction.h"
-#include "Api/RuleRangerActionContext.h"
-#include "Api/RuleRangerMatcher.h"
+#include "RuleRangerRule.h"
+#include "RuleRangerAction.h"
+#include "RuleRangerActionContext.h"
+#include "RuleRangerMatcher.h"
 
 void URuleRangerRule::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
 {

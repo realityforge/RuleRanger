@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,18 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "..\..\Public\Api\MetadataTagMatcher.h"
-#include "Editor.h"
-#include "Subsystems/EditorAssetSubsystem.h"
+#include "RuleRangerAction.h"
 
-bool UMetadataTagMatcher::Test_Implementation(UObject* Object)
-{
-    if (Key != NAME_None && IsValid(Object))
-    {
-        if (const auto EditorAssetSubsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>())
-        {
-            return EditorAssetSubsystem->GetMetadataTag(Object, Key) == Value;
-        }
-    }
-    return false;
-}
+void URuleRangerAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) {}

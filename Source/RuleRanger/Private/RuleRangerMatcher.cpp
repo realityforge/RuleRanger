@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "Api/RuleRangerMatcher.h"
+#include "RuleRangerMatcher.h"
 
 bool URuleRangerMatcher::Test_Implementation(UObject* Object)
 {

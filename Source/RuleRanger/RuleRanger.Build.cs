@@ -23,7 +23,10 @@ public class RuleRanger : ModuleRules
 		PrivateIncludePaths.AddRange(new string[] { });
 		PublicDependencyModuleNames.AddRange(new[] { "Core" });
 		PrivateDependencyModuleNames.AddRange(
-			new[] { "CoreUObject", "EditorSubsystem", "Engine", "Slate", "SlateCore", "UnrealEd" });
+			new[]
+			{
+				"CoreUObject", "DeveloperSettings", "EditorSubsystem", "Engine", "Slate", "SlateCore", "UnrealEd"
+			});
 		DynamicallyLoadedModuleNames.AddRange(new string[] { });
 	}
 }

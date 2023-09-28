@@ -16,7 +16,7 @@
 #include "CoreMinimal.h"
 #include "RuleRangerAction.generated.h"
 
-class URuleRangerActionContext;
+class IRuleRangerActionContext;
 
 /**
  * Base class used to apply an action to an object.
@@ -40,6 +40,5 @@ public:
      * @param ActionContext the context in which the action is invoked.
      * @param Object the object to apply the action to.
      */
-    UFUNCTION(BlueprintNativeEvent)
-    void Apply(URuleRangerActionContext* ActionContext, UObject* Object);
+    void Apply(IRuleRangerActionContext* ActionContext, UObject* Object);
 };

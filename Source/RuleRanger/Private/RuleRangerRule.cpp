@@ -16,7 +16,7 @@
 #include "RuleRangerActionContext.h"
 #include "RuleRangerMatcher.h"
 
-void URuleRangerRule::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void URuleRangerRule::Apply(IRuleRangerActionContext* ActionContext, UObject* Object)
 {
     for (const TObjectPtr<URuleRangerMatcher> Matcher : Matchers)
     {

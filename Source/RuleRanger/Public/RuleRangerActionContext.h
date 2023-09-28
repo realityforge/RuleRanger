@@ -14,13 +14,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/Interface.h"
 #include "RuleRangerActionContext.generated.h"
+
+UINTERFACE(MinimalAPI, NotBlueprintable)
+class URuleRangerActionContext : public UInterface
+{
+    GENERATED_BODY()
+};
 
 /**
  * Context object passed to an action so that the action can be provided context.
  */
-UCLASS()
-class RULERANGER_API URuleRangerActionContext : public UObject
+class RULERANGER_API IRuleRangerActionContext
 {
     GENERATED_BODY()
 
@@ -31,7 +37,8 @@ public:
      *
      * @return true if the ActionContext is in the "error" state, otherwise false.
      */
-    bool InErrorState();
+    UFUNCTION(BlueprintCallable)
+    virtual bool InErrorState() = 0;
 
     // TODO: In the future this will provider the ability to pass back validation
     // failures as well as info, warning and error messages

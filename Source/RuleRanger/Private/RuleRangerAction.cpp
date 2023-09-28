@@ -14,4 +14,4 @@
 #include "RuleRangerAction.h"
 #include "RuleRangerActionContext.h"
 
-void URuleRangerAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) {}
+void URuleRangerAction::Apply(IRuleRangerActionContext* ActionContext, UObject* Object) {}

@@ -12,8 +12,3 @@
  * limitations under the License.
  */
 #include "RuleRangerActionContext.h"
-
-bool URuleRangerActionContext::InErrorState()
-{
-    return false;
-}

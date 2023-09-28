@@ -17,6 +17,21 @@
 #include "UObject/Interface.h"
 #include "RuleRangerActionContext.generated.h"
 
+UENUM(BlueprintType)
+enum class ERuleRangerActionTrigger : uint8
+{
+    /** The action was invoked as a result of an import. */
+    AT_Import,
+    /** The action was invoked as a result of a re-import. */
+    AT_Reimport,
+    /** The action was invoked as a result of a validate. */
+    AT_Validate,
+    /** The action was invoked as an explicit action from a user. */
+    AT_Explicit,
+
+    AT_Max UMETA(Hidden)
+};
+
 UINTERFACE(MinimalAPI, NotBlueprintable)
 class URuleRangerActionContext : public UInterface
 {
@@ -40,10 +55,15 @@ public:
     UFUNCTION(BlueprintCallable)
     virtual bool InErrorState() = 0;
 
+    /**
+     * Return the trigger for the current action. i.e. Why was this action invoked.
+     *
+     * @return the trigger for the current action
+     */
+    virtual ERuleRangerActionTrigger GetActionTrigger() = 0;
+
     // TODO: In the future this will provider the ability to pass back validation
     // failures as well as info, warning and error messages
-    // TODO: This will also provide context. i.e. is the action applied due to explicit
-    // call, import, reimport or save action?
     // TODO: Also some processes we want to provide "linting" and just generate warnings
     // while in some scenarios we want to auto-apply fixes.
     // TODO: Also provide access to flag indicating whether there are any fatal errors

@@ -14,6 +14,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DeveloperSettings.h"
 #include "RuleRangerRuleSet.h"
 #include "UObject/Object.h"
 #include "RuleRangerDeveloperSettings.generated.h"

@@ -14,6 +14,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataAsset.h"
 #include "RuleRangerRule.generated.h"
 
 class IRuleRangerActionContext;

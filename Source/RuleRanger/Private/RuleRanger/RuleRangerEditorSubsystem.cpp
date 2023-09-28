@@ -12,10 +12,12 @@
  * limitations under the License.
  */
 #include "RuleRanger/RuleRangerEditorSubsystem.h"
+#include "Editor.h"
 #include "RuleRangerDeveloperSettings.h"
 #include "RuleRangerLogging.h"
 #include "RuleRangerRule.h"
 #include "Subsystems/EditorAssetSubsystem.h"
+#include "Subsystems/ImportSubsystem.h"
 
 static FName ImportMarkerKey = FName(TEXT("RuleRangerImportProcessed"));
 static FString ImportMarkerValue = FString(TEXT("True"));

@@ -12,5 +12,6 @@
  * limitations under the License.
  */
 #include "RuleRangerAction.h"
+#include "RuleRangerActionContext.h"
 
 void URuleRangerAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) {}

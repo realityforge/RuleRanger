@@ -13,6 +13,7 @@
  */
 #include "RuleRanger/RuleRangerEditorSubsystem.h"
 #include "Editor.h"
+#include "ImportActionContext.h"
 #include "RuleRangerDeveloperSettings.h"
 #include "RuleRangerLogging.h"
 #include "RuleRangerRule.h"
@@ -50,6 +51,11 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
 {
     if (IsValid(Object))
     {
+        if (!ActionContext)
+        {
+            ActionContext = NewObject<UImportActionContext>(this, UImportActionContext::StaticClass());
+        }
+
         const auto Subsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>();
 
         // Use a metadata tag when we have imported an asset so that when we try to reimport asset we can
@@ -69,7 +75,10 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
                     const auto Rule = RulePtr.Get();
                     if ((!bIsReimport && Rule->bApplyOnImport) || (bIsReimport && Rule->bApplyOnReimport))
                     {
-                        UE_LOG(RuleRanger, Warning, TEXT("OnAssetPostImport=%s"), *Object->GetName());
+                        const ERuleRangerActionTrigger Trigger =
+                            bIsReimport ? ERuleRangerActionTrigger::AT_Reimport : ERuleRangerActionTrigger::AT_Import;
+                        ActionContext->ResetContext(Object, Trigger);
+                        Rule->Apply(ActionContext, Object);
                     }
                 }
             }

@@ -20,7 +20,7 @@
 #include "Subsystems/EditorAssetSubsystem.h"
 #include "Subsystems/ImportSubsystem.h"
 
-static FName ImportMarkerKey = FName(TEXT("RuleRangerImportProcessed"));
+static FName ImportMarkerKey = FName(TEXT("RuleRanger.ImportProcessed"));
 static FString ImportMarkerValue = FString(TEXT("True"));
 
 void URuleRangerEditorSubsystem::Initialize(FSubsystemCollectionBase& Collection)

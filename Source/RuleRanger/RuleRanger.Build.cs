@@ -27,6 +27,7 @@ public class RuleRanger : ModuleRules
 			{
 				"CoreUObject", "DeveloperSettings", "EditorSubsystem", "Engine", "Slate", "SlateCore", "UnrealEd"
 			});
+		PrivateIncludePathModuleNames.AddRange(new[] { "MessageLog" });
 		DynamicallyLoadedModuleNames.AddRange(new string[] { });
 	}
 }

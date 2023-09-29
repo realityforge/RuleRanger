@@ -12,6 +12,8 @@
  * limitations under the License.
  */
 #include "RuleRanger.h"
+#include "MessageLog/Public/MessageLogInitializationOptions.h"
+#include "MessageLog/Public/MessageLogModule.h"
 #include "RuleRangerLogging.h"
 
 #define LOCTEXT_NAMESPACE "FRuleRangerModule"
@@ -20,6 +22,16 @@ void FRuleRangerModule::StartupModule()
 {
     // This code will execute after your module is loaded into memory;
     // the exact timing is specified in the .uplugin file per-module
+
+    // create a MessageLog category to use in plugin
+    FMessageLogModule& MessageLogModule = FModuleManager::LoadModuleChecked<FMessageLogModule>("MessageLog");
+    FMessageLogInitializationOptions InitOptions;
+    InitOptions.bShowPages = true;
+    InitOptions.bAllowClear = true;
+    InitOptions.bShowFilters = true;
+    MessageLogModule.RegisterLogListing("RuleRanger",
+                                        NSLOCTEXT("RuleRanger", "RuleRangerLogLabel", "Rule Ranger"),
+                                        InitOptions);
 }
 
 void FRuleRangerModule::ShutdownModule()
@@ -27,6 +39,13 @@ void FRuleRangerModule::ShutdownModule()
     // This function may be called during shutdown to clean up your module.
     // For modules that support dynamic reloading, we call this function before
     // unloading the module.
+
+    // Deregister MessageLog created in Startup
+    if (FModuleManager::Get().IsModuleLoaded("MessageLog"))
+    {
+        FMessageLogModule& MessageLogModule = FModuleManager::GetModuleChecked<FMessageLogModule>("RuleRanger");
+        MessageLogModule.UnregisterLogListing("RuleRanger");
+    }
 }
 
 #undef LOCTEXT_NAMESPACE

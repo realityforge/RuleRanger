@@ -78,7 +78,8 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
                         const ERuleRangerActionTrigger Trigger =
                             bIsReimport ? ERuleRangerActionTrigger::AT_Reimport : ERuleRangerActionTrigger::AT_Import;
                         ActionContext->ResetContext(Object, Trigger);
-                        Rule->Apply(ActionContext, Object);
+                        TScriptInterface<IRuleRangerActionContext> RuleRangerActionContext(ActionContext);
+                        Rule->Apply(RuleRangerActionContext, Object);
                     }
                 }
             }

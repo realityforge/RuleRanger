@@ -14,9 +14,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RuleRangerActionContext.h"
 #include "RuleRangerAction.generated.h"
-
-class IRuleRangerActionContext;
 
 /**
  * Base class used to apply an action to an object.
@@ -40,5 +39,6 @@ public:
      * @param ActionContext the context in which the action is invoked.
      * @param Object the object to apply the action to.
      */
-    void Apply(IRuleRangerActionContext* ActionContext, UObject* Object);
+    UFUNCTION(BlueprintNativeEvent, Category = "Rule Ranger")
+    void Apply(UPARAM(ref) TScriptInterface<IRuleRangerActionContext>& ActionContext, UObject* Object);
 };

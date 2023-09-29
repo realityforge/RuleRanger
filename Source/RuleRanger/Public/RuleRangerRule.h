@@ -96,5 +96,6 @@ public:
      * @param ActionContext the context in which the actions are invoked.
      * @param Object the object to apply the actions to.
      */
-    void Apply(IRuleRangerActionContext* ActionContext, UObject* Object);
+    UFUNCTION(BlueprintNativeEvent, Category = "Rule Ranger")
+    void Apply(UPARAM(ref) TScriptInterface<IRuleRangerActionContext>& ActionContext, UObject* Object);
 };

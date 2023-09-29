@@ -14,6 +14,7 @@
 
 #include "RuleRanger/Actions/NameConventionRenameAction.h"
 #include "Editor.h"
+#include "Misc/UObjectToken.h"
 #include "RuleRangerLogging.h"
 #include "Subsystems/EditorAssetSubsystem.h"
 
@@ -50,7 +51,30 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                         if (NameConvention.Variant.Equals(Variant)
                             || NameConvention.Variant.Equals(NameConvention_DefaultVariant))
                         {
-                            return;
+                            const FString OriginalName{ Object->GetName() };
+                            FString NewName{ OriginalName };
+                            if (!NameConvention.Prefix.IsEmpty() && !NewName.StartsWith(NameConvention.Prefix))
+                            {
+                                NewName.InsertAt(0, NameConvention.Prefix);
+                            }
+                            if (!NameConvention.Suffix.IsEmpty() && !NewName.EndsWith(NameConvention.Suffix))
+                            {
+                                NewName.Append(NameConvention.Suffix);
+                            }
+                            if (!Object->Rename(*NewName))
+                            {
+                                static FName InLogName("RuleRanger");
+                                FText InMessage =
+                                    FText::Format(NSLOCTEXT("RuleRanger",
+                                                            "RenameFailed",
+                                                            "Attempt to rename object '{0}' to '{1}' failed."),
+                                                  FText::FromString(*OriginalName),
+                                                  FText::FromString(*NewName));
+                                FMessageLog(InLogName)
+                                    .Error()
+                                    ->AddToken(FUObjectToken::Create(Object))
+                                    ->AddToken(FTextToken::Create(InMessage));
+                            }
                         }
                     }
                 }

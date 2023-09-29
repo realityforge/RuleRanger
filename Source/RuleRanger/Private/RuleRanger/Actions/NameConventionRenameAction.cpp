@@ -33,15 +33,17 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
             CollectTypeHierarchy(Object, Classes);
             for (auto Class : Classes)
             {
-                UClass* X = Class;
-                UE_LOG(RuleRanger, Verbose, TEXT("NameConventionRenameAction: Looking for NamingConvention rules for class %s"), *X->GetName());
+                UE_LOG(RuleRanger,
+                       VeryVerbose,
+                       TEXT("NameConventionRenameAction: Looking for NamingConvention rules for class %s"),
+                       *Class->GetName());
                 if (TArray<FNameConvention>* NameConventions = NameConventionsMap.Find(Class))
                 {
                     UE_LOG(RuleRanger,
-                           Warning,
+                           VeryVerbose,
                            TEXT("NameConventionRenameAction: Found NamingConvention %d rules for %s"),
                            NameConventions->Num(),
-                           *X->GetName());
+                           *Class->GetName());
                     for (int i = 0; i < NameConventions->Num(); i++)
                     {
                         const FNameConvention& NameConvention = (*NameConventions)[i];
@@ -114,8 +116,7 @@ void UNameConventionRenameAction::RebuildNameConventionsCacheIfNecessary()
                    TEXT("NameConventionRenameAction: Object %s contains %d conventions in cache"),
                    *NameConventionEntry.Key->GetName(),
                    NameConventionEntry.Value.Num());
-            
-        }        
+        }
     }
 }
 

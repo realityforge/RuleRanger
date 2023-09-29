@@ -44,7 +44,10 @@ void FRuleRangerModule::ShutdownModule()
     if (FModuleManager::Get().IsModuleLoaded("MessageLog"))
     {
         FMessageLogModule& MessageLogModule = FModuleManager::GetModuleChecked<FMessageLogModule>("RuleRanger");
-        MessageLogModule.UnregisterLogListing("RuleRanger");
+        if (MessageLogModule.IsRegisteredLogListing("RuleRanger"))
+        {
+            MessageLogModule.UnregisterLogListing("RuleRanger");
+        }
     }
 }
 

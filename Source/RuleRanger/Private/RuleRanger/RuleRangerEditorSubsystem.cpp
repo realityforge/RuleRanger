@@ -71,7 +71,7 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
                DeveloperSettings->Rules.Num());
         for (auto RuleSetIt = DeveloperSettings->Rules.CreateIterator(); RuleSetIt; ++RuleSetIt)
         {
-            const auto RuleSet = RuleSetIt->Get();
+            const auto RuleSet = RuleSetIt->LoadSynchronous();
             if (const auto Path = Object->GetPathName(); Path.StartsWith(RuleSet->Dir.Path))
             {
                 UE_LOG(RuleRanger,

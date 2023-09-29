@@ -13,11 +13,8 @@
  */
 #include "RuleRanger/Matchers/ContentDirMatcher.h"
 #include "Editor.h"
-#include "RuleRangerLogging.h"
 
 bool UContentDirMatcher::Test_Implementation(UObject* Object)
 {
-    const FString PathName = Object->GetPathName();
-    UE_LOG(RuleRanger, Warning, TEXT("PathName=%s"), *PathName);
-    return PathName.StartsWith(Dir.Path);
+    return Object->GetPathName().StartsWith(Dir.Path);
 }

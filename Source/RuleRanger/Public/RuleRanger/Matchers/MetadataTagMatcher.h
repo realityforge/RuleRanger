@@ -31,13 +31,14 @@ class RULERANGER_API UMetadataTagMatcher : public URuleRangerMatcher
     GENERATED_BODY()
 
 public:
+    virtual bool Test_Implementation(UObject* Object) override;
+
+private:
     /** The key used to access the metadata tag to match. */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn, AllowPrivateAccess))
     FName Key{ TEXT("") };
 
     /** The value of metadata tag to match. */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn, AllowPrivateAccess))
     FString Value{ TEXT("") };
-
-    virtual bool Test_Implementation(UObject* Object) override;
 };

@@ -53,6 +53,7 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
     {
         if (!ActionContext)
         {
+            UE_LOG(RuleRanger, Verbose, TEXT("RuleRangerEditorSubsystem: Creating the initial ActionContext"));
             ActionContext = NewObject<UImportActionContext>(this, UImportActionContext::StaticClass());
         }
 
@@ -63,25 +64,62 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
         const bool bIsReimport = Subsystem && Subsystem->GetMetadataTag(Object, ImportMarkerKey) == ImportMarkerValue;
         const auto DeveloperSettings = GetMutableDefault<URuleRangerDeveloperSettings>();
         check(IsValid(DeveloperSettings));
-
+        UE_LOG(RuleRanger,
+               Verbose,
+               TEXT("OnAssetPostImport(%s) discovered %d Rule Set(s)"),
+               *Object->GetName(),
+               DeveloperSettings->Rules.Num());
         for (auto RuleSetIt = DeveloperSettings->Rules.CreateIterator(); RuleSetIt; ++RuleSetIt)
         {
             const auto RuleSet = RuleSetIt->Get();
             if (const auto Path = Object->GetPathName(); Path.StartsWith(RuleSet->Dir.Path))
             {
+                UE_LOG(RuleRanger,
+                       Verbose,
+                       TEXT("OnAssetPostImport(%s) processing Rule Set %s"),
+                       *Object->GetName(),
+                       *RuleSet->GetName());
                 for (const auto RulePtr : RuleSet->Rules)
                 {
                     // ReSharper disable once CppTooWideScopeInitStatement
                     const auto Rule = RulePtr.Get();
                     if ((!bIsReimport && Rule->bApplyOnImport) || (bIsReimport && Rule->bApplyOnReimport))
                     {
+                        UE_LOG(RuleRanger,
+                               Verbose,
+                               TEXT("OnAssetPostImport(%s) applying rule %s as flag on "
+                                    "rule enables rule during %s."),
+                               *Object->GetName(),
+                               *Rule->GetName(),
+                               bIsReimport ? TEXT("reimport") : TEXT("import"));
                         const ERuleRangerActionTrigger Trigger =
                             bIsReimport ? ERuleRangerActionTrigger::AT_Reimport : ERuleRangerActionTrigger::AT_Import;
                         ActionContext->ResetContext(Object, Trigger);
                         TScriptInterface<IRuleRangerActionContext> RuleRangerActionContext(ActionContext);
                         Rule->Apply(RuleRangerActionContext, Object);
                     }
+                    else
+                    {
+                        UE_LOG(RuleRanger,
+                               Verbose,
+                               TEXT("OnAssetPostImport(%s) skipped rule %s as flag on "
+                                    "rule does not enable rule during %s."),
+                               *Object->GetName(),
+                               *Rule->GetName(),
+                               bIsReimport ? TEXT("reimport") : TEXT("import"));
+                    }
                 }
+            }
+            else
+            {
+                UE_LOG(RuleRanger,
+                       Verbose,
+                       TEXT("OnAssetPostImport(%s) skipped processing Rule Set %s as the rule set restricted to "
+                            "content within %s but content path was %s"),
+                       *Object->GetName(),
+                       *RuleSet->GetName(),
+                       *RuleSet->Dir.Path,
+                       *Path);
             }
         }
     }

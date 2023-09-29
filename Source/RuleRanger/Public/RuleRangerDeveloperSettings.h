@@ -22,7 +22,7 @@
 /**
  * RuleRanger Project Settings in the Editor category.
  */
-UCLASS(config = "Editor", DisplayName = "Rule Ranger")
+UCLASS(Config = "Editor", DefaultConfig, DisplayName = "Rule Ranger")
 class RULERANGER_API URuleRangerDeveloperSettings : public UDeveloperSettings
 {
     GENERATED_BODY()
@@ -33,6 +33,6 @@ public:
     /** Gets the category for the settings, some high level grouping like, Editor, Engine, Game...etc. */
     virtual FName GetCategoryName() const override { return FName("Editor"); }
 
-    UPROPERTY(EditAnywhere, Category = "Rule Ranger", meta = (DisplayThumbnail = "false"))
-    TArray<TObjectPtr<URuleRangerRuleSet>> Rules;
+    UPROPERTY(Config, EditAnywhere, Category = "Rule Ranger", meta = (DisplayThumbnail = "false"))
+    TArray<TSoftObjectPtr<URuleRangerRuleSet>> Rules;
 };

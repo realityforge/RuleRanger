@@ -19,7 +19,7 @@
 #include "ImportActionContext.generated.h"
 
 /**
- * Base class used to match against an object to determine whether a rule should be applied to the object.
+ * ActionContext implementation used during the import process.
  */
 UCLASS(Blueprintable, BlueprintType)
 class RULERANGER_API UImportActionContext : public UObject, public IRuleRangerActionContext

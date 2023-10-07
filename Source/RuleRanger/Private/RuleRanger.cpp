@@ -18,18 +18,21 @@
 
 #define LOCTEXT_NAMESPACE "FRuleRangerModule"
 
+static const FName MessageLogModuleName = FName("MessageLog");
+static const FName LogName = FName("RuleRanger");
+
 void FRuleRangerModule::StartupModule()
 {
     // This code will execute after your module is loaded into memory;
     // the exact timing is specified in the .uplugin file per-module
 
     // create a MessageLog category to use in plugin
-    FMessageLogModule& MessageLogModule = FModuleManager::LoadModuleChecked<FMessageLogModule>("MessageLog");
+    FMessageLogModule& MessageLogModule = FModuleManager::LoadModuleChecked<FMessageLogModule>(MessageLogModuleName);
     FMessageLogInitializationOptions InitOptions;
     InitOptions.bShowPages = true;
     InitOptions.bAllowClear = true;
     InitOptions.bShowFilters = true;
-    MessageLogModule.RegisterLogListing("RuleRanger",
+    MessageLogModule.RegisterLogListing(LogName,
                                         NSLOCTEXT("RuleRanger", "RuleRangerLogLabel", "Rule Ranger"),
                                         InitOptions);
 }
@@ -41,12 +44,12 @@ void FRuleRangerModule::ShutdownModule()
     // unloading the module.
 
     // Deregister MessageLog created in Startup
-    if (FModuleManager::Get().IsModuleLoaded("MessageLog"))
+    if (FModuleManager::Get().IsModuleLoaded(MessageLogModuleName))
     {
-        FMessageLogModule& MessageLogModule = FModuleManager::GetModuleChecked<FMessageLogModule>("RuleRanger");
-        if (MessageLogModule.IsRegisteredLogListing("RuleRanger"))
+        FMessageLogModule& MessageLogModule = FModuleManager::GetModuleChecked<FMessageLogModule>(MessageLogModuleName);
+        if (MessageLogModule.IsRegisteredLogListing(LogName))
         {
-            MessageLogModule.UnregisterLogListing("RuleRanger");
+            MessageLogModule.UnregisterLogListing(LogName);
         }
     }
 }

@@ -24,7 +24,7 @@ ERuleRangerActionTrigger UImportActionContext::GetActionTrigger()
     return ActionTrigger;
 }
 
-void UImportActionContext::ResetContext(UObject* InObject, ERuleRangerActionTrigger InActionTrigger)
+void UImportActionContext::ResetContext(UObject* InObject, const ERuleRangerActionTrigger InActionTrigger)
 {
     check(nullptr != InObject);
     Object = InObject;

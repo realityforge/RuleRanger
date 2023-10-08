@@ -60,6 +60,7 @@ public:
      *
      * @return the trigger for the current action
      */
+    UFUNCTION(BlueprintCallable)
     virtual ERuleRangerActionTrigger GetActionTrigger() = 0;
 
     // TODO: In the future this will provider the ability to pass back validation

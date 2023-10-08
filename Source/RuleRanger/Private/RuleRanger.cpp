@@ -18,8 +18,8 @@
 
 #define LOCTEXT_NAMESPACE "FRuleRangerModule"
 
-static const FName MessageLogModuleName = FName("MessageLog");
-static const FName LogName = FName("RuleRanger");
+static const FName MessageLogModuleName = FName(TEXT("MessageLog"));
+static const FName LogName = FName(TEXT("RuleRanger"));
 
 void FRuleRangerModule::StartupModule()
 {

@@ -32,6 +32,21 @@ enum class ERuleRangerActionTrigger : uint8
     AT_Max UMETA(Hidden)
 };
 
+UENUM(BlueprintType)
+enum class ERuleRangerActionState : uint8
+{
+    /** The action was successful and produced no warnings or errors. */
+    AS_Success UMETA(DisplayName = "Success"),
+    /** The action produced one or more warnings but no errors. */
+    AS_Warning UMETA(DisplayName = "Warning"),
+    /** The action produced one or more errors but the errors are not fatal. */
+    AS_Error UMETA(DisplayName = "Error"),
+    /** The action produced one or more fatal errors and further rule processing should not occur for object. */
+    AS_Fatal UMETA(DisplayName = "Fatal"),
+
+    AS_Max UMETA(Hidden)
+};
+
 UINTERFACE(MinimalAPI, NotBlueprintable)
 class URuleRangerActionContext : public UInterface
 {
@@ -47,13 +62,12 @@ class RULERANGER_API IRuleRangerActionContext
 
 public:
     /**
-     * Return true if the ActionContext is in the "error" state.
-     * This means that one of the error methods have been invoked.
+     * Return the current state of the action.
      *
-     * @return true if the ActionContext is in the "error" state, otherwise false.
+     * @return the current state of the action.
      */
     UFUNCTION(BlueprintCallable)
-    virtual bool InErrorState() = 0;
+    virtual ERuleRangerActionState GetState() = 0;
 
     /**
      * Return the trigger for the current action. i.e. Why was this action invoked.
@@ -63,10 +77,38 @@ public:
     UFUNCTION(BlueprintCallable)
     virtual ERuleRangerActionTrigger GetActionTrigger() = 0;
 
-    // TODO: In the future this will provider the ability to pass back validation
-    // failures as well as info, warning and error messages
+    /**
+     * Generate an informational message from action.
+     *
+     * @param InMessage the message.
+     */
+    UFUNCTION(BlueprintCallable)
+    virtual void Info(const FText& InMessage) = 0;
+
+    /**
+     * Generate a warning message from the action.
+     *
+     * @param InMessage the message.
+     */
+    UFUNCTION(BlueprintCallable)
+    virtual void Warning(const FText& InMessage) = 0;
+
+    /**
+     * Generate an error message from the action.
+     *
+     * @param InMessage the message.
+     */
+    UFUNCTION(BlueprintCallable)
+    virtual void Error(const FText& InMessage) = 0;
+
+    /**
+     * Generate an error message from the action.
+     *
+     * @param InMessage the message.
+     */
+    UFUNCTION(BlueprintCallable)
+    virtual void Fatal(const FText& InMessage) = 0;
+
     // TODO: Also some processes we want to provide "linting" and just generate warnings
     // while in some scenarios we want to auto-apply fixes.
-    // TODO: Also provide access to flag indicating whether there are any fatal errors
-    // (and thus can skip further actions until earlier errors addressed)
 };

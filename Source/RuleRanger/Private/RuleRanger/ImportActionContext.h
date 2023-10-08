@@ -27,8 +27,12 @@ class RULERANGER_API UImportActionContext : public UObject, public IRuleRangerAc
     GENERATED_BODY()
 
 public:
-    virtual bool InErrorState() override;
+    virtual ERuleRangerActionState GetState() override;
     virtual ERuleRangerActionTrigger GetActionTrigger() override;
+    virtual void Info(const FText& InMessage) override;
+    virtual void Warning(const FText& InMessage) override;
+    virtual void Error(const FText& InMessage) override;
+    virtual void Fatal(const FText& InMessage) override;
 
     void ResetContext(UObject* InObject, ERuleRangerActionTrigger InActionTrigger);
 
@@ -41,7 +45,29 @@ private:
     UPROPERTY(VisibleAnywhere)
     ERuleRangerActionTrigger ActionTrigger{ ERuleRangerActionTrigger::AT_Max };
 
-    /** Flag indicating the action triggered an error state. */
+    /** Current state of the action. */
     UPROPERTY(VisibleAnywhere)
-    bool bError;
+    ERuleRangerActionState ActionState{ ERuleRangerActionState::AS_Max };
+
+    /** The array of info messages. */
+    UPROPERTY(VisibleAnywhere)
+    TArray<FText> InfoMessages;
+
+    /** The array of warning messages. */
+    UPROPERTY(VisibleAnywhere)
+    TArray<FText> WarningMessages;
+
+    /** The array of error messages. */
+    UPROPERTY(VisibleAnywhere)
+    TArray<FText> ErrorMessages;
+
+    /** The array of fatal messages. */
+    UPROPERTY(VisibleAnywhere)
+    TArray<FText> FatalMessages;
+
+public:
+    FORCEINLINE TArray<FText>& GetInfoMessages() { return InfoMessages; }
+    FORCEINLINE TArray<FText>& GetWarningMessages() { return WarningMessages; }
+    FORCEINLINE TArray<FText>& GetErrorMessages() { return ErrorMessages; }
+    FORCEINLINE TArray<FText>& GetFatalMessages() { return FatalMessages; }
 };

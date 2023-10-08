@@ -14,9 +14,9 @@
 
 #include "ImportActionContext.h"
 
-bool UImportActionContext::InErrorState()
+ERuleRangerActionState UImportActionContext::GetState()
 {
-    return bError;
+    return ActionState;
 }
 
 ERuleRangerActionTrigger UImportActionContext::GetActionTrigger()
@@ -29,5 +29,25 @@ void UImportActionContext::ResetContext(UObject* InObject, const ERuleRangerActi
     check(nullptr != InObject);
     Object = InObject;
     ActionTrigger = InActionTrigger;
-    bError = false;
+    ActionState = ERuleRangerActionState::AS_Success;
+}
+
+void UImportActionContext::Info(const FText& InMessage)
+{
+    InfoMessages.Add(InMessage);
+}
+void UImportActionContext::Warning(const FText& InMessage)
+{
+    WarningMessages.Add(InMessage);
+    ActionState = ActionState < ERuleRangerActionState::AS_Warning ? ERuleRangerActionState::AS_Warning : ActionState;
+}
+void UImportActionContext::Error(const FText& InMessage)
+{
+    ErrorMessages.Add(InMessage);
+    ActionState = ActionState < ERuleRangerActionState::AS_Error ? ERuleRangerActionState::AS_Error : ActionState;
+}
+void UImportActionContext::Fatal(const FText& InMessage)
+{
+    FatalMessages.Add(InMessage);
+    ActionState = ActionState < ERuleRangerActionState::AS_Fatal ? ERuleRangerActionState::AS_Fatal : ActionState;
 }

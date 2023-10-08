@@ -87,8 +87,7 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
                     {
                         UE_LOG(RuleRanger,
                                Verbose,
-                               TEXT("OnAssetPostImport(%s) applying rule %s as flag on "
-                                    "rule enables rule during %s."),
+                               TEXT("OnAssetPostImport(%s) applying rule %s during %s."),
                                *Object->GetName(),
                                *Rule->GetName(),
                                bIsReimport ? TEXT("reimport") : TEXT("import"));

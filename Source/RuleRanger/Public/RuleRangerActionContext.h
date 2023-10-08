@@ -21,7 +21,7 @@ UENUM(BlueprintType)
 enum class ERuleRangerActionTrigger : uint8
 {
     /** The action was invoked as a result of an import. */
-    AT_Import UMETA(DisplayName = "Trigger"),
+    AT_Import UMETA(DisplayName = "Import"),
     /** The action was invoked as a result of a re-import. */
     AT_Reimport UMETA(DisplayName = "ReImport"),
     /** The action was invoked as a result of a validate. */

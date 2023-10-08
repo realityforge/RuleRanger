@@ -94,8 +94,29 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
                         const ERuleRangerActionTrigger Trigger =
                             bIsReimport ? ERuleRangerActionTrigger::AT_Reimport : ERuleRangerActionTrigger::AT_Import;
                         ActionContext->ResetContext(Object, Trigger);
-                        TScriptInterface<IRuleRangerActionContext> RuleRangerActionContext(ActionContext);
-                        Rule->Apply(RuleRangerActionContext, Object);
+                        TScriptInterface<IRuleRangerActionContext> ScriptInterfaceActionContext(ActionContext);
+                        Rule->Apply(ScriptInterfaceActionContext, Object);
+                        const auto State = ActionContext->GetState();
+                        if (ERuleRangerActionState::AS_Fatal == State)
+                        {
+                            UE_LOG(RuleRanger,
+                                   Verbose,
+                                   TEXT("OnAssetPostImport(%s) applied rule %s which resulted in fatal error. "
+                                        "Processing rules will not continue."),
+                                   *Object->GetName(),
+                                   *Rule->GetName());
+                            return;
+                        }
+                        else if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
+                        {
+                            UE_LOG(RuleRanger,
+                                   Verbose,
+                                   TEXT("OnAssetPostImport(%s) applied rule %s which resulted in error. "
+                                        "Processing rules will not continue as ContinueOnError=False."),
+                                   *Object->GetName(),
+                                   *Rule->GetName());
+                            return;
+                        }
                     }
                     else
                     {

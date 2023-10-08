@@ -14,6 +14,7 @@
 #include "RuleRangerRule.h"
 #include "RuleRangerAction.h"
 #include "RuleRangerActionContext.h"
+#include "RuleRangerLogging.h"
 #include "RuleRangerMatcher.h"
 
 void URuleRangerRule::Apply_Implementation(TScriptInterface<IRuleRangerActionContext>& ActionContext, UObject* Object)
@@ -29,8 +30,27 @@ void URuleRangerRule::Apply_Implementation(TScriptInterface<IRuleRangerActionCon
     for (const TObjectPtr<URuleRangerAction> Action : Actions)
     {
         Action->Apply(ActionContext, Object);
-        if (!bContinueOnError && ActionContext->InErrorState())
+        const auto State = ActionContext->GetState();
+        if (ERuleRangerActionState::AS_Fatal == State)
         {
+            UE_LOG(RuleRanger,
+                   Verbose,
+                   TEXT("ApplyRule(%s) on rule %s applied action %s which resulted in fatal error. "
+                        "Processing rules will not continue."),
+                   *Object->GetName(),
+                   *GetName(),
+                   *Action->GetName());
+            return;
+        }
+        else if (!bContinueOnError && ERuleRangerActionState::AS_Error == State)
+        {
+            UE_LOG(RuleRanger,
+                   Verbose,
+                   TEXT("ApplyRule(%s) on rule %s applied action %s which resulted in error. "
+                        "Processing rules will not continue as ContinueOnError=False."),
+                   *Object->GetName(),
+                   *GetName(),
+                   *Action->GetName());
             return;
         }
     }

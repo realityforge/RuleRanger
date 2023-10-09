@@ -17,3 +17,5 @@
 
 // Log category to use within the RuleRanger plugin
 DECLARE_LOG_CATEGORY_EXTERN(RuleRanger, Verbose, All);
+
+extern const FName RuleRangerMessageLogName;

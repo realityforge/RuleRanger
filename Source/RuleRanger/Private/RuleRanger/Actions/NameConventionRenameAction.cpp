@@ -63,14 +63,13 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                             }
                             if (!Object->Rename(*NewName))
                             {
-                                static FName InLogName("RuleRanger");
                                 FText InMessage =
                                     FText::Format(NSLOCTEXT("RuleRanger",
                                                             "RenameFailed",
                                                             "Attempt to rename object '{0}' to '{1}' failed."),
                                                   FText::FromString(*OriginalName),
                                                   FText::FromString(*NewName));
-                                FMessageLog(InLogName)
+                                FMessageLog(RuleRangerMessageLogName)
                                     .Error()
                                     ->AddToken(FUObjectToken::Create(Object))
                                     ->AddToken(FTextToken::Create(InMessage));

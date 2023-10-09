@@ -19,7 +19,7 @@
 #define LOCTEXT_NAMESPACE "FRuleRangerModule"
 
 static const FName MessageLogModuleName = FName(TEXT("MessageLog"));
-static const FName LogName = FName(TEXT("RuleRanger"));
+const FName RuleRangerMessageLogName = FName(TEXT("RuleRanger"));
 
 void FRuleRangerModule::StartupModule()
 {
@@ -32,7 +32,7 @@ void FRuleRangerModule::StartupModule()
     InitOptions.bShowPages = true;
     InitOptions.bAllowClear = true;
     InitOptions.bShowFilters = true;
-    MessageLogModule.RegisterLogListing(LogName,
+    MessageLogModule.RegisterLogListing(RuleRangerMessageLogName,
                                         NSLOCTEXT("RuleRanger", "RuleRangerLogLabel", "Rule Ranger"),
                                         InitOptions);
 }
@@ -47,9 +47,9 @@ void FRuleRangerModule::ShutdownModule()
     if (FModuleManager::Get().IsModuleLoaded(MessageLogModuleName))
     {
         FMessageLogModule& MessageLogModule = FModuleManager::GetModuleChecked<FMessageLogModule>(MessageLogModuleName);
-        if (MessageLogModule.IsRegisteredLogListing(LogName))
+        if (MessageLogModule.IsRegisteredLogListing(RuleRangerMessageLogName))
         {
-            MessageLogModule.UnregisterLogListing(LogName);
+            MessageLogModule.UnregisterLogListing(RuleRangerMessageLogName);
         }
     }
 }

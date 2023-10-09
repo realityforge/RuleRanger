@@ -25,9 +25,9 @@ public class RuleRanger : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new[]
 			{
-				"CoreUObject", "DeveloperSettings", "EditorSubsystem", "Engine", "Slate", "SlateCore", "UnrealEd"
+				"CoreUObject", "DataValidation", "DeveloperSettings", "EditorSubsystem", "Engine", "Slate", "SlateCore", "UnrealEd"
 			});
 		PrivateIncludePathModuleNames.AddRange(new[] { "MessageLog" });
 		DynamicallyLoadedModuleNames.AddRange(new string[] { });
 	}
-}
+}

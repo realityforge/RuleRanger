@@ -30,6 +30,10 @@ void UImportActionContext::ResetContext(UObject* InObject, const ERuleRangerActi
     Object = InObject;
     ActionTrigger = InActionTrigger;
     ActionState = ERuleRangerActionState::AS_Success;
+    InfoMessages.Reset();
+    WarningMessages.Reset();
+    ErrorMessages.Reset();
+    FatalMessages.Reset();
 }
 
 void UImportActionContext::Info(const FText& InMessage)

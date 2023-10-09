@@ -82,6 +82,10 @@ private:
                       RequiredAssetDataTags = "RowStructure=/Script/RuleRanger.NameConvention"))
     UDataTable* NameConventionsTable{ nullptr };
 
+    /** Should the action issue a message log when it attempts to process an object that has no naming convention? */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn, AllowPrivateAccess))
+    bool bNotifyIfNameConventionMissing;
+
     /** Cache for looking up rules. */
     TMap<TObjectPtr<UClass>, TArray<FNameConvention>> NameConventionsMap;
 
@@ -96,6 +100,8 @@ private:
 
     /** Method to build cache if necessary. */
     void RebuildNameConventionsCacheIfNecessary();
+
+    static bool RenameAsset(UObject* Object, const FString& NewName);
 
     static void CollectTypeHierarchy(const UObject* Object, TArray<UClass*>& Classes);
 };

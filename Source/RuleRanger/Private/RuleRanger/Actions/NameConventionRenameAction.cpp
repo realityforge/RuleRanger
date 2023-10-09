@@ -13,71 +13,109 @@
  */
 
 #include "RuleRanger/Actions/NameConventionRenameAction.h"
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetToolsModule.h"
 #include "Editor.h"
 #include "Misc/UObjectToken.h"
 #include "RuleRangerLogging.h"
 #include "Subsystems/EditorAssetSubsystem.h"
 
+static const FName AssetToolsModuleName("AssetTools");
+
 void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRangerActionContext>& ActionContext,
                                                        UObject* Object)
 {
-    if (IsValid(Object) && IsValid(NameConventionsTable))
+    if (IsValid(Object))
     {
-        RebuildNameConventionsCacheIfNecessary();
-
-        if (!NameConventionsMap.IsEmpty())
+        if (IsValid(NameConventionsTable))
         {
-            const auto Subsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>();
-            const auto Variant = Subsystem ? Subsystem->GetMetadataTag(Object, FName("RuleRanger.Variant")) : TEXT("");
+            RebuildNameConventionsCacheIfNecessary();
 
-            TArray<UClass*> Classes;
-            CollectTypeHierarchy(Object, Classes);
-            for (auto Class : Classes)
+            if (!NameConventionsMap.IsEmpty())
             {
-                UE_LOG(RuleRanger,
-                       VeryVerbose,
-                       TEXT("NameConventionRenameAction: Looking for NamingConvention rules for class %s"),
-                       *Class->GetName());
-                if (TArray<FNameConvention>* NameConventions = NameConventionsMap.Find(Class))
+                const auto Subsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>();
+                const auto Variant =
+                    Subsystem ? Subsystem->GetMetadataTag(Object, FName("RuleRanger.Variant")) : TEXT("");
+
+                const FString OriginalName{ Object->GetName() };
+
+                TArray<UClass*> Classes;
+                CollectTypeHierarchy(Object, Classes);
+                for (auto Class : Classes)
                 {
                     UE_LOG(RuleRanger,
                            VeryVerbose,
-                           TEXT("NameConventionRenameAction: Found NamingConvention %d rules for %s"),
-                           NameConventions->Num(),
+                           TEXT("NameConventionRenameAction: Looking for NamingConvention rules for class %s"),
                            *Class->GetName());
-                    for (int i = 0; i < NameConventions->Num(); i++)
+                    if (TArray<FNameConvention>* NameConventions = NameConventionsMap.Find(Class))
                     {
-                        const FNameConvention& NameConvention = (*NameConventions)[i];
-                        if (NameConvention.Variant.Equals(Variant)
-                            || NameConvention.Variant.Equals(NameConvention_DefaultVariant))
+                        UE_LOG(RuleRanger,
+                               VeryVerbose,
+                               TEXT("NameConventionRenameAction: Found NamingConvention %d rules for %s"),
+                               NameConventions->Num(),
+                               *Class->GetName());
+                        for (int i = 0; i < NameConventions->Num(); i++)
                         {
-                            const FString OriginalName{ Object->GetName() };
-                            FString NewName{ OriginalName };
-                            if (!NameConvention.Prefix.IsEmpty() && !NewName.StartsWith(NameConvention.Prefix))
+                            const FNameConvention& NameConvention = (*NameConventions)[i];
+                            if (NameConvention.Variant.Equals(Variant)
+                                || NameConvention.Variant.Equals(NameConvention_DefaultVariant))
                             {
-                                NewName.InsertAt(0, NameConvention.Prefix);
-                            }
-                            if (!NameConvention.Suffix.IsEmpty() && !NewName.EndsWith(NameConvention.Suffix))
-                            {
-                                NewName.Append(NameConvention.Suffix);
-                            }
-                            if (!Object->Rename(*NewName))
-                            {
-                                FText InMessage =
-                                    FText::Format(NSLOCTEXT("RuleRanger",
-                                                            "RenameFailed",
-                                                            "Attempt to rename object '{0}' to '{1}' failed."),
-                                                  FText::FromString(*OriginalName),
-                                                  FText::FromString(*NewName));
-                                FMessageLog(RuleRangerMessageLogName)
-                                    .Error()
-                                    ->AddToken(FUObjectToken::Create(Object))
-                                    ->AddToken(FTextToken::Create(InMessage));
+                                FString NewName{ OriginalName };
+                                if (!NameConvention.Prefix.IsEmpty() && !NewName.StartsWith(NameConvention.Prefix))
+                                {
+                                    NewName.InsertAt(0, NameConvention.Prefix);
+                                }
+                                if (!NameConvention.Suffix.IsEmpty() && !NewName.EndsWith(NameConvention.Suffix))
+                                {
+                                    NewName.Append(NameConvention.Suffix);
+                                }
+                                if (!RenameAsset(Object, NewName))
+                                {
+                                    const auto InMessage =
+                                        FText::Format(NSLOCTEXT("RuleRanger",
+                                                                "RenameFailed",
+                                                                "Attempt to rename object '{0}' to '{1}' failed."),
+                                                      FText::FromString(*OriginalName),
+                                                      FText::FromString(*NewName));
+                                    FMessageLog(RuleRangerMessageLogName)
+                                        .Error()
+                                        ->AddToken(FUObjectToken::Create(Object))
+                                        ->AddToken(FTextToken::Create(InMessage));
+                                }
+                                return;
                             }
                         }
                     }
+                    if (bNotifyIfNameConventionMissing)
+                    {
+                        const auto InMessage = FText::Format(NSLOCTEXT("RuleRanger",
+                                                                       "NameConventionMissing",
+                                                                       "Unable to locate Naming Convention for "
+                                                                       "object '{0}' of type '{1}' in '{2}'."),
+                                                             FText::FromString(*OriginalName),
+                                                             FText::FromString(*Object->GetClass()->GetName()),
+                                                             FText::FromString(*NameConventionsTable->GetName()));
+                        FMessageLog(RuleRangerMessageLogName)
+                            .Info()
+                            ->AddToken(FUObjectToken::Create(Object))
+                            ->AddToken(FTextToken::Create(InMessage));
+                    }
+                    else
+                    {
+                        UE_LOG(RuleRanger,
+                               Verbose,
+                               TEXT("NameConventionRenameAction: Failed to find NamingConvention rules for class %s"),
+                               *Class->GetName());
+                    }
                 }
             }
+        }
+        else
+        {
+            UE_LOG(RuleRanger,
+                   Error,
+                   TEXT("NameConventionRenameAction: Action has not specified "
+                        "NameConventionsTable property and will not be applied as a result."));
         }
     }
 }
@@ -141,6 +179,26 @@ void UNameConventionRenameAction::RebuildNameConventionsCacheIfNecessary()
                    NameConventionEntry.Value.Num());
         }
     }
+}
+
+bool UNameConventionRenameAction::RenameAsset(UObject* Object, const FString& NewName)
+{
+    const auto PathName = Object->GetPathName();
+    const auto PackagePath = FPackageName::GetLongPackagePath(Object->GetOutermost()->GetName());
+
+    TArray<FAssetRenameData> AssetsAndNames;
+    AssetsAndNames.Add(FAssetRenameData(Object, PackagePath, NewName));
+
+    const bool bSuccess =
+        FModuleManager::LoadModuleChecked<FAssetToolsModule>(AssetToolsModuleName).Get().RenameAssets(AssetsAndNames);
+
+    // Notify asset registry of rename .. if required
+    FAssetRegistryModule::AssetRenamed(Object, PathName);
+
+    // This should not be called during loads of object so neither of these functions should return false
+    ensure(Object->MarkPackageDirty());
+    ensure(Object->GetOuter()->MarkPackageDirty());
+    return bSuccess;
 }
 
 void UNameConventionRenameAction::CollectTypeHierarchy(const UObject* Object, TArray<UClass*>& Classes)

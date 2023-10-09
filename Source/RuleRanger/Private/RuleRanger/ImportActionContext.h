@@ -36,6 +36,8 @@ public:
 
     void ResetContext(UObject* InObject, ERuleRangerActionTrigger InActionTrigger);
 
+    void EmitMessageLogs();
+
 private:
     /** The object that the associated action is acting upon. */
     UPROPERTY(VisibleAnywhere)

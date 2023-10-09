@@ -13,6 +13,8 @@
  */
 
 #include "ImportActionContext.h"
+#include "Misc/UObjectToken.h"
+#include "RuleRangerLogging.h"
 
 ERuleRangerActionState UImportActionContext::GetState()
 {
@@ -34,6 +36,38 @@ void UImportActionContext::ResetContext(UObject* InObject, const ERuleRangerActi
     WarningMessages.Reset();
     ErrorMessages.Reset();
     FatalMessages.Reset();
+}
+
+void UImportActionContext::EmitMessageLogs()
+{
+    for (int i = 0; i < InfoMessages.Num(); i++)
+    {
+        FMessageLog(RuleRangerMessageLogName)
+            .Info()
+            ->AddToken(FUObjectToken::Create(Object))
+            ->AddToken(FTextToken::Create(InfoMessages[i]));
+    }
+    for (int i = 0; i < WarningMessages.Num(); i++)
+    {
+        FMessageLog(RuleRangerMessageLogName)
+            .Warning()
+            ->AddToken(FUObjectToken::Create(Object))
+            ->AddToken(FTextToken::Create(WarningMessages[i]));
+    }
+    for (int i = 0; i < ErrorMessages.Num(); i++)
+    {
+        FMessageLog(RuleRangerMessageLogName)
+            .Error()
+            ->AddToken(FUObjectToken::Create(Object))
+            ->AddToken(FTextToken::Create(ErrorMessages[i]));
+    }
+    for (int i = 0; i < FatalMessages.Num(); i++)
+    {
+        FMessageLog(RuleRangerMessageLogName)
+            .Error()
+            ->AddToken(FUObjectToken::Create(Object))
+            ->AddToken(FTextToken::Create(FatalMessages[i]));
+    }
 }
 
 void UImportActionContext::Info(const FText& InMessage)

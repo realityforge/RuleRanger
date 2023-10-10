@@ -86,27 +86,29 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                             }
                         }
                     }
-                    if (bNotifyIfNameConventionMissing)
-                    {
-                        const auto InMessage = FText::Format(NSLOCTEXT("RuleRanger",
-                                                                       "NameConventionMissing",
-                                                                       "Unable to locate Naming Convention for "
-                                                                       "object '{0}' of type '{1}' in '{2}'."),
-                                                             FText::FromString(*OriginalName),
-                                                             FText::FromString(*Object->GetClass()->GetName()),
-                                                             FText::FromString(*NameConventionsTable->GetName()));
-                        FMessageLog(RuleRangerMessageLogName)
-                            .Info()
-                            ->AddToken(FUObjectToken::Create(Object))
-                            ->AddToken(FTextToken::Create(InMessage));
-                    }
-                    else
-                    {
-                        UE_LOG(RuleRanger,
-                               Verbose,
-                               TEXT("NameConventionRenameAction: Failed to find NamingConvention rules for class %s"),
-                               *Class->GetName());
-                    }
+                }
+                if (bNotifyIfNameConventionMissing)
+                {
+                    FMessageLog(RuleRangerMessageLogName)
+                        .Warning()
+                        ->AddToken(FTextToken::Create(NSLOCTEXT("RuleRanger",
+                                                                "MissingNamingConvention",
+                                                                "Unable to locate Naming Convention for ")))
+                        ->AddToken(FUObjectToken::Create(Object))
+                        ->AddToken(FTextToken::Create(NSLOCTEXT("RuleRanger", "OfType", " of type ")))
+                        ->AddToken(FUObjectToken::Create(Object->GetClass()))
+                        ->AddToken(FTextToken::Create(NSLOCTEXT("RuleRanger", "In", " in ")))
+                        ->AddToken(FUObjectToken::Create(NameConventionsTable));
+                }
+                else
+                {
+                    UE_LOG(RuleRanger,
+                           Verbose,
+                           TEXT("NameConventionRenameAction: Unable to locate Naming Convention for "
+                                "object '%s' of type '%s' in '%s'."),
+                           *OriginalName,
+                           *Object->GetClass()->GetName(),
+                           *NameConventionsTable->GetName());
                 }
             }
         }

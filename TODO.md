@@ -5,7 +5,7 @@ Shorthand notes of where to go next with this experiment:
 * Create Matcher to match against the asset name, asset path using a string contains, regex and either case sensitive or insensitively
 * Add a `SourcePathName` matcher (See importerRules plugin for inspiration)
 * Create an Action that sets MetaData value
-* Remove Importer RUles plugin
+* Remove Importer Rules plugin
 * Replace all the different ruby variants accomplishing the same behaviour
 * Add support for running as validator. (Rules just check and don't rename etc?)
 * Add an action that sets Variant metadata after analyzing various file types:

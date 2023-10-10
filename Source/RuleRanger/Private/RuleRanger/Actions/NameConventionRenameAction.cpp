@@ -69,18 +69,29 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                                 {
                                     NewName.Append(NameConvention.Suffix);
                                 }
-                                if (!RenameAsset(Object, NewName))
+                                if (NewName.Equals(OriginalName))
                                 {
-                                    const auto InMessage =
-                                        FText::Format(NSLOCTEXT("RuleRanger",
-                                                                "RenameFailed",
-                                                                "Attempt to rename object '{0}' to '{1}' failed."),
-                                                      FText::FromString(*OriginalName),
-                                                      FText::FromString(*NewName));
-                                    FMessageLog(RuleRangerMessageLogName)
-                                        .Error()
-                                        ->AddToken(FUObjectToken::Create(Object))
-                                        ->AddToken(FTextToken::Create(InMessage));
+                                    UE_LOG(RuleRanger,
+                                           Verbose,
+                                           TEXT("NameConventionRenameAction: Object %s matches naming convention. "
+                                                "No action required."),
+                                           *Object->GetName());
+                                }
+                                else
+                                {
+                                    if (!RenameAsset(Object, NewName))
+                                    {
+                                        const auto InMessage =
+                                            FText::Format(NSLOCTEXT("RuleRanger",
+                                                                    "RenameFailed",
+                                                                    "Attempt to rename object '{0}' to '{1}' failed."),
+                                                          FText::FromString(*OriginalName),
+                                                          FText::FromString(*NewName));
+                                        FMessageLog(RuleRangerMessageLogName)
+                                            .Error()
+                                            ->AddToken(FUObjectToken::Create(Object))
+                                            ->AddToken(FTextToken::Create(InMessage));
+                                    }
                                 }
                                 return;
                             }

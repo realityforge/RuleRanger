@@ -19,9 +19,9 @@ bool UMetadataTagMatcher::Test_Implementation(UObject* Object)
 {
     if (Key != NAME_None && IsValid(Object))
     {
-        if (const auto EditorAssetSubsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>())
+        if (const auto Subsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>())
         {
-            return EditorAssetSubsystem->GetMetadataTag(Object, Key) == Value;
+            return Subsystem->GetMetadataTag(Object, Key) == Value;
         }
     }
     return false;

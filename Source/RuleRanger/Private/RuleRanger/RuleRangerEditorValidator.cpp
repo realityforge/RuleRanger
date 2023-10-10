@@ -34,28 +34,38 @@ bool URuleRangerEditorValidator::CanValidateAsset_Implementation(UObject* InAsse
            DeveloperSettings->Rules.Num());
     for (auto RuleSetIt = DeveloperSettings->Rules.CreateIterator(); RuleSetIt; ++RuleSetIt)
     {
-        const auto RuleSet = RuleSetIt->LoadSynchronous();
-        if (const auto Path = InAsset->GetPathName(); Path.StartsWith(RuleSet->Dir.Path))
+        if (const auto RuleSet = RuleSetIt->LoadSynchronous())
         {
-            UE_LOG(RuleRanger,
-                   Verbose,
-                   TEXT("CanValidateAsset(%s) processing Rule Set %s"),
-                   *InAsset->GetName(),
-                   *RuleSet->GetName());
-            for (const auto RulePtr : RuleSet->Rules)
+            if (const auto Path = InAsset->GetPathName(); Path.StartsWith(RuleSet->Dir.Path))
             {
-                // ReSharper disable once CppTooWideScopeInitStatement
-                const auto Rule = RulePtr.Get();
-                if (Rule->bApplyOnValidate)
+                UE_LOG(RuleRanger,
+                       Verbose,
+                       TEXT("CanValidateAsset(%s) processing Rule Set %s"),
+                       *InAsset->GetName(),
+                       *RuleSet->GetName());
+                for (const auto RulePtr : RuleSet->Rules)
                 {
-                    UE_LOG(RuleRanger,
-                           Verbose,
-                           TEXT("CanValidateAsset(%s) detectedapplicable rule %s."),
-                           *InAsset->GetName(),
-                           *Rule->GetName());
-                    return true;
+                    // ReSharper disable once CppTooWideScopeInitStatement
+                    const auto Rule = RulePtr.Get();
+                    if (Rule->bApplyOnValidate)
+                    {
+                        UE_LOG(RuleRanger,
+                               Verbose,
+                               TEXT("CanValidateAsset(%s) detected applicable rule %s."),
+                               *InAsset->GetName(),
+                               *Rule->GetName());
+                        return true;
+                    }
                 }
             }
+        }
+        else
+        {
+            UE_LOG(RuleRanger,
+                   Error,
+                   TEXT("CanValidateAsset(%s) failed to load rule set %s."),
+                   *InAsset->GetName(),
+                   *RuleSetIt->GetAssetName());
         }
     }
     // If we get here there is no rules that apply to the asset
@@ -101,7 +111,7 @@ EDataValidationResult URuleRangerEditorValidator::ValidateLoadedAsset_Implementa
                                TEXT("OnAssetValidate(%s) detected applicable rule %s."),
                                *InAsset->GetName(),
                                *Rule->GetName());
-                        
+
                         ActionContext->ResetContext(InAsset, ERuleRangerActionTrigger::AT_Validate);
 
                         TScriptInterface<IRuleRangerActionContext> ScriptInterfaceActionContext(ActionContext);

@@ -21,6 +21,9 @@
 
 inline static FString NameConvention_DefaultVariant{ TEXT("") };
 
+/**
+ * The structure defining naming conventions for different asset types.
+ */
 USTRUCT(BlueprintType)
 struct FNameConvention : public FTableRowBase
 {
@@ -55,7 +58,8 @@ struct FNameConvention : public FTableRowBase
 };
 
 /**
- *
+ * Action to rename assets according to naming convention specified in a DataTable.
+ * The action may optionally issue warnings if applied to an asset that has no NamingConvention specified.
  */
 UCLASS(AutoExpandCategories = ("Rule Ranger"),
        Blueprintable,
@@ -101,7 +105,13 @@ private:
     /** Method to build cache if necessary. */
     void RebuildNameConventionsCacheIfNecessary();
 
+    /** Actual method to perform the rename of an asset. */
     static bool RenameAsset(UObject* Object, const FString& NewName);
 
+    /**
+     * Add the types of an object into a class, starting with the most specific and moving to least specific at the end
+     * of the list. "Alternative" type hierarchies such as via Blueprint type system are also incorporated into the
+     * list.
+     */
     static void CollectTypeHierarchy(const UObject* Object, TArray<UClass*>& Classes);
 };

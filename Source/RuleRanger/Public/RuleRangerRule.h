@@ -73,15 +73,6 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default", meta = (ExposeOnSpawn))
     int32 Priority{ 1000 };
 
-    /**
-     * The names of the object types that this rule is applied to.
-     *
-     * This is primarily used as an optimisation strategy so that rules can be indexed by object type.
-     * If we did not need this optimisation then we could just add a matcher that matches an object type.
-     */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn))
-    TArray<TSubclassOf<UObject>> ObjectTypes;
-
     /** The matchers that an object MUST match before this rule is applied. */
     UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn, E))
     TArray<TObjectPtr<URuleRangerMatcher>> Matchers;

@@ -94,8 +94,10 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
                         const ERuleRangerActionTrigger Trigger =
                             bIsReimport ? ERuleRangerActionTrigger::AT_Reimport : ERuleRangerActionTrigger::AT_Import;
                         ActionContext->ResetContext(Object, Trigger);
+
                         TScriptInterface<IRuleRangerActionContext> ScriptInterfaceActionContext(ActionContext);
                         Rule->Apply(ScriptInterfaceActionContext, Object);
+
                         ActionContext->EmitMessageLogs();
                         const auto State = ActionContext->GetState();
                         if (ERuleRangerActionState::AS_Fatal == State)

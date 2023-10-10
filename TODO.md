@@ -48,3 +48,4 @@ Shorthand notes of where to go next with this experiment:
   * Packed: Use texture type in RGBA order. e.g., ARMH (Ambient Occlusion, Roughness, Metallic, Height)
 * Add rules for "Level (World Partition)" => prefix: `L_`, suffix: `_WP`
 * Add rules for "Data Asset" => prefix: `DA*_`, Prefix should be based on sub-class type
+* Add ability to add skip rules for assets in a user friendly way without changing RuleSet assets.

@@ -35,15 +35,36 @@ void USetMetadataTagsAction::Apply_Implementation(TScriptInterface<IRuleRangerAc
                 }
                 else if (MetadataTag.Value.IsEmpty())
                 {
-                    UE_LOG(
-                        RuleRanger,
-                        Error,
-                        TEXT("SetMetadataTagsAction: Empty value specified when attempting to add MetadataTag to %s"),
-                        *Object->GetName());
+                    UE_LOG(RuleRanger,
+                           Error,
+                           TEXT("SetMetadataTagsAction: Empty value specified when attempting to "
+                                "add MetadataTag to %s"),
+                           *Object->GetName());
                 }
                 else
                 {
-                    Subsystem->SetMetadataTag(Object, MetadataTag.Key, MetadataTag.Value);
+                    FString ExistingValue = Subsystem->GetMetadataTag(Object, MetadataTag.Key);
+                    if (ExistingValue.Equals(MetadataTag.Value))
+                    {
+                        UE_LOG(RuleRanger,
+                               Verbose,
+                               TEXT("SetMetadataTagsAction: MetaDataTag %s=%s already exists on %s. "
+                                    "No action required."),
+                               *MetadataTag.Key.ToString(),
+                               *MetadataTag.Value,
+                               *Object->GetName());
+                    }
+                    else
+                    {
+                        UE_LOG(RuleRanger,
+                               Verbose,
+                               TEXT("SetMetadataTagsAction: MetaDataTag %s=%s not present on %s. "
+                                    "Adding."),
+                               *MetadataTag.Key.ToString(),
+                               *MetadataTag.Value,
+                               *Object->GetName());
+                        Subsystem->SetMetadataTag(Object, MetadataTag.Key, MetadataTag.Value);
+                    }
                 }
             }
         }

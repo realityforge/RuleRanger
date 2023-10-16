@@ -28,8 +28,9 @@ ERuleRangerActionTrigger UImportActionContext::GetActionTrigger()
 
 bool UImportActionContext::IsDryRun()
 {
-    return ERuleRangerActionTrigger::AT_Save == ActionTrigger || ERuleRangerActionTrigger::AT_Import == ActionTrigger
-        || ERuleRangerActionTrigger::AT_Reimport == ActionTrigger || ERuleRangerActionTrigger::AT_Fix == ActionTrigger;
+    return !(ERuleRangerActionTrigger::AT_Save == ActionTrigger || ERuleRangerActionTrigger::AT_Import == ActionTrigger
+             || ERuleRangerActionTrigger::AT_Reimport == ActionTrigger
+             || ERuleRangerActionTrigger::AT_Fix == ActionTrigger);
 }
 
 void UImportActionContext::ResetContext(UObject* InObject, const ERuleRangerActionTrigger InActionTrigger)

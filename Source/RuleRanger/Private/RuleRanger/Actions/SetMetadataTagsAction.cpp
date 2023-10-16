@@ -68,7 +68,7 @@ void USetMetadataTagsAction::Apply_Implementation(TScriptInterface<IRuleRangerAc
                                     "MetaData tag {Key}={Value} is not present and would add if not in DryRun mode."),
                                 Arguments);
 
-                            ActionContext->Info(Message);
+                            ActionContext->Warning(Message);
                         }
                         else
                         {

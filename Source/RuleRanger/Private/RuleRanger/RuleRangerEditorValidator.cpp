@@ -23,8 +23,40 @@ URuleRangerEditorValidator::URuleRangerEditorValidator()
     bIsEnabled = true;
 }
 
+// Cached value ... assuming this is valid and that CanValidateAsset is only invoked after
+// CanValidate invoked and there is only one instance ... so maybe this horrible hack is ok?
+static EDataValidationUsecase DataValidationUsecase{ EDataValidationUsecase::None };
+
+static FString DescribeDataValidationUsecase(const EDataValidationUsecase InDataValidationUsecase)
+{
+    switch (InDataValidationUsecase)
+    {
+        case EDataValidationUsecase::None:
+            return TEXT("None");
+        case EDataValidationUsecase::Manual:
+            return TEXT("Manual");
+        case EDataValidationUsecase::Commandlet:
+            return TEXT("Commandlet");
+        case EDataValidationUsecase::Save:
+            return TEXT("Save");
+        case EDataValidationUsecase::PreSubmit:
+            return TEXT("PreSubmit");
+        case EDataValidationUsecase::Script:
+        default:
+            return TEXT("Script");
+    }
+}
+
+bool URuleRangerEditorValidator::CanValidate_Implementation(const EDataValidationUsecase InUsecase) const
+{
+    UE_LOG(RuleRanger, Verbose, TEXT("CanValidate(%s)"), *DescribeDataValidationUsecase(InUsecase));
+    DataValidationUsecase = InUsecase;
+    return true;
+}
+
 bool URuleRangerEditorValidator::CanValidateAsset_Implementation(UObject* InAsset) const
 {
+    const bool IsSave = EDataValidationUsecase::Save == DataValidationUsecase;
     const auto DeveloperSettings = GetMutableDefault<URuleRangerDeveloperSettings>();
     check(IsValid(DeveloperSettings));
     UE_LOG(RuleRanger,
@@ -47,13 +79,24 @@ bool URuleRangerEditorValidator::CanValidateAsset_Implementation(UObject* InAsse
                 {
                     // ReSharper disable once CppTooWideScopeInitStatement
                     const auto Rule = RulePtr.Get();
-                    if (Rule->bApplyOnValidate)
+                    if (!IsSave && Rule->bApplyOnValidate)
                     {
                         UE_LOG(RuleRanger,
                                Verbose,
-                               TEXT("CanValidateAsset(%s) detected applicable rule %s."),
+                               TEXT("CanValidateAsset(%s) detected applicable rule %s in usecase %s."),
                                *InAsset->GetName(),
-                               *Rule->GetName());
+                               *Rule->GetName(),
+                               *DescribeDataValidationUsecase(DataValidationUsecase));
+                        return true;
+                    }
+                    else if (IsSave && Rule->bApplyOnSave)
+                    {
+                        UE_LOG(RuleRanger,
+                               Verbose,
+                               TEXT("CanValidateAsset(%s) detected applicable rule %s in usecase %s."),
+                               *InAsset->GetName(),
+                               *Rule->GetName(),
+                               *DescribeDataValidationUsecase(DataValidationUsecase));
                         return true;
                     }
                 }
@@ -83,6 +126,7 @@ EDataValidationResult URuleRangerEditorValidator::ValidateLoadedAsset_Implementa
             ActionContext = NewObject<UImportActionContext>(this, UImportActionContext::StaticClass());
         }
 
+        const bool IsSave = EDataValidationUsecase::Save == DataValidationUsecase;
         const auto DeveloperSettings = GetMutableDefault<URuleRangerDeveloperSettings>();
         check(IsValid(DeveloperSettings));
         UE_LOG(RuleRanger,
@@ -104,7 +148,7 @@ EDataValidationResult URuleRangerEditorValidator::ValidateLoadedAsset_Implementa
                 {
                     // ReSharper disable once CppTooWideScopeInitStatement
                     const auto Rule = RulePtr.Get();
-                    if (Rule->bApplyOnValidate)
+                    if ((!IsSave && Rule->bApplyOnValidate) || (IsSave && Rule->bApplyOnSave))
                     {
                         UE_LOG(RuleRanger,
                                Verbose,
@@ -112,7 +156,9 @@ EDataValidationResult URuleRangerEditorValidator::ValidateLoadedAsset_Implementa
                                *InAsset->GetName(),
                                *Rule->GetName());
 
-                        ActionContext->ResetContext(InAsset, ERuleRangerActionTrigger::AT_Validate);
+                        ActionContext->ResetContext(InAsset,
+                                                    IsSave ? ERuleRangerActionTrigger::AT_Save
+                                                           : ERuleRangerActionTrigger::AT_Validate);
 
                         TScriptInterface<IRuleRangerActionContext> ScriptInterfaceActionContext(ActionContext);
                         Rule->Apply(ScriptInterfaceActionContext, InAsset);

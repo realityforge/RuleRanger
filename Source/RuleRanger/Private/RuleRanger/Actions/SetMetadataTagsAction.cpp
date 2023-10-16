@@ -56,14 +56,31 @@ void USetMetadataTagsAction::Apply_Implementation(TScriptInterface<IRuleRangerAc
                     }
                     else
                     {
-                        UE_LOG(RuleRanger,
-                               Verbose,
-                               TEXT("SetMetadataTagsAction: MetaDataTag %s=%s not present on %s. "
-                                    "Adding."),
-                               *MetadataTag.Key.ToString(),
-                               *MetadataTag.Value,
-                               *Object->GetName());
-                        Subsystem->SetMetadataTag(Object, MetadataTag.Key, MetadataTag.Value);
+                        if (ActionContext->IsDryRun())
+                        {
+                            FFormatNamedArguments Arguments;
+                            Arguments.Add(TEXT("Key"), FText::FromString(MetadataTag.Key.ToString()));
+                            Arguments.Add(TEXT("Value"), FText::FromString(MetadataTag.Value));
+                            const FText Message = FText::Format(
+                                NSLOCTEXT(
+                                    "RuleRanger",
+                                    "RuleRangerMissingMetaDataTag",
+                                    "MetaData tag {Key}={Value} is not present and would add if not in DryRun mode."),
+                                Arguments);
+
+                            ActionContext->Info(Message);
+                        }
+                        else
+                        {
+                            UE_LOG(RuleRanger,
+                                   Verbose,
+                                   TEXT("SetMetadataTagsAction: MetaDataTag %s=%s is not present on %s. "
+                                        "Adding."),
+                                   *MetadataTag.Key.ToString(),
+                                   *MetadataTag.Value,
+                                   *Object->GetName());
+                            Subsystem->SetMetadataTag(Object, MetadataTag.Key, MetadataTag.Value);
+                        }
                     }
                 }
             }

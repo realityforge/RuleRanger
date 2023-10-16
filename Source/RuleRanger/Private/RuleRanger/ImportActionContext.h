@@ -29,6 +29,7 @@ class RULERANGER_API UImportActionContext : public UObject, public IRuleRangerAc
 public:
     virtual ERuleRangerActionState GetState() override;
     virtual ERuleRangerActionTrigger GetActionTrigger() override;
+    virtual bool IsDryRun() override;
     virtual void Info(const FText& InMessage) override;
     virtual void Warning(const FText& InMessage) override;
     virtual void Error(const FText& InMessage) override;

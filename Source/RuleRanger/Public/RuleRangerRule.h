@@ -55,6 +55,12 @@ public:
     bool bApplyOnValidate{ true };
 
     /**
+     * True to apply this rule when the asset is validated.
+     */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default", meta = (ExposeOnSpawn))
+    bool bApplyOnSave{ true };
+
+    /**
      * True to apply this rule when explicitly requested from the editor UI.
      */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default", meta = (ExposeOnSpawn))

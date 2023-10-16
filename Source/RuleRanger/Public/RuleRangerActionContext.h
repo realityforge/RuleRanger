@@ -26,8 +26,12 @@ enum class ERuleRangerActionTrigger : uint8
     AT_Reimport UMETA(DisplayName = "ReImport"),
     /** The action was invoked as a result of a validate. */
     AT_Validate UMETA(DisplayName = "Validate"),
-    /** The action was invoked as an explicit action from a user. */
-    AT_Explicit UMETA(DisplayName = "Explicit"),
+    /** The action was invoked as a result of a validate. */
+    AT_Save UMETA(DisplayName = "Save"),
+    /** The action was invoked as an explicit "report" action from a user. */
+    AT_Report UMETA(DisplayName = "Report"),
+    /** The action was invoked as an explicit "fix" action from a user. */
+    AT_Fix UMETA(DisplayName = "Fix"),
 
     AT_Max UMETA(Hidden)
 };
@@ -78,6 +82,15 @@ public:
     virtual ERuleRangerActionTrigger GetActionTrigger() = 0;
 
     /**
+     * Return true if this action is a "Dry" run and should just issue warnings on non-compliance
+     * and info on action that would take to fix compliance.
+     *
+     * @return true if the action should be a dry run.
+     */
+    UFUNCTION(BlueprintCallable)
+    virtual bool IsDryRun() = 0;
+
+    /**
      * Generate an informational message from action.
      *
      * @param InMessage the message.
@@ -108,7 +121,4 @@ public:
      */
     UFUNCTION(BlueprintCallable)
     virtual void Fatal(const FText& InMessage) = 0;
-
-    // TODO: Also some processes we want to provide "linting" and just generate warnings
-    // while in some scenarios we want to auto-apply fixes.
 };

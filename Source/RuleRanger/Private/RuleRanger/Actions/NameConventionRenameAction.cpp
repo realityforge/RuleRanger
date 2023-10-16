@@ -79,18 +79,35 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                                 }
                                 else
                                 {
-                                    if (!RenameAsset(Object, NewName))
+                                    if (ActionContext->IsDryRun())
                                     {
-                                        const auto InMessage =
-                                            FText::Format(NSLOCTEXT("RuleRanger",
-                                                                    "RenameFailed",
-                                                                    "Attempt to rename object '{0}' to '{1}' failed."),
-                                                          FText::FromString(*OriginalName),
-                                                          FText::FromString(*NewName));
-                                        FMessageLog(RuleRangerMessageLogName)
-                                            .Error()
-                                            ->AddToken(FUObjectToken::Create(Object))
-                                            ->AddToken(FTextToken::Create(InMessage));
+                                        FFormatNamedArguments Arguments;
+                                        Arguments.Add(TEXT("OriginalName"), FText::FromString(OriginalName));
+                                        Arguments.Add(TEXT("NewName"), FText::FromString(NewName));
+                                        const FText Message = FText::Format(
+                                            NSLOCTEXT(
+                                                "RuleRanger",
+                                                "RuleRangerRenameAction",
+                                                "Asset needs to be renamed from '{OriginalName}' to '{NewName}'. Action skipped in DryRun mode"),
+                                            Arguments);
+
+                                        ActionContext->Warning(Message);
+                                    }
+                                    else
+                                    {
+                                        if (!RenameAsset(Object, NewName))
+                                        {
+                                            const auto InMessage = FText::Format(
+                                                NSLOCTEXT("RuleRanger",
+                                                          "RenameFailed",
+                                                          "Attempt to rename object '{0}' to '{1}' failed."),
+                                                FText::FromString(OriginalName),
+                                                FText::FromString(NewName));
+                                            FMessageLog(RuleRangerMessageLogName)
+                                                .Error()
+                                                ->AddToken(FUObjectToken::Create(Object))
+                                                ->AddToken(FTextToken::Create(InMessage));
+                                        }
                                     }
                                 }
                                 return;

@@ -3,11 +3,7 @@
 Shorthand notes of where to go next with this experiment:
 
 * Create Matcher to match against the asset name, asset path using a string contains, regex and either case sensitive or insensitively
-* Add a `SourcePathName` matcher (See importerRules plugin for inspiration)
-* Create an Action that sets MetaData value
-* Remove Importer Rules plugin
 * Replace all the different ruby variants accomplishing the same behaviour
-* Add support for running as validator. (Rules just check and don't rename etc?)
 * Add an action that sets Variant metadata after analyzing various file types:
     * Blueprint variant derivation: Look for The `Cast<UBlueprint>(Object)->BlueprintType` property. Convert 
       the `EBlueprintType` value to `RuleRanger.Variant` metadata. This should allow us to add rules:
@@ -29,7 +25,6 @@ Shorthand notes of where to go next with this experiment:
 * Use regex matcher and regex renamer action to fix `_Inst` suffix on material instances. Actually lets just add rules
   to transform "old" conventions (i.e. SK_Mannequin_PhysicsAsset -> PHYS_Mannequin, SK_Mannequin_Skeleton -> 
   SKEL_Mannequin, etc). Make sure this runs before NameConventionRename action
-* Add parameter to `NameConventionRename` so that iw will not rename - just alert (or maybe just alert during linting?)
 * Material functions that are Material Layers are prefixed with ML not MF!
 * Retargeters should be named as RTG_\[Source\]_To_\[Target\]
 * Make a rule for handling texture extensions

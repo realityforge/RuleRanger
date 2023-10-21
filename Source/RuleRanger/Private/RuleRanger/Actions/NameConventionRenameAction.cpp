@@ -56,6 +56,14 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                         for (int i = 0; i < NameConventions->Num(); i++)
                         {
                             const FNameConvention& NameConvention = (*NameConventions)[i];
+                            UE_LOG(RuleRanger,
+                                   VeryVerbose,
+                                   TEXT("NameConventionRenameAction: Attempting to match NameConvention "
+                                        "Prefix=%s, Suffix=%s, Variant=%s against asset with Variant=%s"),
+                                   *NameConvention.Prefix,
+                                   *NameConvention.Suffix,
+                                   *NameConvention.Variant,
+                                   *Variant);
                             if (NameConvention.Variant.Equals(Variant)
                                 || NameConvention.Variant.Equals(NameConvention_DefaultVariant))
                             {

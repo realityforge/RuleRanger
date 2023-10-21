@@ -104,14 +104,4 @@ private:
 
     /** Method to build cache if necessary. */
     void RebuildNameConventionsCacheIfNecessary();
-
-    /** Actual method to perform the rename of an asset. */
-    static bool RenameAsset(UObject* Object, const FString& NewName);
-
-    /**
-     * Add the types of an object into a class, starting with the most specific and moving to least specific at the end
-     * of the list. "Alternative" type hierarchies such as via Blueprint type system are also incorporated into the
-     * list.
-     */
-    static void CollectTypeHierarchy(const UObject* Object, TArray<UClass*>& Classes);
 };

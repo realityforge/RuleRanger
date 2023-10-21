@@ -17,10 +17,9 @@
 #include "AssetToolsModule.h"
 #include "Editor.h"
 #include "Misc/UObjectToken.h"
+#include "RuleRanger/RuleRangerUtilities.h"
 #include "RuleRangerLogging.h"
 #include "Subsystems/EditorAssetSubsystem.h"
-
-static const FName AssetToolsModuleName("AssetTools");
 
 void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRangerActionContext>& ActionContext,
                                                        UObject* Object)
@@ -40,7 +39,7 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                 const FString OriginalName{ Object->GetName() };
 
                 TArray<UClass*> Classes;
-                CollectTypeHierarchy(Object, Classes);
+                RuleRangerUtilities::CollectTypeHierarchy(Object, Classes);
                 for (auto Class : Classes)
                 {
                     UE_LOG(RuleRanger,
@@ -95,7 +94,7 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                                     }
                                     else
                                     {
-                                        if (!RenameAsset(Object, NewName))
+                                        if (!RuleRangerUtilities::RenameAsset(Object, NewName))
                                         {
                                             const auto InMessage = FText::Format(
                                                 NSLOCTEXT("RuleRanger",
@@ -208,48 +207,5 @@ void UNameConventionRenameAction::RebuildNameConventionsCacheIfNecessary()
                    *NameConventionEntry.Key->GetName(),
                    NameConventionEntry.Value.Num());
         }
-    }
-}
-
-bool UNameConventionRenameAction::RenameAsset(UObject* Object, const FString& NewName)
-{
-    const auto PathName = Object->GetPathName();
-    const auto PackagePath = FPackageName::GetLongPackagePath(Object->GetOutermost()->GetName());
-
-    TArray<FAssetRenameData> AssetsAndNames;
-    AssetsAndNames.Add(FAssetRenameData(Object, PackagePath, NewName));
-
-    const bool bSuccess =
-        FModuleManager::LoadModuleChecked<FAssetToolsModule>(AssetToolsModuleName).Get().RenameAssets(AssetsAndNames);
-
-    // Notify asset registry of rename .. if required
-    FAssetRegistryModule::AssetRenamed(Object, PathName);
-
-    // This should not be called during loads of object so neither of these functions should return false
-    ensure(Object->MarkPackageDirty());
-    ensure(Object->GetOuter()->MarkPackageDirty());
-    return bSuccess;
-}
-
-void UNameConventionRenameAction::CollectTypeHierarchy(const UObject* Object, TArray<UClass*>& Classes)
-{
-    bool bProcessedBlueprintHierarchy{ false };
-    UClass* Class = Object->GetClass();
-    while (Class)
-    {
-        if (!bProcessedBlueprintHierarchy && Object->IsA<UBlueprint>())
-        {
-            bProcessedBlueprintHierarchy = true;
-            // If Object is a Blueprint then we have an alternate hierarchy accessible via the ParentClass property.
-            // TODO: Assess with a similar pattern needs to be applied for other asset based class hierarchies...
-            UClass* BlueprintClass{ Cast<UBlueprint>(Object)->ParentClass };
-            while (BlueprintClass)
-            {
-                Classes.Add(BlueprintClass);
-                BlueprintClass = BlueprintClass->GetSuperClass();
-            }
-        }
-        Classes.Add(Class);
-        Class = Class->GetSuperClass();
     }
 }

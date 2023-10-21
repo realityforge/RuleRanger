@@ -40,5 +40,5 @@ protected:
 private:
     /** A flag controlling whether matching is Case Sensitive or not. */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn, AllowPrivateAccess))
-    bool bCaseSensitive;
+    bool bCaseSensitive{ false };
 };

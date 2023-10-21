@@ -2,7 +2,6 @@
 
 Shorthand notes of where to go next with this experiment:
 
-* Create Matcher to match against the asset name, asset path using a string contains, regex and either case sensitive or insensitively
 * Replace all the different ruby variants accomplishing the same behaviour
 * Add an action that sets Variant metadata after analyzing various file types:
     * Blueprint variant derivation: Look for The `Cast<UBlueprint>(Object)->BlueprintType` property. Convert 

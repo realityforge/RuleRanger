@@ -50,8 +50,8 @@ struct FNameConvention : public FTableRowBase
 
     FORCEINLINE bool operator<(const FNameConvention& Other) const
     {
-        return Variant.Equals(NameConvention_DefaultVariant)      ? true
-            : Other.Variant.Equals(NameConvention_DefaultVariant) ? false
+        return Variant.Equals(NameConvention_DefaultVariant)      ? false
+            : Other.Variant.Equals(NameConvention_DefaultVariant) ? true
             : Prefix != Other.Prefix                              ? Prefix < Other.Prefix
                                                                   : Suffix < Other.Suffix;
     }

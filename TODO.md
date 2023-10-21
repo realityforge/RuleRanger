@@ -29,3 +29,23 @@ Shorthand notes of where to go next with this experiment:
 * Add rules for "Level (World Partition)" => prefix: `L_`, suffix: `_WP`
 * Add ability to add skip rules for assets in a user friendly way without changing RuleSet assets.
 * Add a log of every action that resulted in change applied in a run
+* Add validation to check that textures are a power of two. Unreal Engine would not generate mips unless your texture resolution is a power of 2. X and Y do not have to match they just need to be power of 2. For example, 2048x2048 and 2048x1024 both worked
+* Texture resolutions that are not multiples of 4 will not compress.Nearly all (if not every) game-engine compression format (DXT, ETC, ASTC, etc.) is based on the idea of 4x4 blocks or sometimes 6x6 or 8x8. Bringing in an image with dimensions that are a multiple of 4, like 304x304, results in DXT compression, but 305x305 gives B8G8R8A8(uncompressed). So if you need to have some non-Po2 textures, it seems like restricting both dimensions to multiples of 4 (or 8 or 12 to be really safe) should do it. 
+* Add check to ensure that every Blueprint (that inherits from a specific class?) has a Thumbnail specified
+* Add check to ensure every parameter in a Material has a group/description specified.
+* Add check to unreal that verifies every Niagara system has an "Effect Type" associated with it.
+* Add check to unreal that verifies that "Masks" compression setting set for textures of the _AORMT or similar textures
+* Add check to unreal that verifies that "Normalmap" compression setting set for textures of the _N or similar textures
+* Add check to ensure sRGB set only BaseCOlor textures where expected?
+* Add metadata to assets to track origin. (i.e. What license and where was it sourced from)
+
+
+Add Action that applies a layout for textures based on metadata and types? Maybe something like:
+Possible Directory layout:
+ `Characters/[CharacterName]/Animations`
+ `Characters/[CharacterName]/Materials`
+ `Characters/[CharacterName]/Materials/Instances`
+ `Characters/[CharacterName]/Materials/Functions`
+ `Characters/[CharacterName]/Materials/Layers`
+ `Characters/[CharacterName]/Rigs`
+ `Characters/[CharacterName]/Textures`

@@ -134,9 +134,19 @@ EDataValidationResult URuleRangerEditorValidator::ValidateLoadedAsset_Implementa
                TEXT("OnAssetValidate(%s) discovered %d Rule Set(s)"),
                *InAsset->GetName(),
                DeveloperSettings->Rules.Num());
+        int RuleSetIndex = 0;
         for (auto RuleSetIt = DeveloperSettings->Rules.CreateIterator(); RuleSetIt; ++RuleSetIt)
         {
+            RuleSetIndex++;
             const auto RuleSet = RuleSetIt->LoadSynchronous();
+            if (!IsValid(RuleSet))
+            {
+                UE_LOG(RuleRanger,
+                       Error,
+                       TEXT("OnAssetValidate(%s) detected invalid RuleSet at index %d."),
+                       *InAsset->GetName(),
+                       RuleSetIndex);
+            }
             if (const auto Path = InAsset->GetPathName(); Path.StartsWith(RuleSet->Dir.Path))
             {
                 UE_LOG(RuleRanger,
@@ -144,11 +154,22 @@ EDataValidationResult URuleRangerEditorValidator::ValidateLoadedAsset_Implementa
                        TEXT("OnAssetValidate(%s) processing Rule Set %s"),
                        *InAsset->GetName(),
                        *RuleSet->GetName());
+                int RuleIndex = 0;
                 for (const auto RulePtr : RuleSet->Rules)
                 {
+                    RuleIndex++;
                     // ReSharper disable once CppTooWideScopeInitStatement
                     const auto Rule = RulePtr.Get();
-                    if ((!IsSave && Rule->bApplyOnValidate) || (IsSave && Rule->bApplyOnSave))
+                    if (!IsValid(Rule))
+                    {
+                        UE_LOG(RuleRanger,
+                               Error,
+                               TEXT("OnAssetValidate(%s) detected invalid rule at index %d in RuleSet %s."),
+                               *InAsset->GetName(),
+                               RuleIndex,
+                               *RuleSet->GetName());
+                    }
+                    else if ((!IsSave && Rule->bApplyOnValidate) || (IsSave && Rule->bApplyOnSave))
                     {
                         UE_LOG(RuleRanger,
                                Verbose,

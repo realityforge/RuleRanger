@@ -49,7 +49,7 @@ void USetMetadataTagsAction::Apply_Implementation(TScriptInterface<IRuleRangerAc
                         UE_LOG(RuleRanger,
                                Verbose,
                                TEXT("SetMetadataTagsAction: MetaDataTag %s=%s already exists on %s. "
-                                    "No action required."),
+                                    "No action required"),
                                *MetadataTag.Key.ToString(),
                                *MetadataTag.Value,
                                *Object->GetName());
@@ -65,7 +65,7 @@ void USetMetadataTagsAction::Apply_Implementation(TScriptInterface<IRuleRangerAc
                                 NSLOCTEXT(
                                     "RuleRanger",
                                     "RuleRangerMissingMetaDataTag",
-                                    "MetaData tag {Key}={Value} is not present and would add if not in DryRun mode."),
+                                    "MetaData tag {Key}={Value} is not present. This tag would be added if RuleRanger was not in DryRun mode"),
                                 Arguments);
 
                             ActionContext->Warning(Message);
@@ -75,7 +75,7 @@ void USetMetadataTagsAction::Apply_Implementation(TScriptInterface<IRuleRangerAc
                             UE_LOG(RuleRanger,
                                    Verbose,
                                    TEXT("SetMetadataTagsAction: MetaDataTag %s=%s is not present on %s. "
-                                        "Adding."),
+                                        "Adding MetaDataTag"),
                                    *MetadataTag.Key.ToString(),
                                    *MetadataTag.Value,
                                    *Object->GetName());

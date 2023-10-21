@@ -80,6 +80,10 @@ void USetMetadataTagsAction::Apply_Implementation(TScriptInterface<IRuleRangerAc
                                    *MetadataTag.Value,
                                    *Object->GetName());
                             Subsystem->SetMetadataTag(Object, MetadataTag.Key, MetadataTag.Value);
+                            // This should not be called during loads of object so neither of these functions should
+                            // return false
+                            ensure(Object->MarkPackageDirty());
+                            ensure(Object->GetOuter()->MarkPackageDirty());
                         }
                     }
                 }

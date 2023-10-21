@@ -12,8 +12,7 @@
  * limitations under the License.
  */
 #include "RuleRanger.h"
-#include "MessageLog/Public/MessageLogInitializationOptions.h"
-#include "MessageLog/Public/MessageLogModule.h"
+#include "MessageLogModule.h"
 #include "RuleRangerLogging.h"
 
 #define LOCTEXT_NAMESPACE "FRuleRangerModule"

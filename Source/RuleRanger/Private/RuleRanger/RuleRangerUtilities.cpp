@@ -15,6 +15,7 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetToolsModule.h"
 #include "IAssetTools.h"
+#include "Materials/MaterialInterface.h"
 
 static const FName AssetToolsModuleName("AssetTools");
 
@@ -58,5 +59,24 @@ void RuleRangerUtilities::CollectTypeHierarchy(const UObject* Object, TArray<UCl
         }
         Classes.Add(Class);
         Class = Class->GetSuperClass();
+    }
+}
+
+void RuleRangerUtilities::CollectInstanceHierarchy(UObject* Object, TArray<UObject*>& Instances)
+{
+    Instances.Add(Object);
+
+    if (Object->IsA<UMaterialInstance>())
+    {
+        UMaterialInstance* Instance = Cast<UMaterialInstance>(Object);
+        while (Instance)
+        {
+            if (Instance->Parent)
+            {
+                Instances.Add(Instance->Parent);
+            } // This will be null if we traverse from MaterialInstance parent to Material which will terminate this
+              // loop
+            Instance = Cast<UMaterialInstance>(Instance->Parent);
+        }
     }
 }

@@ -41,4 +41,8 @@ private:
     /** The value of the editor property to match. */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn, AllowPrivateAccess))
     FString Value{ TEXT("") };
+
+    /** Flag indicating whether the property matcher should look at parent instances. */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn, AllowPrivateAccess))
+    bool bTraverseInstanceHierarchy{ true };
 };

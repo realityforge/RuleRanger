@@ -108,6 +108,7 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
                                         "Processing rules will not continue."),
                                    *Object->GetName(),
                                    *Rule->GetName());
+                            ActionContext->ClearContext();
                             return;
                         }
                         else if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
@@ -118,6 +119,7 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
                                         "Processing rules will not continue as ContinueOnError=False."),
                                    *Object->GetName(),
                                    *Rule->GetName());
+                            ActionContext->ClearContext();
                             return;
                         }
                     }
@@ -145,5 +147,6 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
                        *Path);
             }
         }
+        ActionContext->ClearContext();
     }
 }

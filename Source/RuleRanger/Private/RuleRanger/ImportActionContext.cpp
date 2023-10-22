@@ -45,6 +45,17 @@ void UImportActionContext::ResetContext(UObject* InObject, const ERuleRangerActi
     FatalMessages.Reset();
 }
 
+void UImportActionContext::ClearContext()
+{
+    Object = nullptr;
+    ActionTrigger = ERuleRangerActionTrigger::AT_Report;
+    ActionState = ERuleRangerActionState::AS_Success;
+    InfoMessages.Reset();
+    WarningMessages.Reset();
+    ErrorMessages.Reset();
+    FatalMessages.Reset();
+}
+
 void UImportActionContext::EmitMessageLogs()
 {
     for (int i = 0; i < InfoMessages.Num(); i++)

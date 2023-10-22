@@ -196,6 +196,7 @@ EDataValidationResult URuleRangerEditorValidator::ValidateLoadedAsset_Implementa
                         {
                             AssetFails(InAsset, ActionContext->GetFatalMessages()[i], ValidationErrors);
                         }
+                        ActionContext->ClearContext();
                     }
                 }
             }

@@ -36,6 +36,7 @@ public:
     virtual void Fatal(const FText& InMessage) override;
 
     void ResetContext(UObject* InObject, ERuleRangerActionTrigger InActionTrigger);
+    void ClearContext();
 
     void EmitMessageLogs();
 

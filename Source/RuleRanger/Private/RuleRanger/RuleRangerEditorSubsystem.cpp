@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 #include "RuleRanger/RuleRangerEditorSubsystem.h"
+#include "ActionContextImpl.h"
 #include "Editor.h"
-#include "ImportActionContext.h"
 #include "RuleRangerDeveloperSettings.h"
 #include "RuleRangerLogging.h"
 #include "RuleRangerRule.h"
@@ -54,7 +54,7 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
         if (!ActionContext)
         {
             UE_LOG(RuleRanger, Verbose, TEXT("RuleRangerEditorSubsystem: Creating the initial ActionContext"));
-            ActionContext = NewObject<UImportActionContext>(this, UImportActionContext::StaticClass());
+            ActionContext = NewObject<UActionContextImpl>(this, UActionContextImpl::StaticClass());
         }
 
         const auto Subsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>();

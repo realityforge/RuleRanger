@@ -16,13 +16,13 @@
 #include "CoreMinimal.h"
 #include "RuleRangerActionContext.h"
 #include "UObject/Object.h"
-#include "ImportActionContext.generated.h"
+#include "ActionContextImpl.generated.h"
 
 /**
  * ActionContext implementation used during the import process.
  */
 UCLASS(Blueprintable, BlueprintType)
-class RULERANGER_API UImportActionContext : public UObject, public IRuleRangerActionContext
+class RULERANGER_API UActionContextImpl : public UObject, public IRuleRangerActionContext
 {
     GENERATED_BODY()
 

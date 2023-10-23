@@ -18,7 +18,7 @@
 #include "EditorValidatorBase.h"
 #include "RuleRangerEditorValidator.generated.h"
 
-class UImportActionContext;
+class UActionContextImpl;
 
 /**
  * Validator extension that applies the RuleRanger rules in a validation mode.
@@ -37,5 +37,5 @@ public:
 
 private:
     UPROPERTY(VisibleAnywhere)
-    UImportActionContext* ActionContext{ nullptr };
+    UActionContextImpl* ActionContext{ nullptr };
 };

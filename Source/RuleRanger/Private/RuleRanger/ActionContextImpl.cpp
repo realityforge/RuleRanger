@@ -12,28 +12,28 @@
  * limitations under the License.
  */
 
-#include "ImportActionContext.h"
+#include "ActionContextImpl.h"
 #include "Misc/UObjectToken.h"
 #include "RuleRangerLogging.h"
 
-ERuleRangerActionState UImportActionContext::GetState()
+ERuleRangerActionState UActionContextImpl::GetState()
 {
     return ActionState;
 }
 
-ERuleRangerActionTrigger UImportActionContext::GetActionTrigger()
+ERuleRangerActionTrigger UActionContextImpl::GetActionTrigger()
 {
     return ActionTrigger;
 }
 
-bool UImportActionContext::IsDryRun()
+bool UActionContextImpl::IsDryRun()
 {
     return !(ERuleRangerActionTrigger::AT_Save == ActionTrigger || ERuleRangerActionTrigger::AT_Import == ActionTrigger
              || ERuleRangerActionTrigger::AT_Reimport == ActionTrigger
              || ERuleRangerActionTrigger::AT_Fix == ActionTrigger);
 }
 
-void UImportActionContext::ResetContext(UObject* InObject, const ERuleRangerActionTrigger InActionTrigger)
+void UActionContextImpl::ResetContext(UObject* InObject, const ERuleRangerActionTrigger InActionTrigger)
 {
     check(nullptr != InObject);
     Object = InObject;
@@ -45,7 +45,7 @@ void UImportActionContext::ResetContext(UObject* InObject, const ERuleRangerActi
     FatalMessages.Reset();
 }
 
-void UImportActionContext::ClearContext()
+void UActionContextImpl::ClearContext()
 {
     Object = nullptr;
     ActionTrigger = ERuleRangerActionTrigger::AT_Report;
@@ -56,7 +56,7 @@ void UImportActionContext::ClearContext()
     FatalMessages.Reset();
 }
 
-void UImportActionContext::EmitMessageLogs()
+void UActionContextImpl::EmitMessageLogs()
 {
     for (int i = 0; i < InfoMessages.Num(); i++)
     {
@@ -88,21 +88,21 @@ void UImportActionContext::EmitMessageLogs()
     }
 }
 
-void UImportActionContext::Info(const FText& InMessage)
+void UActionContextImpl::Info(const FText& InMessage)
 {
     InfoMessages.Add(InMessage);
 }
-void UImportActionContext::Warning(const FText& InMessage)
+void UActionContextImpl::Warning(const FText& InMessage)
 {
     WarningMessages.Add(InMessage);
     ActionState = ActionState < ERuleRangerActionState::AS_Warning ? ERuleRangerActionState::AS_Warning : ActionState;
 }
-void UImportActionContext::Error(const FText& InMessage)
+void UActionContextImpl::Error(const FText& InMessage)
 {
     ErrorMessages.Add(InMessage);
     ActionState = ActionState < ERuleRangerActionState::AS_Error ? ERuleRangerActionState::AS_Error : ActionState;
 }
-void UImportActionContext::Fatal(const FText& InMessage)
+void UActionContextImpl::Fatal(const FText& InMessage)
 {
     FatalMessages.Add(InMessage);
     ActionState = ActionState < ERuleRangerActionState::AS_Fatal ? ERuleRangerActionState::AS_Fatal : ActionState;

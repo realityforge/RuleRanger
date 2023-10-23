@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 #include "RuleRanger/RuleRangerEditorValidator.h"
-#include "ImportActionContext.h"
+#include "ActionContextImpl.h"
 #include "RuleRangerActionContext.h"
 #include "RuleRangerDeveloperSettings.h"
 #include "RuleRangerLogging.h"
@@ -123,7 +123,7 @@ EDataValidationResult URuleRangerEditorValidator::ValidateLoadedAsset_Implementa
         if (!ActionContext)
         {
             UE_LOG(RuleRanger, Verbose, TEXT("RuleRangerEditorSubsystem: Creating the initial ActionContext"));
-            ActionContext = NewObject<UImportActionContext>(this, UImportActionContext::StaticClass());
+            ActionContext = NewObject<UActionContextImpl>(this, UActionContextImpl::StaticClass());
         }
 
         const bool IsSave = EDataValidationUsecase::Save == DataValidationUsecase;

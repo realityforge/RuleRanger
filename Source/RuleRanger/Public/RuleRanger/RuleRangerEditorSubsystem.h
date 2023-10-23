@@ -19,7 +19,7 @@
 #include "UObject/Object.h"
 #include "RuleRangerEditorSubsystem.generated.h"
 
-class UImportActionContext;
+class UActionContextImpl;
 
 /**
  * The subsystem responsible for managing callbacks to other subsystems such as ImportSubsystem callbacks.
@@ -38,7 +38,7 @@ public:
 
 private:
     UPROPERTY(VisibleAnywhere)
-    UImportActionContext* ActionContext{ nullptr };
+    UActionContextImpl* ActionContext{ nullptr };
 
     // Handle for delegate that has been registered.
     FDelegateHandle OnAssetPostImportDelegateHandle;

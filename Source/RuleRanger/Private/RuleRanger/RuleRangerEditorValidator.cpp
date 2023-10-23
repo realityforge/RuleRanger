@@ -184,6 +184,8 @@ EDataValidationResult URuleRangerEditorValidator::ValidateLoadedAsset_Implementa
                         TScriptInterface<IRuleRangerActionContext> ScriptInterfaceActionContext(ActionContext);
                         Rule->Apply(ScriptInterfaceActionContext, InAsset);
 
+                        ActionContext->EmitMessageLogs();
+
                         for (int i = 0; i < ActionContext->GetWarningMessages().Num(); i++)
                         {
                             AssetWarning(InAsset, ActionContext->GetWarningMessages()[i]);

@@ -2,7 +2,6 @@
 
 Shorthand notes of where to go next with this experiment:
 
-* Replace all the different ruby variants accomplishing the same behaviour
 * Add a mechanism for adding an exclude `DataTable` that will will list assets that will ignore either particular rules or all rules?
 * Enhance NameConventionRename action so that it can optionally warn on unknown assets (IsAsset=> true)
 * Add an Action that renames according to a regex (primarily so can transform new to old naming conventions. Make

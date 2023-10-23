@@ -91,12 +91,12 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                                         FFormatNamedArguments Arguments;
                                         Arguments.Add(TEXT("OriginalName"), FText::FromString(OriginalName));
                                         Arguments.Add(TEXT("NewName"), FText::FromString(NewName));
-                                        const FText Message = FText::Format(
-                                            NSLOCTEXT(
-                                                "RuleRanger",
-                                                "RuleRangerRenameAction",
-                                                "Asset needs to be renamed from '{OriginalName}' to '{NewName}'. Action skipped in DryRun mode"),
-                                            Arguments);
+                                        const FText Message =
+                                            FText::Format(NSLOCTEXT("RuleRanger",
+                                                                    "RenameAction",
+                                                                    "Asset needs to be renamed from '{OriginalName}' "
+                                                                    "to '{NewName}'. Action skipped in DryRun mode"),
+                                                          Arguments);
 
                                         ActionContext->Warning(Message);
                                     }

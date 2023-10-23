@@ -61,12 +61,12 @@ void USetMetadataTagsAction::Apply_Implementation(TScriptInterface<IRuleRangerAc
                             FFormatNamedArguments Arguments;
                             Arguments.Add(TEXT("Key"), FText::FromString(MetadataTag.Key.ToString()));
                             Arguments.Add(TEXT("Value"), FText::FromString(MetadataTag.Value));
-                            const FText Message = FText::Format(
-                                NSLOCTEXT(
-                                    "RuleRanger",
-                                    "RuleRangerMissingMetaDataTag",
-                                    "MetaData tag {Key}={Value} is not present. This tag would be added if RuleRanger was not in DryRun mode"),
-                                Arguments);
+                            const FText Message =
+                                FText::Format(NSLOCTEXT("RuleRanger",
+                                                        "MetaDataTagAddOmitted",
+                                                        "MetaData tag {Key}={Value} is not present. This tag would "
+                                                        "be added if RuleRanger was not in DryRun mode"),
+                                              Arguments);
 
                             ActionContext->Error(Message);
                         }
@@ -77,7 +77,7 @@ void USetMetadataTagsAction::Apply_Implementation(TScriptInterface<IRuleRangerAc
                             Arguments.Add(TEXT("Value"), FText::FromString(MetadataTag.Value));
                             const FText Message =
                                 FText::Format(NSLOCTEXT("RuleRanger",
-                                                        "RuleRangerSetMetaDataTag",
+                                                        "SetMetaDataTag",
                                                         "MetaData tag {Key}={Value} is not present. Adding tag."),
                                               Arguments);
 

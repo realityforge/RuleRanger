@@ -93,8 +93,8 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                                         Arguments.Add(TEXT("NewName"), FText::FromString(NewName));
                                         const FText Message =
                                             FText::Format(NSLOCTEXT("RuleRanger",
-                                                                    "RenameAction",
-                                                                    "Asset needs to be renamed from '{OriginalName}' "
+                                                                    "ObjectRenameOmitted",
+                                                                    "Object needs to be renamed from '{OriginalName}' "
                                                                     "to '{NewName}'. Action skipped in DryRun mode"),
                                                           Arguments);
 
@@ -107,8 +107,8 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                                         Arguments.Add(TEXT("NewName"), FText::FromString(NewName));
                                         const auto Message =
                                             FText::Format(NSLOCTEXT("RuleRanger",
-                                                                    "RenameAsset",
-                                                                    "Asset named {OriginalName} has been renamed "
+                                                                    "ObjectRenamed",
+                                                                    "Object named {OriginalName} has been renamed "
                                                                     "to {NewName} to match convention."),
                                                           Arguments);
 
@@ -118,7 +118,7 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                                         {
                                             const auto InMessage = FText::Format(
                                                 NSLOCTEXT("RuleRanger",
-                                                          "RenameFailed",
+                                                          "ObjectRenameFailed",
                                                           "Attempt to rename object '{0}' to '{1}' failed."),
                                                 FText::FromString(OriginalName),
                                                 FText::FromString(NewName));

@@ -52,12 +52,12 @@ void URemoveMetadataTagsAction::Apply_Implementation(TScriptInterface<IRuleRange
                         {
                             FFormatNamedArguments Arguments;
                             Arguments.Add(TEXT("Key"), FText::FromString(MetadataKey.ToString()));
-                            const FText Message = FText::Format(
-                                NSLOCTEXT(
-                                    "RuleRanger",
-                                    "RuleRangerMissingMetaDataTag",
-                                    "MetaData tag {Key} is present. This tag would be removed if RuleRanger was not in DryRun mode"),
-                                Arguments);
+                            const FText Message =
+                                FText::Format(NSLOCTEXT("RuleRanger",
+                                                        "MetaDataTagRemoveOmitted",
+                                                        "MetaData tag {Key} is present. This tag would be removed if "
+                                                        "RuleRanger was not in DryRun mode"),
+                                              Arguments);
 
                             ActionContext->Error(Message);
                         }
@@ -67,7 +67,7 @@ void URemoveMetadataTagsAction::Apply_Implementation(TScriptInterface<IRuleRange
                             Arguments.Add(TEXT("Key"), FText::FromString(MetadataKey.ToString()));
                             const FText Message =
                                 FText::Format(NSLOCTEXT("RuleRanger",
-                                                        "RuleRangerRemoveMetaDataTag",
+                                                        "RemovingMetaDataTag",
                                                         "MetaData tag with key {Key} is present. Removing tag."),
                                               Arguments);
 

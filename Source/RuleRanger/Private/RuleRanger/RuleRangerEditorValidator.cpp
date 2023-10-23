@@ -204,16 +204,11 @@ EDataValidationResult URuleRangerEditorValidator::ValidateLoadedAsset_Implementa
             }
         }
 
-        const auto State = ActionContext->GetState();
-        if (ERuleRangerActionState::AS_Success == State || ERuleRangerActionState::AS_Warning == State)
+        if (EDataValidationResult::NotValidated == GetValidationResult())
         {
             AssetPasses(InAsset);
-            return EDataValidationResult::Valid;
         }
-        else
-        {
-            return EDataValidationResult::Invalid;
-        }
+        return GetValidationResult();
     }
     else
     {

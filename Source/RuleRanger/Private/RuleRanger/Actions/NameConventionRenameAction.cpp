@@ -102,6 +102,18 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                                     }
                                     else
                                     {
+                                        FFormatNamedArguments Arguments;
+                                        Arguments.Add(TEXT("OriginalName"), FText::FromString(OriginalName));
+                                        Arguments.Add(TEXT("NewName"), FText::FromString(NewName));
+                                        const auto Message =
+                                            FText::Format(NSLOCTEXT("RuleRanger",
+                                                                    "RenameAsset",
+                                                                    "Asset named {OriginalName} has been renamed "
+                                                                    "to {NewName} to match convention."),
+                                                          Arguments);
+
+                                        ActionContext->Info(Message);
+
                                         if (!RuleRangerUtilities::RenameAsset(Object, NewName))
                                         {
                                             const auto InMessage = FText::Format(
@@ -110,10 +122,7 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                                                           "Attempt to rename object '{0}' to '{1}' failed."),
                                                 FText::FromString(OriginalName),
                                                 FText::FromString(NewName));
-                                            FMessageLog(RuleRangerMessageLogName)
-                                                .Error()
-                                                ->AddToken(FUObjectToken::Create(Object))
-                                                ->AddToken(FTextToken::Create(InMessage));
+                                            ActionContext->Error(InMessage);
                                         }
                                     }
                                 }

@@ -68,17 +68,20 @@ void USetMetadataTagsAction::Apply_Implementation(TScriptInterface<IRuleRangerAc
                                     "MetaData tag {Key}={Value} is not present. This tag would be added if RuleRanger was not in DryRun mode"),
                                 Arguments);
 
-                            ActionContext->Warning(Message);
+                            ActionContext->Error(Message);
                         }
                         else
                         {
-                            UE_LOG(RuleRanger,
-                                   Verbose,
-                                   TEXT("SetMetadataTagsAction: MetaDataTag %s=%s is not present on %s. "
-                                        "Adding MetaDataTag"),
-                                   *MetadataTag.Key.ToString(),
-                                   *MetadataTag.Value,
-                                   *Object->GetName());
+                            FFormatNamedArguments Arguments;
+                            Arguments.Add(TEXT("Key"), FText::FromString(MetadataTag.Key.ToString()));
+                            Arguments.Add(TEXT("Value"), FText::FromString(MetadataTag.Value));
+                            const FText Message =
+                                FText::Format(NSLOCTEXT("RuleRanger",
+                                                        "RuleRangerSetMetaDataTag",
+                                                        "MetaData tag {Key}={Value} is not present. Adding tag."),
+                                              Arguments);
+
+                            ActionContext->Info(Message);
                             Subsystem->SetMetadataTag(Object, MetadataTag.Key, MetadataTag.Value);
                             // This should not be called during loads of object so neither of these functions should
                             // return false

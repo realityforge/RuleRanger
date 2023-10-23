@@ -59,16 +59,19 @@ void URemoveMetadataTagsAction::Apply_Implementation(TScriptInterface<IRuleRange
                                     "MetaData tag {Key} is present. This tag would be removed if RuleRanger was not in DryRun mode"),
                                 Arguments);
 
-                            ActionContext->Warning(Message);
+                            ActionContext->Error(Message);
                         }
                         else
                         {
-                            UE_LOG(RuleRanger,
-                                   Verbose,
-                                   TEXT("RemoveMetadataTagsAction: MetaDataTag with key %s is present on %s. "
-                                        "Removing MetaDataTag"),
-                                   *MetadataKey.ToString(),
-                                   *Object->GetName());
+                            FFormatNamedArguments Arguments;
+                            Arguments.Add(TEXT("Key"), FText::FromString(MetadataKey.ToString()));
+                            const FText Message =
+                                FText::Format(NSLOCTEXT("RuleRanger",
+                                                        "RuleRangerRemoveMetaDataTag",
+                                                        "MetaData tag with key {Key} is present. Removing tag."),
+                                              Arguments);
+
+                            ActionContext->Info(Message);
                             Subsystem->RemoveMetadataTag(Object, MetadataKey);
                             // This should not be called during loads of object so neither of these functions should
                             // return false

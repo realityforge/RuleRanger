@@ -37,6 +37,4 @@ private:
     /** The type to match. */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn, AllowPrivateAccess))
     TSubclassOf<UObject> ObjectType;
-    //     UPROPERTY(EditAnywhere, meta=(MetaClass="GameMode")
-    // FStringClassReference GameModeClass2;
 };

@@ -15,7 +15,6 @@
 #include "MessageLogModule.h"
 #include "RuleRangerLogging.h"
 
-#define LOCTEXT_NAMESPACE "FRuleRangerModule"
 
 static const FName MessageLogModuleName = FName(TEXT("MessageLog"));
 const FName RuleRangerMessageLogName = FName(TEXT("RuleRanger"));
@@ -53,7 +52,6 @@ void FRuleRangerModule::ShutdownModule()
     }
 }
 
-#undef LOCTEXT_NAMESPACE
 
 IMPLEMENT_MODULE(FRuleRangerModule, RuleRanger)
 

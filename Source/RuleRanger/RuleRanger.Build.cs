@@ -21,7 +21,7 @@ public class RuleRanger : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 		PublicIncludePaths.AddRange(new string[] { });
 		PrivateIncludePaths.AddRange(new string[] { });
-		PublicDependencyModuleNames.AddRange(new[] { "Core" });
+		PublicDependencyModuleNames.AddRange(new[] { "ContentBrowser", "Core" });
 		PrivateDependencyModuleNames.AddRange(
 			new[]
 			{
@@ -30,6 +30,7 @@ public class RuleRanger : ModuleRules
 				"DeveloperSettings",
 				"EditorSubsystem",
 				"Engine",
+				"Projects", // IPluginManager
 				"MessageLog",
 				"Slate",
 				"SlateCore",

@@ -33,7 +33,7 @@ Shorthand notes of where to go next with this experiment:
 * Add check to unreal that verifies every Niagara system has an "Effect Type" associated with it.
 * Add check to unreal that verifies that "Masks" compression setting set for textures of the _AORMT or similar textures
 * Add check to unreal that verifies that "Normalmap" compression setting set for textures of the _N or similar textures
-* Add check to ensure sRGB set only BaseCOlor textures where expected?
+* Add check to ensure sRGB set only BaseColor textures where expected?
 * Add metadata to assets to track origin. (i.e. What license and where was it sourced from)
 
 

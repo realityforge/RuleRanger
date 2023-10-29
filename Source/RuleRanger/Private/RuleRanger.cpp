@@ -21,9 +21,6 @@ const FName RuleRangerMessageLogName = FName(TEXT("RuleRanger"));
 
 void FRuleRangerModule::StartupModule()
 {
-    // This code will execute after your module is loaded into memory;
-    // the exact timing is specified in the .uplugin file per-module
-
     // create a MessageLog category to use in plugin
     FMessageLogModule& MessageLogModule = FModuleManager::LoadModuleChecked<FMessageLogModule>(MessageLogModuleName);
     FMessageLogInitializationOptions InitOptions;

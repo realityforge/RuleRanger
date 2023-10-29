@@ -15,50 +15,62 @@
 #include "RuleRanger/Actions/RemoveNameSuffixAction.h"
 #include "Editor.h"
 #include "RuleRanger/RuleRangerUtilities.h"
+#include "RuleRangerLogging.h"
 
 void URemoveNameSuffixAction::Apply_Implementation(TScriptInterface<IRuleRangerActionContext>& ActionContext,
                                                    UObject* Object)
 {
     if (IsValid(Object) && !Suffix.IsEmpty())
     {
-        const FString OriginalName{ Object->GetName() };
-        if (OriginalName.EndsWith(Suffix, bCaseSensitive ? ESearchCase::CaseSensitive : ESearchCase::IgnoreCase))
+        if (Suffix.IsEmpty())
         {
-            const FString NewName{ OriginalName.LeftChop(Suffix.Len()) };
-            if (ActionContext->IsDryRun())
+            UE_LOG(RuleRanger,
+                   Error,
+                   TEXT("RemoveNameSuffixAction: Empty Suffix specified when attempting to remove Suffix from %s"),
+                   *Object->GetName());
+        }
+        else
+        {
+            const FString OriginalName{ Object->GetName() };
+            if (OriginalName.EndsWith(Suffix, bCaseSensitive ? ESearchCase::CaseSensitive : ESearchCase::IgnoreCase))
             {
-                FFormatNamedArguments Arguments;
-                Arguments.Add(TEXT("OriginalName"), FText::FromString(OriginalName));
-                Arguments.Add(TEXT("NewName"), FText::FromString(NewName));
-                const FText Message = FText::Format(NSLOCTEXT("RuleRanger",
-                                                              "ObjectRenameOmitted",
-                                                              "Object needs to be renamed from '{OriginalName}' "
-                                                              "to '{NewName}'. Action skipped in DryRun mode"),
-                                                    Arguments);
-
-                ActionContext->Warning(Message);
-            }
-            else
-            {
-                FFormatNamedArguments Arguments;
-                Arguments.Add(TEXT("OriginalName"), FText::FromString(OriginalName));
-                Arguments.Add(TEXT("NewName"), FText::FromString(NewName));
-                const auto Message = FText::Format(NSLOCTEXT("RuleRanger",
-                                                             "ObjectRenamed",
-                                                             "Object named {OriginalName} has been renamed "
-                                                             "to {NewName} to match convention."),
-                                                   Arguments);
-
-                ActionContext->Info(Message);
-
-                if (!RuleRangerUtilities::RenameAsset(Object, NewName))
+                const FString NewName{ OriginalName.LeftChop(Suffix.Len()) };
+                if (ActionContext->IsDryRun())
                 {
-                    const auto InMessage = FText::Format(NSLOCTEXT("RuleRanger",
-                                                                   "ObjectRenameFailed",
-                                                                   "Attempt to rename object '{0}' to '{1}' failed."),
-                                                         FText::FromString(OriginalName),
-                                                         FText::FromString(NewName));
-                    ActionContext->Error(InMessage);
+                    FFormatNamedArguments Arguments;
+                    Arguments.Add(TEXT("OriginalName"), FText::FromString(OriginalName));
+                    Arguments.Add(TEXT("NewName"), FText::FromString(NewName));
+                    const FText Message = FText::Format(NSLOCTEXT("RuleRanger",
+                                                                  "ObjectRenameOmitted",
+                                                                  "Object needs to be renamed from '{OriginalName}' "
+                                                                  "to '{NewName}'. Action skipped in DryRun mode"),
+                                                        Arguments);
+
+                    ActionContext->Warning(Message);
+                }
+                else
+                {
+                    FFormatNamedArguments Arguments;
+                    Arguments.Add(TEXT("OriginalName"), FText::FromString(OriginalName));
+                    Arguments.Add(TEXT("NewName"), FText::FromString(NewName));
+                    const auto Message = FText::Format(NSLOCTEXT("RuleRanger",
+                                                                 "ObjectRenamed",
+                                                                 "Object named {OriginalName} has been renamed "
+                                                                 "to {NewName} to match convention."),
+                                                       Arguments);
+
+                    ActionContext->Info(Message);
+
+                    if (!RuleRangerUtilities::RenameAsset(Object, NewName))
+                    {
+                        const auto InMessage =
+                            FText::Format(NSLOCTEXT("RuleRanger",
+                                                    "ObjectRenameFailed",
+                                                    "Attempt to rename object '{0}' to '{1}' failed."),
+                                          FText::FromString(OriginalName),
+                                          FText::FromString(NewName));
+                        ActionContext->Error(InMessage);
+                    }
                 }
             }
         }

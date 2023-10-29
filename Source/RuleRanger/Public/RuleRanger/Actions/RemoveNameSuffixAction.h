@@ -20,7 +20,7 @@
 #include "RemoveNameSuffixAction.generated.h"
 
 /**
- * Action to set one or more metadata tags.
+ * Action to remove a suffix from a name.
  */
 UCLASS(AutoExpandCategories = ("Rule Ranger"),
        Blueprintable,
@@ -37,7 +37,7 @@ public:
                                       UObject* Object) override;
 
 private:
-    /** The suffix to match. */
+    /** The suffix to remove. */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rule Ranger", meta = (ExposeOnSpawn, AllowPrivateAccess))
     FString Suffix;
     /** A flag controlling whether matching is Case Sensitive or not. */

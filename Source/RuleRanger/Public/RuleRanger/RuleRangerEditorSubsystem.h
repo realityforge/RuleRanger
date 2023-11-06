@@ -45,6 +45,9 @@ public:
     void ProcessRule(UObject* Object, const RuleRangerRuleFn& ProcessRuleFunction);
     bool IsMatchingRulePresent(UObject* Object, const RuleRangerRuleFn& ProcessRuleFunction);
 
+    /** Return the set of ActiveRuleSetScopes that are active for the current project. */
+    TArray<TSoftObjectPtr<URuleRangerRuleSetScope>> GetActiveRuleSetScopes();
+
 private:
     UPROPERTY(VisibleAnywhere)
     UActionContextImpl* ActionContext{ nullptr };

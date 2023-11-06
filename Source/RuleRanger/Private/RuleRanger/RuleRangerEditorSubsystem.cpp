@@ -17,6 +17,7 @@
 #include "RuleRangerDeveloperSettings.h"
 #include "RuleRangerLogging.h"
 #include "RuleRangerRule.h"
+#include "RuleRangerRuleSet.h"
 #include "RuleRangerRuleSetScope.h"
 #include "Subsystems/EditorAssetSubsystem.h"
 #include "Subsystems/ImportSubsystem.h"
@@ -56,10 +57,9 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
     // identify this through the presence of tag.
     const bool bIsReimport = Subsystem && Subsystem->GetMetadataTag(Object, ImportMarkerKey) == ImportMarkerValue;
 
-    ProcessRule(Object,
-                [this,bIsReimport](URuleRangerRule* Rule, UObject* InObject) {
-                    return ProcessOnAssetPostImportRule(bIsReimport, Rule, InObject);
-                });
+    ProcessRule(Object, [this, bIsReimport](URuleRangerRule* Rule, UObject* InObject) {
+        return ProcessOnAssetPostImportRule(bIsReimport, Rule, InObject);
+    });
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
@@ -73,21 +73,20 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const RuleRangerRu
             ActionContext = NewObject<UActionContextImpl>(this, UActionContextImpl::StaticClass());
         }
 
-        const auto DeveloperSettings = GetMutableDefault<URuleRangerDeveloperSettings>();
-        check(IsValid(DeveloperSettings));
+        auto RuleRangerRuleSetScopes = GetActiveRuleSetScopes();
         UE_LOG(RuleRanger,
                Verbose,
                TEXT("Located %d Rule Set Scope(s) when discovering rules for object %s"),
-               DeveloperSettings->RuleSetScopes.Num(),
+               RuleRangerRuleSetScopes.Num(),
                *Object->GetName());
-        for (auto RuleSetScopeIt = DeveloperSettings->RuleSetScopes.CreateIterator(); RuleSetScopeIt; ++RuleSetScopeIt)
+        for (auto RuleSetScopeIt = RuleRangerRuleSetScopes.CreateIterator(); RuleSetScopeIt; ++RuleSetScopeIt)
         {
             if (const auto RuleSetScope = RuleSetScopeIt->LoadSynchronous())
             {
                 if (const auto Path = Object->GetPathName(); RuleSetScope->ScopeMatches(Path))
                 {
-                    for (const auto RuleSetIt = RuleSetScope->RuleSets.CreateIterator(); RuleSetScopeIt; ++
-                         RuleSetScopeIt)
+                    for (const auto RuleSetIt = RuleSetScope->RuleSets.CreateIterator(); RuleSetScopeIt;
+                         ++RuleSetScopeIt)
                     {
                         if (const auto RuleSet = RuleSetIt->Get())
                         {
@@ -117,8 +116,9 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const RuleRangerRu
                                 {
                                     UE_LOG(RuleRanger,
                                            Error,
-                                           TEXT( "Invalid Rule skipped at index %d in " "rule set '%s' "
-                                               "from scope '%s' when analyzing object '%s'" ),
+                                           TEXT("Invalid Rule skipped at index %d in "
+                                                "rule set '%s' "
+                                                "from scope '%s' when analyzing object '%s'"),
                                            RuleIndex,
                                            *RuleSet->GetName(),
                                            *RuleSetScope->GetName(),
@@ -152,23 +152,22 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const RuleRangerRu
 
 bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* Object, const RuleRangerRuleFn& ProcessRuleFunction)
 {
-     if (IsValid(Object))
+    if (IsValid(Object))
     {
-        const auto DeveloperSettings = GetMutableDefault<URuleRangerDeveloperSettings>();
-        check(IsValid(DeveloperSettings));
+        auto RuleRangerRuleSetScopes = GetActiveRuleSetScopes();
         UE_LOG(RuleRanger,
                Verbose,
                TEXT("Located %d Rule Set Scope(s) when discovering rules for object %s"),
-               DeveloperSettings->RuleSetScopes.Num(),
+               RuleRangerRuleSetScopes.Num(),
                *Object->GetName());
-        for (auto RuleSetScopeIt = DeveloperSettings->RuleSetScopes.CreateIterator(); RuleSetScopeIt; ++RuleSetScopeIt)
+        for (auto RuleSetScopeIt = RuleRangerRuleSetScopes.CreateIterator(); RuleSetScopeIt; ++RuleSetScopeIt)
         {
             if (const auto RuleSetScope = RuleSetScopeIt->LoadSynchronous())
             {
                 if (const auto Path = Object->GetPathName(); RuleSetScope->ScopeMatches(Path))
                 {
-                    for (const auto RuleSetIt = RuleSetScope->RuleSets.CreateIterator(); RuleSetScopeIt; ++
-                         RuleSetScopeIt)
+                    for (const auto RuleSetIt = RuleSetScope->RuleSets.CreateIterator(); RuleSetScopeIt;
+                         ++RuleSetScopeIt)
                     {
                         if (const auto RuleSet = RuleSetIt->Get())
                         {
@@ -183,7 +182,7 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* Object, const Ru
                                 // ReSharper disable once CppTooWideScopeInitStatement
                                 if (const auto Rule = RulePtr.Get(); IsValid(Rule))
                                 {
-                                    if(ProcessRuleFunction(Rule, Object))
+                                    if (ProcessRuleFunction(Rule, Object))
                                     {
                                         return true;
                                     }
@@ -192,8 +191,9 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* Object, const Ru
                                 {
                                     UE_LOG(RuleRanger,
                                            Error,
-                                           TEXT( "Invalid Rule skipped at index %d in " "rule set '%s' "
-                                               "from scope '%s' when analyzing object '%s'" ),
+                                           TEXT("Invalid Rule skipped at index %d in "
+                                                "rule set '%s' "
+                                                "from scope '%s' when analyzing object '%s'"),
                                            RuleIndex,
                                            *RuleSet->GetName(),
                                            *RuleSetScope->GetName(),
@@ -225,6 +225,14 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* Object, const Ru
     return false;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
+TArray<TSoftObjectPtr<URuleRangerRuleSetScope>> URuleRangerEditorSubsystem::GetActiveRuleSetScopes()
+{
+    const auto DeveloperSettings = GetMutableDefault<URuleRangerDeveloperSettings>();
+    check(IsValid(DeveloperSettings));
+    return DeveloperSettings->RuleSetScopes;
+}
+
 bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(const bool bIsReimport,
                                                               URuleRangerRule* Rule,
                                                               UObject* InObject)
@@ -240,9 +248,7 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(const bool bIsReim
                *Rule->GetName(),
                bIsReimport ? TEXT("reimport") : TEXT("import"));
         const ERuleRangerActionTrigger Trigger =
-            bIsReimport
-            ? ERuleRangerActionTrigger::AT_Reimport
-            : ERuleRangerActionTrigger::AT_Import;
+            bIsReimport ? ERuleRangerActionTrigger::AT_Reimport : ERuleRangerActionTrigger::AT_Import;
         ActionContext->ResetContext(InObject, Trigger);
 
         TScriptInterface<IRuleRangerActionContext> ScriptInterfaceActionContext(ActionContext);
@@ -255,7 +261,7 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(const bool bIsReim
             UE_LOG(RuleRanger,
                    Verbose,
                    TEXT("OnAssetPostImport(%s) applied rule %s which resulted in fatal error. "
-                       "Processing rules will not continue."),
+                        "Processing rules will not continue."),
                    *InObject->GetName(),
                    *Rule->GetName());
             ActionContext->ClearContext();
@@ -266,7 +272,7 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(const bool bIsReim
             UE_LOG(RuleRanger,
                    Verbose,
                    TEXT("OnAssetPostImport(%s) applied rule %s which resulted in error. "
-                       "Processing rules will not continue as ContinueOnError=False."),
+                        "Processing rules will not continue as ContinueOnError=False."),
                    *InObject->GetName(),
                    *Rule->GetName());
             ActionContext->ClearContext();
@@ -278,7 +284,7 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(const bool bIsReim
         UE_LOG(RuleRanger,
                Verbose,
                TEXT("OnAssetPostImport(%s) skipped rule %s as flag on "
-                   "rule does not enable rule during %s."),
+                    "rule does not enable rule during %s."),
                *InObject->GetName(),
                *Rule->GetName(),
                bIsReimport ? TEXT("reimport") : TEXT("import"));

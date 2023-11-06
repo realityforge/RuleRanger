@@ -63,13 +63,6 @@ void FRuleRangerModule::ReregisterMessageLogLogs()
 }
 
 // -------------------------------------------------------------------------------------------
-// StyleSet
-// -------------------------------------------------------------------------------------------
-
-// Statics for UI Styling
-static const FName StyleName(TEXT("RuleRangerStyle"));
-
-// -------------------------------------------------------------------------------------------
 // Content browser extensions
 // -------------------------------------------------------------------------------------------
 
@@ -93,7 +86,7 @@ static void OnExtendContentBrowserForSelectedPaths(FMenuBuilder& MenuBuilder, co
     MenuBuilder.AddMenuEntry(
         NSLOCTEXT("RuleRanger", "ScanSelectedPaths", "Scan with RuleRanger"),
         NSLOCTEXT("RuleRanger", "ScanSelectedPaths", "Scan selected paths with RuleRanger"),
-        FSlateIcon(StyleName, FRuleRangerStyle::GetToolbarIconStyleName()),
+        FSlateIcon(FRuleRangerStyle::GetStyleSetName(), FRuleRangerStyle::GetToolbarIconStyleName()),
         FUIAction(FExecuteAction::CreateLambda([SelectedPaths]() { OnScanSelectedPaths(SelectedPaths); })),
         NAME_None,
         EUserInterfaceActionType::Button);

@@ -63,7 +63,7 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const RuleRangerRuleFn& ProcessRuleFunction)
+void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerRuleFn& ProcessRuleFunction)
 {
     if (IsValid(Object))
     {
@@ -150,7 +150,7 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const RuleRangerRu
     ActionContext->ClearContext();
 }
 
-bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* Object, const RuleRangerRuleFn& ProcessRuleFunction)
+bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* Object, const FRuleRangerRuleFn& ProcessRuleFunction)
 {
     if (IsValid(Object))
     {

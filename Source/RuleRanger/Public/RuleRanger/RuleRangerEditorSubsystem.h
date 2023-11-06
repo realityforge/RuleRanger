@@ -25,7 +25,7 @@ class UActionContextImpl;
 
 // Shape of function called to check whether rule will run or actually execute rule.
 // The actual function is determined by where it is used.
-using RuleRangerRuleFn = std::function<bool(URuleRangerRule* Rule, UObject* InObject)>;
+using FRuleRangerRuleFn = std::function<bool(URuleRangerRule* Rule, UObject* InObject)>;
 
 /**
  * The subsystem responsible for managing callbacks to other subsystems such as ImportSubsystem callbacks.
@@ -42,8 +42,8 @@ public:
     /** Implement this for deinitialization of instances of the system */
     virtual void Deinitialize() override;
 
-    void ProcessRule(UObject* Object, const RuleRangerRuleFn& ProcessRuleFunction);
-    bool IsMatchingRulePresent(UObject* Object, const RuleRangerRuleFn& ProcessRuleFunction);
+    void ProcessRule(UObject* Object, const FRuleRangerRuleFn& ProcessRuleFunction);
+    bool IsMatchingRulePresent(UObject* Object, const FRuleRangerRuleFn& ProcessRuleFunction);
 
     /** Return the set of ActiveRuleSetScopes that are active for the current project. */
     TArray<TSoftObjectPtr<URuleRangerRuleSetScope>> GetActiveRuleSetScopes();

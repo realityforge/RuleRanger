@@ -12,8 +12,17 @@
  * limitations under the License.
  */
 #include "RuleRangerCommands.h"
+#include "RuleRangerStyle.h"
 
 #define LOCTEXT_NAMESPACE "FRuleRangerModule"
+
+FRuleRangerCommands::FRuleRangerCommands()
+    : TCommands(TEXT("RuleRanger"),
+                NSLOCTEXT("RuleRanger", "RuleRanger", "RuleRanger Plugin"),
+                NAME_None,
+                FRuleRangerStyle::GetStyleSetName())
+{
+}
 
 void FRuleRangerCommands::RegisterCommands()
 {

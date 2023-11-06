@@ -1,5 +1,5 @@
 /*
-* Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -15,16 +15,11 @@
 
 #include "CoreMinimal.h"
 #include "Framework/Commands/Commands.h"
-#include "RuleRangerStyle.h"
 
 class FRuleRangerCommands final : public TCommands<FRuleRangerCommands>
 {
 public:
-    FRuleRangerCommands()
-        : TCommands(TEXT("RuleRanger"),
-                    NSLOCTEXT("RuleRanger", "RuleRanger", "RuleRanger Plugin"),
-                    NAME_None,
-                    FRuleRangerStyle::GetStyleSetName()) { }
+    FRuleRangerCommands();
 
     virtual void RegisterCommands() override;
 

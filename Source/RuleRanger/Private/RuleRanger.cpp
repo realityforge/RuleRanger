@@ -15,6 +15,7 @@
 #include "ContentBrowserModule.h"
 #include "Interfaces/IPluginManager.h"
 #include "MessageLogModule.h"
+#include "RuleRangerCommands.h"
 #include "RuleRangerLogging.h"
 #include "RuleRangerStyle.h"
 #include "Styling/SlateStyleRegistry.h"
@@ -202,6 +203,8 @@ void FRuleRangerModule::StartupModule()
         FRuleRangerStyle::Initialize();
         FRuleRangerStyle::ReloadTextures();
 
+        FRuleRangerCommands::Register();
+
         RegisterContentBrowserExtensions();
     }
     else
@@ -220,6 +223,8 @@ void FRuleRangerModule::ShutdownModule()
         if (FModuleManager::Get().IsModuleLoaded("ContentBrowser"))
         {
             DeregisterContentBrowserExtensions();
+
+            FRuleRangerCommands::Unregister();
             FRuleRangerStyle::Shutdown();
         }
     }

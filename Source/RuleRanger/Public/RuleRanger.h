@@ -33,17 +33,6 @@ private:
     // -------------------------------------------------------------------------------------------
 
     void ReregisterMessageLogLogs();
-    void DeregisterStyleSet();
-
-    // -------------------------------------------------------------------------------------------
-    // StyleSet
-    // -------------------------------------------------------------------------------------------
-
-    // StyleSet used for UI elements
-    TSharedPtr<FSlateStyleSet> StyleSet{ nullptr };
-
-    // Initialize the StyleSet. Called during StartupModule
-    void RegisterStyleSet();
 
     // -------------------------------------------------------------------------------------------
     // Content browser extensions

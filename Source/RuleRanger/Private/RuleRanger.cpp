@@ -16,6 +16,7 @@
 #include "Interfaces/IPluginManager.h"
 #include "MessageLogModule.h"
 #include "RuleRangerLogging.h"
+#include "RuleRangerStyle.h"
 #include "Styling/SlateStyleRegistry.h"
 
 static const FName RuleRangerModuleName = FName(TEXT("RuleRanger"));
@@ -67,41 +68,6 @@ void FRuleRangerModule::ReregisterMessageLogLogs()
 
 // Statics for UI Styling
 static const FName StyleName(TEXT("RuleRangerStyle"));
-static const FName ToolbarIconStyleName(TEXT("RuleRanger.Toolbar.Icon"));
-
-void FRuleRangerModule::RegisterStyleSet()
-{
-    StyleSet = MakeShareable(new FSlateStyleSet(StyleName));
-    StyleSet->SetContentRoot(FPaths::EngineContentDir() / TEXT("Editor/Slate"));
-    StyleSet->SetCoreContentRoot(FPaths::EngineContentDir() / TEXT("Slate"));
-
-    // The content directory of the RuleRanger Plugin
-    const auto ContentDir = IPluginManager::Get().FindPlugin(RuleRangerModuleName.ToString())->GetContentDir();
-
-    // Now add all styles
-    StyleSet->Set(ToolbarIconStyleName,
-                  new FSlateImageBrush(ContentDir / TEXT("Icons/magnifying_glass.png"), CoreStyleConstants::Icon16x16));
-
-    // Register StyleSheet in Engine
-    FSlateStyleRegistry::RegisterSlateStyle(*StyleSet);
-
-    UE_LOG(RuleRanger, VeryVerbose, TEXT("RuleRangerModule: InitStyleSet() complete."));
-}
-
-void FRuleRangerModule::DeregisterStyleSet()
-{
-    if (StyleSet.IsValid())
-    {
-        // Deregister and reset StyleSheet
-        UE_LOG(RuleRanger, VeryVerbose, TEXT("RuleRangerModule: Deregistering StyleSet."));
-        FSlateStyleRegistry::UnRegisterSlateStyle(*StyleSet);
-        StyleSet.Reset();
-    }
-    else
-    {
-        UE_LOG(RuleRanger, Verbose, TEXT("RuleRangerModule: Skipping deregister of StyleSet as Invalid."));
-    }
-}
 
 // -------------------------------------------------------------------------------------------
 // Content browser extensions
@@ -127,7 +93,7 @@ static void OnExtendContentBrowserForSelectedPaths(FMenuBuilder& MenuBuilder, co
     MenuBuilder.AddMenuEntry(
         NSLOCTEXT("RuleRanger", "ScanSelectedPaths", "Scan with RuleRanger"),
         NSLOCTEXT("RuleRanger", "ScanSelectedPaths", "Scan selected paths with RuleRanger"),
-        FSlateIcon(StyleName, ToolbarIconStyleName),
+        FSlateIcon(StyleName, FRuleRangerStyle::GetToolbarIconStyleName()),
         FUIAction(FExecuteAction::CreateLambda([SelectedPaths]() { OnScanSelectedPaths(SelectedPaths); })),
         NAME_None,
         EUserInterfaceActionType::Button);
@@ -166,7 +132,7 @@ static void OnExtendContentBrowserForSelectedAssets(FMenuBuilder& MenuBuilder, c
     MenuBuilder.AddMenuEntry(
         NSLOCTEXT("RuleRanger", "ScanSelectedPaths", "Scan with RuleRanger"),
         NSLOCTEXT("RuleRanger", "ScanSelectedPaths", "Scan selected paths with RuleRanger"),
-        FSlateIcon(StyleName, ToolbarIconStyleName),
+        FSlateIcon(FRuleRangerStyle::GetStyleSetName(), FRuleRangerStyle::GetToolbarIconStyleName()),
         FUIAction(FExecuteAction::CreateLambda([SelectedAssets]() { OnScanSelectedAssets(SelectedAssets); })),
         NAME_None,
         EUserInterfaceActionType::Button);
@@ -239,7 +205,10 @@ void FRuleRangerModule::StartupModule()
     {
         UE_LOG(RuleRanger, VeryVerbose, TEXT("RuleRangerModule: Initializing Editor integration."));
         // First setup stylesheet
-        RegisterStyleSet();
+
+        FRuleRangerStyle::Initialize();
+        FRuleRangerStyle::ReloadTextures();
+
         RegisterContentBrowserExtensions();
     }
     else
@@ -258,7 +227,7 @@ void FRuleRangerModule::ShutdownModule()
         if (FModuleManager::Get().IsModuleLoaded("ContentBrowser"))
         {
             DeregisterContentBrowserExtensions();
-            DeregisterStyleSet();
+            FRuleRangerStyle::Shutdown();
         }
     }
 

@@ -31,7 +31,7 @@ using RuleRangerRuleFn = std::function<bool(URuleRangerRule* Rule, UObject* InOb
  * The subsystem responsible for managing callbacks to other subsystems such as ImportSubsystem callbacks.
  */
 UCLASS(BlueprintType, CollapseCategories)
-class RULERANGER_API URuleRangerEditorSubsystem : public UEditorSubsystem
+class RULERANGER_API URuleRangerEditorSubsystem final : public UEditorSubsystem
 {
     GENERATED_BODY()
 
@@ -62,5 +62,5 @@ private:
      * @param InObject the object to apply rule to.
      * @return true to keep processing, false if no more rules should be applied to object.
      */
-    bool ProcessOnAssetPostImportRule(const bool bIsReimport, URuleRangerRule*  Rule, UObject* InObject);
+    bool ProcessOnAssetPostImportRule(const bool bIsReimport, URuleRangerRule* Rule, UObject* InObject);
 };

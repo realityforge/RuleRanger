@@ -26,7 +26,7 @@ UCLASS(AutoExpandCategories = ("Rule Ranger"),
        CollapseCategories,
        DefaultToInstanced,
        EditInlineNew)
-class RULERANGER_API USourceFilenameEndsWithMatcher : public USourcePathMatcherBase
+class RULERANGER_API USourceFilenameEndsWithMatcher final : public USourcePathMatcherBase
 {
     GENERATED_BODY()
 

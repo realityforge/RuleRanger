@@ -28,7 +28,7 @@ UCLASS(AutoExpandCategories = ("Rule Ranger"),
        CollapseCategories,
        DefaultToInstanced,
        EditInlineNew)
-class RULERANGER_API URemoveNamePrefixAction : public URuleRangerAction
+class RULERANGER_API URemoveNamePrefixAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

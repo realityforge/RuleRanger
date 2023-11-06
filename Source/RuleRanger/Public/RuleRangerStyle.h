@@ -17,7 +17,7 @@
 #include "Styling/SlateStyle.h"
 
 /** The class responsible for managing styles used in RuleRanger plugin. */
-class FRuleRangerStyle
+class FRuleRangerStyle final
 {
 public:
     static void Initialize();

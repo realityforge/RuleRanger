@@ -26,7 +26,7 @@ UCLASS(AutoExpandCategories = ("Rule Ranger"),
        CollapseCategories,
        DefaultToInstanced,
        EditInlineNew)
-class RULERANGER_API UNameSuffixMatcher : public URuleRangerMatcher
+class RULERANGER_API UNameSuffixMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

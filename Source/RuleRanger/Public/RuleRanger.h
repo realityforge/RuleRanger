@@ -17,7 +17,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-class FRuleRangerModule : public IModuleInterface
+class FRuleRangerModule final : public IModuleInterface
 {
 public:
     // -------------------------------------------------------------------------------------------

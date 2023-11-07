@@ -13,6 +13,7 @@
  */
 
 #include "RuleRangerContentBrowserExtensions.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "ContentBrowserModule.h"
 #include "RuleRanger/RuleRangerEditorSubsystem.h"
 #include "RuleRangerCommands.h"
@@ -47,31 +48,75 @@ static void OnFixSelectedAssets(const TArray<FAssetData>& Assets)
         }
     }
 }
-static void OnScanSelectedPaths(const TArray<FString>& Paths)
+static void OnScanSelectedPaths(const TArray<FString>& AssetPaths)
 {
     if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
     {
-        for (auto& Path : Paths)
+        const auto& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
+        for (auto& AssetPath : AssetPaths)
         {
-            FSoftObjectPath AssetPath(Path);
-            if (UObject* Object = AssetPath.TryLoad())
+            const auto& AssetData = AssetRegistry.GetAssetByObjectPath(AssetPath);
+            if (AssetData.IsRedirector())
             {
-                Subsystem->ScanObject(Object);
+                // Ignore
+            }
+            else if (AssetData.IsUAsset())
+            {
+                if (UObject* Object = AssetData.GetAsset())
+                {
+                    Subsystem->ScanObject(Object);
+                }
+            }
+            else
+            {
+                // Assuming this is a folder
+                TArray<FAssetData> Assets;
+                AssetRegistry.GetAssetsByPath(*AssetPath, Assets, true);
+
+                for (auto& Asset : Assets)
+                {
+                    if (UObject* Object = Asset.GetAsset())
+                    {
+                        Subsystem->ScanObject(Object);
+                    }
+                }
             }
         }
     }
 }
 
-static void OnFixSelectedPaths(const TArray<FString>& Paths)
+static void OnFixSelectedPaths(const TArray<FString>& AssetPaths)
 {
     if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
     {
-        for (auto& Path : Paths)
+        const auto& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
+        for (auto& AssetPath : AssetPaths)
         {
-            FSoftObjectPath AssetPath(Path);
-            if (UObject* Object = AssetPath.TryLoad())
+            const auto& AssetData = AssetRegistry.GetAssetByObjectPath(AssetPath);
+            if (AssetData.IsRedirector())
             {
-                Subsystem->ScanAndFixObject(Object);
+                // Ignore
+            }
+            else if (AssetData.IsUAsset())
+            {
+                if (UObject* Object = AssetData.GetAsset())
+                {
+                    Subsystem->ScanObject(Object);
+                }
+            }
+            else
+            {
+                // Assuming this is a folder
+                TArray<FAssetData> Assets;
+                AssetRegistry.GetAssetsByPath(*AssetPath, Assets, true);
+
+                for (auto& Asset : Assets)
+                {
+                    if (UObject* Object = Asset.GetAsset())
+                    {
+                        Subsystem->ScanAndFixObject(Object);
+                    }
+                }
             }
         }
     }
@@ -129,10 +174,10 @@ static TSharedRef<FExtender> OnExtendForSelectedAssetsMenu(const TArray<FAssetDa
     UE_LOG(RuleRanger, VeryVerbose, TEXT("OnExtendForSelectedAssetsMenu() invoked."));
 
     const TSharedPtr<FUICommandList> CommandList = MakeShareable(new FUICommandList);
-    CommandList->MapAction(FRuleRangerCommands::Get().ScanSelectedPaths,
+    CommandList->MapAction(FRuleRangerCommands::Get().ScanSelectedAssets,
                            FExecuteAction::CreateLambda(([Assets]() { OnScanSelectedAssets(Assets); })),
                            FCanExecuteAction());
-    CommandList->MapAction(FRuleRangerCommands::Get().FixSelectedPaths,
+    CommandList->MapAction(FRuleRangerCommands::Get().FixSelectedAssets,
                            FExecuteAction::CreateLambda(([Assets]() { OnFixSelectedAssets(Assets); })),
                            FCanExecuteAction());
 

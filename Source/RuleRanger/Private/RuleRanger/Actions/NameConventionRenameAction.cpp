@@ -17,6 +17,7 @@
 #include "Misc/UObjectToken.h"
 #include "RuleRanger/RuleRangerUtilities.h"
 #include "RuleRangerLogging.h"
+#include "RuleRangerMessageLog.h"
 #include "Subsystems/EditorAssetSubsystem.h"
 
 void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRangerActionContext>& ActionContext,
@@ -131,7 +132,7 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                 }
                 if (bNotifyIfNameConventionMissing)
                 {
-                    FMessageLog(RuleRangerMessageLogName)
+                    FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
                         .Warning()
                         ->AddToken(FTextToken::Create(NSLOCTEXT("RuleRanger",
                                                                 "MissingNamingConvention",

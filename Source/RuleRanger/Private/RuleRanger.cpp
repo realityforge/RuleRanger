@@ -13,55 +13,12 @@
  */
 #include "RuleRanger.h"
 #include "ContentBrowserModule.h"
-#include "Interfaces/IPluginManager.h"
-#include "MessageLogModule.h"
 #include "RuleRangerCommands.h"
 #include "RuleRangerLogging.h"
+#include "RuleRangerMessageLog.h"
 #include "RuleRangerStyle.h"
-#include "Styling/SlateStyleRegistry.h"
 
 static const FName RuleRangerModuleName = FName(TEXT("RuleRanger"));
-
-// -------------------------------------------------------------------------------------------
-// MessageLog
-// -------------------------------------------------------------------------------------------
-
-// Statics relating to MessageLog usage
-static const FName MessageLogModuleName = FName(TEXT("MessageLog"));
-const FName RuleRangerMessageLogName = FName(TEXT("RuleRanger"));
-
-// ReSharper disable once CppMemberFunctionMayBeStatic
-void FRuleRangerModule::RegisterMessageLogLogs()
-{
-    // create a MessageLog category to use in plugin
-    FMessageLogModule& MessageLogModule = FModuleManager::LoadModuleChecked<FMessageLogModule>(MessageLogModuleName);
-    FMessageLogInitializationOptions InitOptions;
-    InitOptions.bShowPages = true;
-    InitOptions.bAllowClear = true;
-    InitOptions.bShowFilters = true;
-    MessageLogModule.RegisterLogListing(RuleRangerMessageLogName,
-                                        NSLOCTEXT("RuleRanger", "RuleRangerLogLabel", "Rule Ranger"),
-                                        InitOptions);
-}
-
-// ReSharper disable once CppMemberFunctionMayBeStatic
-void FRuleRangerModule::ReregisterMessageLogLogs()
-{
-    // Deregister MessageLog created in Startup
-    if (FModuleManager::Get().IsModuleLoaded(MessageLogModuleName))
-    {
-        FMessageLogModule& MessageLogModule = FModuleManager::GetModuleChecked<FMessageLogModule>(MessageLogModuleName);
-        if (MessageLogModule.IsRegisteredLogListing(RuleRangerMessageLogName))
-        {
-            UE_LOG(RuleRanger, VeryVerbose, TEXT("RuleRangerModule: Deregistering MessageLog."));
-            MessageLogModule.UnregisterLogListing(RuleRangerMessageLogName);
-        }
-        else
-        {
-            UE_LOG(RuleRanger, Verbose, TEXT("RuleRangerModule: Skipping deregister of MessageLog as not registered."));
-        }
-    }
-}
 
 // -------------------------------------------------------------------------------------------
 // Content browser extensions
@@ -192,7 +149,7 @@ void FRuleRangerModule::DeregisterContentBrowserExtensions() const
 
 void FRuleRangerModule::StartupModule()
 {
-    RegisterMessageLogLogs();
+    FRuleRangerMessageLog::Initialize();
 
     // Add integrations of RuleRanger into Editor UI
     if (!IsRunningCommandlet())
@@ -229,7 +186,7 @@ void FRuleRangerModule::ShutdownModule()
         }
     }
 
-    ReregisterMessageLogLogs();
+    FRuleRangerMessageLog::Shutdown();
 }
 
 IMPLEMENT_MODULE(FRuleRangerModule, RuleRanger)

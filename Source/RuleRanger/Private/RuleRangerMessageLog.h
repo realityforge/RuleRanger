@@ -13,7 +13,20 @@
  */
 #pragma once
 
-#include "Logging/LogCategory.h"
+#include "CoreMinimal.h"
+#include "Styling/SlateStyle.h"
 
-// Log category to use within the RuleRanger plugin
-DECLARE_LOG_CATEGORY_EXTERN(RuleRanger, Verbose, All);
+/** The class responsible for managing MessageLog categories used in RuleRanger plugin. */
+class FRuleRangerMessageLog final
+{
+public:
+    static void Initialize();
+
+    static void Shutdown();
+
+private:
+    const static FName MessageLogName;
+
+public:
+    FORCEINLINE static const FName& GetMessageLogName() { return MessageLogName; }
+};

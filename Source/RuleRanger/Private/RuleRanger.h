@@ -29,12 +29,6 @@ public:
 
 private:
     // -------------------------------------------------------------------------------------------
-    // MessageLog
-    // -------------------------------------------------------------------------------------------
-
-    void ReregisterMessageLogLogs();
-
-    // -------------------------------------------------------------------------------------------
     // Content browser extensions
     // -------------------------------------------------------------------------------------------
 
@@ -47,6 +41,5 @@ private:
     FDelegateHandle ContentBrowserMenuExtender_SelectedAssetsDelegateHandle;
 
     void RegisterContentBrowserExtensions();
-    void RegisterMessageLogLogs();
     void DeregisterContentBrowserExtensions() const;
 };

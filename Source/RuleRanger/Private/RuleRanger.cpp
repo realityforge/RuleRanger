@@ -190,6 +190,3 @@ void FRuleRangerModule::ShutdownModule()
 }
 
 IMPLEMENT_MODULE(FRuleRangerModule, RuleRanger)
-
-// The implementation of log category top use within plugin
-DEFINE_LOG_CATEGORY(RuleRanger);

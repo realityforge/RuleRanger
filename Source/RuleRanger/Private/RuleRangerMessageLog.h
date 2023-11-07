@@ -14,7 +14,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Styling/SlateStyle.h"
 
 /** The class responsible for managing MessageLog categories used in RuleRanger plugin. */
 class FRuleRangerMessageLog final

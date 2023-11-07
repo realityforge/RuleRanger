@@ -18,9 +18,16 @@
 #include "RuleRanger/RuleRangerEditorSubsystem.h"
 #include "RuleRangerCommands.h"
 #include "RuleRangerLogging.h"
+#include "RuleRangerMessageLog.h"
 
 static void OnScanSelectedAssets(const TArray<FAssetData>& Assets)
 {
+    FMessageLog MessageLog(FRuleRangerMessageLog::GetMessageLogName());
+    MessageLog.NewPage(FText::FromString(TEXT("Scan Selected Assets")));
+    MessageLog.Info()->AddToken(
+        FTextToken::Create(NSLOCTEXT("RuleRanger", "ScanAssetsStarting", "Rule Ranger will scan the selected assets")));
+    MessageLog.Open(EMessageSeverity::Info, true);
+
     if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
     {
         for (auto& Asset : Assets)
@@ -32,10 +39,18 @@ static void OnScanSelectedAssets(const TArray<FAssetData>& Assets)
             }
         }
     }
+    MessageLog.Info()->AddToken(FTextToken::Create(
+        NSLOCTEXT("RuleRanger", "ScanAssetsCompleted", "Rule Ranger has completed scanning of the selected assets")));
 }
 
 static void OnFixSelectedAssets(const TArray<FAssetData>& Assets)
 {
+    FMessageLog MessageLog(FRuleRangerMessageLog::GetMessageLogName());
+    MessageLog.NewPage(FText::FromString(TEXT("Fix Selected Assets")));
+    MessageLog.Info()->AddToken(FTextToken::Create(
+        NSLOCTEXT("RuleRanger", "ScanAndFixAssetsStarting", "Rule Ranger will scan and fix the selected assets")));
+    MessageLog.Open(EMessageSeverity::Info, true);
+
     if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
     {
         for (auto& Asset : Assets)
@@ -47,9 +62,19 @@ static void OnFixSelectedAssets(const TArray<FAssetData>& Assets)
             }
         }
     }
+    MessageLog.Info()->AddToken(
+        FTextToken::Create(NSLOCTEXT("RuleRanger",
+                                     "ScanAndFixAssetsCompleted",
+                                     "Rule Ranger has completed scanning of the selected assets")));
 }
 static void OnScanSelectedPaths(const TArray<FString>& AssetPaths)
 {
+    FMessageLog MessageLog(FRuleRangerMessageLog::GetMessageLogName());
+    MessageLog.NewPage(FText::FromString(TEXT("Scan Selected Paths")));
+    MessageLog.Info()->AddToken(
+        FTextToken::Create(NSLOCTEXT("RuleRanger", "ScanPathsStarting", "Rule Ranger will scan the selected paths")));
+    MessageLog.Open(EMessageSeverity::Info, true);
+
     if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
     {
         const auto& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
@@ -83,10 +108,18 @@ static void OnScanSelectedPaths(const TArray<FString>& AssetPaths)
             }
         }
     }
+    MessageLog.Info()->AddToken(FTextToken::Create(
+        NSLOCTEXT("RuleRanger", "ScanPathsCompleted", "Rule Ranger has completed scanning of the selected paths")));
 }
 
 static void OnFixSelectedPaths(const TArray<FString>& AssetPaths)
 {
+    FMessageLog MessageLog(FRuleRangerMessageLog::GetMessageLogName());
+    MessageLog.NewPage(FText::FromString(TEXT("Fix Selected Paths")));
+    MessageLog.Info()->AddToken(FTextToken::Create(
+        NSLOCTEXT("RuleRanger", "ScanAndFixPathsStarting", "Rule Ranger will scan and fix the selected paths")));
+    MessageLog.Open(EMessageSeverity::Info, true);
+
     if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
     {
         const auto& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
@@ -120,6 +153,10 @@ static void OnFixSelectedPaths(const TArray<FString>& AssetPaths)
             }
         }
     }
+    MessageLog.Info()->AddToken(
+        FTextToken::Create(NSLOCTEXT("RuleRanger",
+                                     "ScanAndFixPathsCompleted",
+                                     "Rule Ranger has completed scanning and fixing of the selected paths")));
 }
 
 // ReSharper disable once CppPassValueParameterByConstReference

@@ -17,8 +17,6 @@
 #include "RuleRangerLogging.h"
 #include "Styling/SlateStyleRegistry.h"
 
-const FName FRuleRangerStyle::ToolbarIconStyleName = TEXT("RuleRanger.Toolbar.Icon");
-
 TSharedPtr<FSlateStyleSet> FRuleRangerStyle::StyleInstance = nullptr;
 
 void FRuleRangerStyle::Initialize()
@@ -65,8 +63,13 @@ TSharedRef<FSlateStyleSet> FRuleRangerStyle::Create()
     TSharedRef<FSlateStyleSet> Style = MakeShareable(new FSlateStyleSet(GetStyleSetName()));
     Style->SetContentRoot(ResourcesDir);
 
-    // Now add all styles
-    Style->Set(FRuleRangerStyle::ToolbarIconStyleName,
+    Style->Set(TEXT("RuleRanger.ScanSelectedPaths"),
+               new FSlateImageBrush(ResourcesDir / TEXT("Icons/magnifying_glass.png"), Icon16x16));
+    Style->Set(TEXT("RuleRanger.FixSelectedPaths"),
+               new FSlateImageBrush(ResourcesDir / TEXT("Icons/magnifying_glass.png"), Icon16x16));
+    Style->Set(TEXT("RuleRanger.ScanSelectedAssets"),
+               new FSlateImageBrush(ResourcesDir / TEXT("Icons/magnifying_glass.png"), Icon16x16));
+    Style->Set(TEXT("RuleRanger.FixSelectedAssets"),
                new FSlateImageBrush(ResourcesDir / TEXT("Icons/magnifying_glass.png"), Icon16x16));
 
     return Style;

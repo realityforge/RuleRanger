@@ -16,6 +16,8 @@
 #include "CoreMinimal.h"
 #include "Framework/Commands/Commands.h"
 
+class URuleRangerRule;
+
 class FRuleRangerCommands final : public TCommands<FRuleRangerCommands>
 {
 public:
@@ -23,5 +25,8 @@ public:
 
     virtual void RegisterCommands() override;
 
-    TSharedPtr<FUICommandInfo> OpenRuleRangerWindow;
+    TSharedPtr<FUICommandInfo> ScanSelectedPaths;
+    TSharedPtr<FUICommandInfo> FixSelectedPaths;
+    TSharedPtr<FUICommandInfo> ScanSelectedAssets;
+    TSharedPtr<FUICommandInfo> FixSelectedAssets;
 };

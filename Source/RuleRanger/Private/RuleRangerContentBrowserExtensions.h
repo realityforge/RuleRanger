@@ -26,10 +26,10 @@ public:
 
 private:
     // Delegate called when extending ContextBrowser SelectedPaths Context menu
-    static FContentBrowserMenuExtender_SelectedPaths ContentBrowserMenuExtender_SelectedPathsDelegate;
-    static FDelegateHandle ContentBrowserMenuExtender_SelectedPathsDelegateHandle;
+    static FContentBrowserMenuExtender_SelectedPaths SelectedPathsDelegate;
+    static FDelegateHandle SelectedPathsDelegateHandle;
 
     // Delegate called when extending ContextBrowser SelectedAssets Context menu
-    static FContentBrowserMenuExtender_SelectedAssets ContentBrowserMenuExtender_SelectedAssetsDelegate;
-    static FDelegateHandle ContentBrowserMenuExtender_SelectedAssetsDelegateHandle;
+    static FContentBrowserMenuExtender_SelectedAssets SelectedAssetsDelegate;
+    static FDelegateHandle SelectedAssetsDelegateHandle;
 };

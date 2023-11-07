@@ -14,93 +14,139 @@
 
 #include "RuleRangerContentBrowserExtensions.h"
 #include "ContentBrowserModule.h"
-#include "RuleRanger.h"
+#include "RuleRanger/RuleRangerEditorSubsystem.h"
+#include "RuleRangerCommands.h"
 #include "RuleRangerLogging.h"
-#include "RuleRangerStyle.h"
 
-// -------------------------------------------------------------------------------------------
-// Content browser extensions
-// -------------------------------------------------------------------------------------------
-
-static void OnScanSelectedPaths(const TArray<FString>& SelectedPaths)
+static void OnScanSelectedAssets(const TArray<FAssetData>& Assets)
 {
-    if (const auto& Module = FModuleManager::GetModulePtr<FRuleRangerModule>(FRuleRangerModule::GetModuleName()))
+    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
     {
-        // TODO: Replace this with dialog to perform scan
-        UE_LOG(RuleRanger, Error, TEXT("OnScanSelectedPaths not implemented yet."));
+        for (auto& Asset : Assets)
+        {
+            // Object can be null if it is a redirect
+            if (UObject* Object = Asset.GetAsset())
+            {
+                Subsystem->ScanObject(Object);
+            }
+        }
+    }
+}
+
+static void OnFixSelectedAssets(const TArray<FAssetData>& Assets)
+{
+    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
+    {
+        for (auto& Asset : Assets)
+        {
+            // Object can be null if it is a redirect
+            if (UObject* Object = Asset.GetAsset())
+            {
+                Subsystem->ScanAndFixObject(Object);
+            }
+        }
+    }
+}
+static void OnScanSelectedPaths(const TArray<FString>& Paths)
+{
+    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
+    {
+        for (auto& Path : Paths)
+        {
+            FSoftObjectPath AssetPath(Path);
+            if (UObject* Object = AssetPath.TryLoad())
+            {
+                Subsystem->ScanObject(Object);
+            }
+        }
+    }
+}
+
+static void OnFixSelectedPaths(const TArray<FString>& Paths)
+{
+    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
+    {
+        for (auto& Path : Paths)
+        {
+            FSoftObjectPath AssetPath(Path);
+            if (UObject* Object = AssetPath.TryLoad())
+            {
+                Subsystem->ScanAndFixObject(Object);
+            }
+        }
     }
 }
 
 // ReSharper disable once CppPassValueParameterByConstReference
-static void OnExtendContentBrowserForSelectedPaths(FMenuBuilder& MenuBuilder, const TArray<FString> SelectedPaths)
+static void OnExtendForSelectedPaths(FMenuBuilder& MenuBuilder)
 {
     UE_LOG(RuleRanger, VeryVerbose, TEXT("FRuleRangerContentBrowserExtensions: OnExtendContentBrowser() invoked."));
 
     MenuBuilder.BeginSection("RuleRangerContentBrowserContext",
                              NSLOCTEXT("RuleRanger", "ContextMenuSectionName", "Rule Ranger"));
 
-    MenuBuilder.AddMenuEntry(
-        NSLOCTEXT("RuleRanger", "ScanSelectedPaths", "Scan with RuleRanger"),
-        NSLOCTEXT("RuleRanger", "ScanSelectedPaths", "Scan selected paths with RuleRanger"),
-        FSlateIcon(FRuleRangerStyle::GetStyleSetName(), FRuleRangerStyle::GetToolbarIconStyleName()),
-        FUIAction(FExecuteAction::CreateLambda([SelectedPaths]() { OnScanSelectedPaths(SelectedPaths); })),
-        NAME_None,
-        EUserInterfaceActionType::Button);
+    MenuBuilder.AddMenuEntry(FRuleRangerCommands::Get().ScanSelectedPaths);
+    MenuBuilder.AddMenuEntry(FRuleRangerCommands::Get().FixSelectedPaths);
 
     MenuBuilder.AddSeparator();
     MenuBuilder.EndSection();
 }
 
-static TSharedRef<FExtender> OnContentBrowserExtendSelectedPathsMenu(const TArray<FString>& SelectedPaths)
+static TSharedRef<FExtender> OnExtendSelectedPathsMenu(const TArray<FString>& Paths)
 {
-    UE_LOG(RuleRanger,
-           VeryVerbose,
-           TEXT("FRuleRangerContentBrowserExtensions: OnContentBrowserExtendSelectedPathsMenu() invoked."));
+    UE_LOG(RuleRanger, VeryVerbose, TEXT("OnExtendSelectedPathsMenu() invoked."));
+
+    const TSharedPtr<FUICommandList> CommandList = MakeShareable(new FUICommandList);
+    CommandList->MapAction(FRuleRangerCommands::Get().ScanSelectedPaths,
+                           FExecuteAction::CreateLambda(([Paths]() { OnScanSelectedPaths(Paths); })),
+                           FCanExecuteAction());
+    CommandList->MapAction(FRuleRangerCommands::Get().FixSelectedPaths,
+                           FExecuteAction::CreateLambda(([Paths]() { OnFixSelectedPaths(Paths); })),
+                           FCanExecuteAction());
     auto Extender = MakeShared<FExtender>();
-    const auto MenuExtensionDelegate =
-        FMenuExtensionDelegate::CreateStatic(&OnExtendContentBrowserForSelectedPaths, SelectedPaths);
-    Extender->AddMenuExtension("PathContextBulkOperations", EExtensionHook::After, nullptr, MenuExtensionDelegate);
+    const auto MenuExtensionDelegate = FMenuExtensionDelegate::CreateStatic(&OnExtendForSelectedPaths);
+    Extender->AddMenuExtension("PathContextBulkOperations", EExtensionHook::After, CommandList, MenuExtensionDelegate);
     return Extender;
 }
 
-static void OnScanSelectedAssets(const TArray<FAssetData>& SelectedAssets)
-{
-    if (const auto& Module = FModuleManager::GetModulePtr<FRuleRangerModule>(FRuleRangerModule::GetModuleName()))
-    {
-        // TODO: Replace this with dialog to perform scan
-        UE_LOG(RuleRanger, Error, TEXT("OnScanSelectedAssets not implemented yet."));
-    }
-}
-
 // ReSharper disable once CppPassValueParameterByConstReference
-static void OnExtendContentBrowserForSelectedAssets(FMenuBuilder& MenuBuilder, const TArray<FAssetData> SelectedAssets)
+static void OnExtendForSelectedAssets(FMenuBuilder& MenuBuilder)
 {
-    UE_LOG(RuleRanger, VeryVerbose, TEXT("FRuleRangerContentBrowserExtensions: OnExtendAssetSelectionMenu() invoked."));
+    UE_LOG(RuleRanger, VeryVerbose, TEXT("OnExtendForSelectedAssets() invoked."));
 
     MenuBuilder.BeginSection("RuleRangerContentBrowserContext",
                              NSLOCTEXT("RuleRanger", "ContextMenuSectionName", "Rule Ranger"));
 
-    MenuBuilder.AddMenuEntry(
-        NSLOCTEXT("RuleRanger", "ScanSelectedPaths", "Scan with RuleRanger"),
-        NSLOCTEXT("RuleRanger", "ScanSelectedPaths", "Scan selected paths with RuleRanger"),
-        FSlateIcon(FRuleRangerStyle::GetStyleSetName(), FRuleRangerStyle::GetToolbarIconStyleName()),
-        FUIAction(FExecuteAction::CreateLambda([SelectedAssets]() { OnScanSelectedAssets(SelectedAssets); })),
-        NAME_None,
-        EUserInterfaceActionType::Button);
+    MenuBuilder.AddMenuEntry(FRuleRangerCommands::Get().ScanSelectedAssets);
+    MenuBuilder.AddMenuEntry(FRuleRangerCommands::Get().FixSelectedAssets);
 
     MenuBuilder.AddSeparator();
     MenuBuilder.EndSection();
 }
 
-static TSharedRef<FExtender> OnContentBrowserExtendSelectedAssetsMenu(const TArray<FAssetData>& SelectedAssets)
+static TSharedRef<FExtender> OnExtendForSelectedAssetsMenu(const TArray<FAssetData>& Assets)
 {
-    UE_LOG(RuleRanger, VeryVerbose, TEXT("RuleRangerModule: OnContentBrowserExtendSelectedAssetsMenu() invoked."));
+    UE_LOG(RuleRanger, VeryVerbose, TEXT("OnExtendForSelectedAssetsMenu() invoked."));
+
+    const TSharedPtr<FUICommandList> CommandList = MakeShareable(new FUICommandList);
+    CommandList->MapAction(FRuleRangerCommands::Get().ScanSelectedPaths,
+                           FExecuteAction::CreateLambda(([Assets]() { OnScanSelectedAssets(Assets); })),
+                           FCanExecuteAction());
+    CommandList->MapAction(FRuleRangerCommands::Get().FixSelectedPaths,
+                           FExecuteAction::CreateLambda(([Assets]() { OnFixSelectedAssets(Assets); })),
+                           FCanExecuteAction());
+
     TSharedRef<FExtender> Extender = MakeShared<FExtender>();
-    const auto MenuExtensionDelegate =
-        FMenuExtensionDelegate::CreateStatic(&OnExtendContentBrowserForSelectedAssets, SelectedAssets);
-    Extender->AddMenuExtension("CommonAssetActions", EExtensionHook::After, nullptr, MenuExtensionDelegate);
+    const auto MenuExtensionDelegate = FMenuExtensionDelegate::CreateStatic(&OnExtendForSelectedAssets);
+    Extender->AddMenuExtension("CommonAssetActions", EExtensionHook::After, CommandList, MenuExtensionDelegate);
+
     return Extender;
 }
+
+FContentBrowserMenuExtender_SelectedPaths FRuleRangerContentBrowserExtensions::SelectedPathsDelegate;
+FDelegateHandle FRuleRangerContentBrowserExtensions::SelectedPathsDelegateHandle;
+FContentBrowserMenuExtender_SelectedAssets FRuleRangerContentBrowserExtensions::SelectedAssetsDelegate;
+FDelegateHandle FRuleRangerContentBrowserExtensions::SelectedAssetsDelegateHandle;
 
 void FRuleRangerContentBrowserExtensions::Initialize()
 {
@@ -109,20 +155,16 @@ void FRuleRangerContentBrowserExtensions::Initialize()
     UE_LOG(RuleRanger,
            VeryVerbose,
            TEXT("FRuleRangerContentBrowserExtensions::Shutdown(): Registering ContentBrowser Extensions."));
-    ContentBrowserMenuExtender_SelectedPathsDelegate =
-        FContentBrowserMenuExtender_SelectedPaths::CreateStatic(&OnContentBrowserExtendSelectedPathsMenu);
-    Module.GetAllPathViewContextMenuExtenders().Add(ContentBrowserMenuExtender_SelectedPathsDelegate);
-    ContentBrowserMenuExtender_SelectedPathsDelegateHandle =
-        ContentBrowserMenuExtender_SelectedPathsDelegate.GetHandle();
-    check(ContentBrowserMenuExtender_SelectedPathsDelegateHandle.IsValid());
+    SelectedPathsDelegate = FContentBrowserMenuExtender_SelectedPaths::CreateStatic(&OnExtendSelectedPathsMenu);
+    Module.GetAllPathViewContextMenuExtenders().Add(SelectedPathsDelegate);
+    SelectedPathsDelegateHandle = SelectedPathsDelegate.GetHandle();
+    check(SelectedPathsDelegateHandle.IsValid());
 
     // Asset extenders
-    ContentBrowserMenuExtender_SelectedAssetsDelegate =
-        FContentBrowserMenuExtender_SelectedAssets::CreateStatic(&OnContentBrowserExtendSelectedAssetsMenu);
-    Module.GetAllAssetViewContextMenuExtenders().Add(ContentBrowserMenuExtender_SelectedAssetsDelegate);
-    ContentBrowserMenuExtender_SelectedAssetsDelegateHandle =
-        ContentBrowserMenuExtender_SelectedAssetsDelegate.GetHandle();
-    check(ContentBrowserMenuExtender_SelectedAssetsDelegateHandle.IsValid());
+    SelectedAssetsDelegate = FContentBrowserMenuExtender_SelectedAssets::CreateStatic(&OnExtendForSelectedAssetsMenu);
+    Module.GetAllAssetViewContextMenuExtenders().Add(SelectedAssetsDelegate);
+    SelectedAssetsDelegateHandle = SelectedAssetsDelegate.GetHandle();
+    check(SelectedAssetsDelegateHandle.IsValid());
 }
 
 void FRuleRangerContentBrowserExtensions::Shutdown()
@@ -132,12 +174,12 @@ void FRuleRangerContentBrowserExtensions::Shutdown()
     if (FModuleManager::Get().IsModuleLoaded(ContentBrowserModuleName))
     {
         auto& Module = FModuleManager::LoadModuleChecked<FContentBrowserModule>(ContentBrowserModuleName);
-        if (ContentBrowserMenuExtender_SelectedPathsDelegateHandle.IsValid())
+        if (SelectedPathsDelegateHandle.IsValid())
         {
             UE_LOG(RuleRanger,
                    VeryVerbose,
                    TEXT("FRuleRangerContentBrowserExtensions::Shutdown(): Deregistering ContentBrowser Extensions."));
-            auto Target = ContentBrowserMenuExtender_SelectedPathsDelegateHandle;
+            auto Target = SelectedPathsDelegateHandle;
             Module.GetAllPathViewContextMenuExtenders().RemoveAll(
                 [&Target](const auto& Delegate) { return Delegate.GetHandle() == Target; });
             Target.Reset();

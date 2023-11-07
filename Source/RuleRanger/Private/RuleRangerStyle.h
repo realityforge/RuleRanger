@@ -35,9 +35,4 @@ public:
 private:
     static TSharedRef<FSlateStyleSet> Create();
     static TSharedPtr<FSlateStyleSet> StyleInstance;
-
-    const static FName ToolbarIconStyleName;
-
-public:
-    FORCEINLINE static const FName& GetToolbarIconStyleName() { return ToolbarIconStyleName; }
 };

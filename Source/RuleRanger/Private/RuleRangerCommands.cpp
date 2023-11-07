@@ -26,9 +26,24 @@ FRuleRangerCommands::FRuleRangerCommands()
 
 void FRuleRangerCommands::RegisterCommands()
 {
-    UI_COMMAND(OpenRuleRangerWindow,
-               "RuleRanger",
-               "Activate the RuleRanger window",
+    UI_COMMAND(ScanSelectedPaths,
+               "Scan with RuleRanger",
+               "Scan selected paths with RuleRanger",
+               EUserInterfaceActionType::Button,
+               FInputChord());
+    UI_COMMAND(FixSelectedPaths,
+               "Apply fixes with RuleRanger",
+               "Scan and fix selected paths with RuleRanger",
+               EUserInterfaceActionType::Button,
+               FInputChord());
+    UI_COMMAND(ScanSelectedAssets,
+               "Scan with RuleRanger",
+               "Scan selected assets with RuleRanger",
+               EUserInterfaceActionType::Button,
+               FInputChord());
+    UI_COMMAND(FixSelectedAssets,
+               "Apply fixes with RuleRanger",
+               "Scan and fix selected assets with RuleRanger",
                EUserInterfaceActionType::Button,
                FInputChord());
 }

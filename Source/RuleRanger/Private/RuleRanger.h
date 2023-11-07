@@ -13,33 +13,17 @@
  */
 #pragma once
 
-#include "ContentBrowserDelegates.h"
-#include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
 class FRuleRangerModule final : public IModuleInterface
 {
 public:
-    // -------------------------------------------------------------------------------------------
-    // Core Module functionality
-    // -------------------------------------------------------------------------------------------
-
     virtual void StartupModule() override;
     virtual void ShutdownModule() override;
 
 private:
-    // -------------------------------------------------------------------------------------------
-    // Content browser extensions
-    // -------------------------------------------------------------------------------------------
+    static const FName ModuleName;
 
-    // Delegate called when extending ContextBrowser SelectedPaths Context menu
-    FContentBrowserMenuExtender_SelectedPaths ContentBrowserMenuExtender_SelectedPathsDelegate;
-    FDelegateHandle ContentBrowserMenuExtender_SelectedPathsDelegateHandle;
-
-    // Delegate called when extending ContextBrowser SelectedAssets Context menu
-    FContentBrowserMenuExtender_SelectedAssets ContentBrowserMenuExtender_SelectedAssetsDelegate;
-    FDelegateHandle ContentBrowserMenuExtender_SelectedAssetsDelegateHandle;
-
-    void RegisterContentBrowserExtensions();
-    void DeregisterContentBrowserExtensions() const;
+public:
+    FORCEINLINE static const FName& GetModuleName() { return ModuleName; }
 };

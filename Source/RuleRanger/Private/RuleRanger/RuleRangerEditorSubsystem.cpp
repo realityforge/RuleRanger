@@ -82,7 +82,7 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
     {
         if (!ActionContext)
         {
-            UE_LOG(RuleRanger, Verbose, TEXT("RuleRangerEditorSubsystem: Creating the initial ActionContext"));
+            UE_LOG(RuleRanger, VeryVerbose, TEXT("RuleRangerEditorSubsystem: Creating the initial ActionContext"));
             ActionContext = NewObject<UActionContextImpl>(this, UActionContextImpl::StaticClass());
 
             // TODO: This will not have correct type when first created
@@ -90,7 +90,7 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
 
         auto RuleRangerRuleSetScopes = GetActiveRuleSetScopes();
         UE_LOG(RuleRanger,
-               Verbose,
+               VeryVerbose,
                TEXT("Located %d Rule Set Scope(s) when discovering rules for object %s"),
                RuleRangerRuleSetScopes.Num(),
                *Object->GetName());
@@ -106,7 +106,7 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
                         if (const auto RuleSet = RuleSetIt->Get())
                         {
                             UE_LOG(RuleRanger,
-                                   Verbose,
+                                   VeryVerbose,
                                    TEXT("Processing Rule Set %s for object %s"),
                                    *RuleSet->GetName(),
                                    *Object->GetName());
@@ -119,7 +119,7 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
                                     if (!ProcessRuleFunction(Rule, Object))
                                     {
                                         UE_LOG(RuleRanger,
-                                               Verbose,
+                                               VeryVerbose,
                                                TEXT("Rule %s indicated that following rules should be skipped for %s"),
                                                *RuleSet->GetName(),
                                                *Object->GetName());
@@ -171,7 +171,7 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* InObject, const 
     {
         auto RuleRangerRuleSetScopes = GetActiveRuleSetScopes();
         UE_LOG(RuleRanger,
-               Verbose,
+               VeryVerbose,
                TEXT("Located %d Rule Set Scope(s) when discovering rules for object %s"),
                RuleRangerRuleSetScopes.Num(),
                *InObject->GetName());
@@ -187,7 +187,7 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* InObject, const 
                         if (const auto RuleSet = RuleSetIt->Get())
                         {
                             UE_LOG(RuleRanger,
-                                   Verbose,
+                                   VeryVerbose,
                                    TEXT("Processing Rule Set %s for object %s"),
                                    *RuleSet->GetName(),
                                    *InObject->GetName());
@@ -257,7 +257,7 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(const bool bIsReim
     if ((!bIsReimport && Rule->bApplyOnImport) || (bIsReimport && Rule->bApplyOnReimport))
     {
         UE_LOG(RuleRanger,
-               Verbose,
+               VeryVerbose,
                TEXT("OnAssetPostImport(%s) applying rule %s during %s."),
                *InObject->GetName(),
                *Rule->GetName(),
@@ -274,7 +274,7 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(const bool bIsReim
         if (ERuleRangerActionState::AS_Fatal == State)
         {
             UE_LOG(RuleRanger,
-                   Verbose,
+                   VeryVerbose,
                    TEXT("OnAssetPostImport(%s) applied rule %s which resulted in fatal error. "
                         "Processing rules will not continue."),
                    *InObject->GetName(),
@@ -285,7 +285,7 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(const bool bIsReim
         else if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
         {
             UE_LOG(RuleRanger,
-                   Verbose,
+                   VeryVerbose,
                    TEXT("OnAssetPostImport(%s) applied rule %s which resulted in error. "
                         "Processing rules will not continue as ContinueOnError=False."),
                    *InObject->GetName(),
@@ -297,7 +297,7 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(const bool bIsReim
     else
     {
         UE_LOG(RuleRanger,
-               Verbose,
+               VeryVerbose,
                TEXT("OnAssetPostImport(%s) skipped rule %s as flag on "
                     "rule does not enable rule during %s."),
                *InObject->GetName(),
@@ -314,7 +314,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerRule* Rule, UObjec
     if (Rule->bApplyOnDemand)
     {
         UE_LOG(RuleRanger,
-               Verbose,
+               VeryVerbose,
                TEXT("ProcessDemandScan(%s) applying rule %s."),
                *InObject->GetName(),
                *Rule->GetName());
@@ -328,7 +328,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerRule* Rule, UObjec
         if (ERuleRangerActionState::AS_Fatal == State)
         {
             UE_LOG(RuleRanger,
-                   Verbose,
+                   VeryVerbose,
                    TEXT("ProcessDemandScan(%s) applied rule %s which resulted in fatal error. "
                         "Processing rules will not continue."),
                    *InObject->GetName(),
@@ -339,7 +339,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerRule* Rule, UObjec
         else if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
         {
             UE_LOG(RuleRanger,
-                   Verbose,
+                   VeryVerbose,
                    TEXT("ProcessDemandScan(%s) applied rule %s which resulted in error. "
                         "Processing rules will not continue as ContinueOnError=False."),
                    *InObject->GetName(),
@@ -351,7 +351,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerRule* Rule, UObjec
     else
     {
         UE_LOG(RuleRanger,
-               Verbose,
+               VeryVerbose,
                TEXT("ProcessDemandScan(%s) skipped rule %s as flag on "
                     "rule does not enable rule on demand."),
                *InObject->GetName(),
@@ -367,7 +367,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerRule* Rule, 
     if (Rule->bApplyOnDemand)
     {
         UE_LOG(RuleRanger,
-               Verbose,
+               VeryVerbose,
                TEXT("ProcessDemandScanAndFix(%s) applying rule %s."),
                *InObject->GetName(),
                *Rule->GetName());
@@ -381,7 +381,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerRule* Rule, 
         if (ERuleRangerActionState::AS_Fatal == State)
         {
             UE_LOG(RuleRanger,
-                   Verbose,
+                   VeryVerbose,
                    TEXT("ProcessDemandScanAndFix(%s) applied rule %s which resulted in fatal error. "
                         "Processing rules will not continue."),
                    *InObject->GetName(),
@@ -392,7 +392,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerRule* Rule, 
         else if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
         {
             UE_LOG(RuleRanger,
-                   Verbose,
+                   VeryVerbose,
                    TEXT("ProcessDemandScanAndFix(%s) applied rule %s which resulted in error. "
                         "Processing rules will not continue as ContinueOnError=False."),
                    *InObject->GetName(),
@@ -404,7 +404,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerRule* Rule, 
     else
     {
         UE_LOG(RuleRanger,
-               Verbose,
+               VeryVerbose,
                TEXT("ProcessDemandScanAndFix(%s) skipped rule %s as flag on "
                     "rule does not enable rule on demand."),
                *InObject->GetName(),

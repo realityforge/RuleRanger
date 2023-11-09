@@ -13,8 +13,9 @@
  */
 #include "RuleRanger/Matchers/ObjectTypeMatcher.h"
 #include "Editor.h"
+#include "RuleRanger/RuleRangerUtilities.h"
 
 bool UObjectTypeMatcher::Test_Implementation(UObject* Object)
 {
-    return Object->IsA(ObjectType);
+    return RuleRangerUtilities::IsA(Object, ObjectType);
 }

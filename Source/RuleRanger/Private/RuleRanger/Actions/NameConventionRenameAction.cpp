@@ -168,6 +168,7 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
 void UNameConventionRenameAction::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
     const FName PropertyName = PropertyChangedEvent.Property ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+    // ReSharper disable once CppTooWideScopeInitStatement
     const FName TableName = GET_MEMBER_NAME_CHECKED(UNameConventionRenameAction, NameConventionsTable);
     if (TableName == PropertyName)
     {
@@ -207,6 +208,7 @@ void UNameConventionRenameAction::RebuildNameConventionsCacheIfNecessary()
         for (const auto RowName : NameConventionsTable->GetRowNames())
         {
             const auto NameConvention = NameConventionsTable->FindRow<FNameConvention>(RowName, TEXT(""));
+            // ReSharper disable once CppTooWideScopeInitStatement
             const auto ObjectType = NameConvention->ObjectType.Get();
             if (NameConvention && IsValid(ObjectType))
             {

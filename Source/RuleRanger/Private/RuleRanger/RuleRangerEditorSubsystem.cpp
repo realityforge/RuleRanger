@@ -91,7 +91,7 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
         auto RuleRangerRuleSetScopes = GetActiveRuleSetScopes();
         UE_LOG(RuleRanger,
                VeryVerbose,
-               TEXT("Located %d Rule Set Scope(s) when discovering rules for object %s"),
+               TEXT("ProcessRule: Located %d Rule Set Scope(s) when discovering rules for object %s"),
                RuleRangerRuleSetScopes.Num(),
                *Object->GetName());
         for (auto RuleSetScopeIt = RuleRangerRuleSetScopes.CreateIterator(); RuleSetScopeIt; ++RuleSetScopeIt)
@@ -106,7 +106,7 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
                         {
                             UE_LOG(RuleRanger,
                                    VeryVerbose,
-                                   TEXT("Processing Rule Set %s for object %s"),
+                                   TEXT("ProcessRule: Processing Rule Set %s for object %s"),
                                    *RuleSet->GetName(),
                                    *Object->GetName());
                             int RuleIndex = 0;
@@ -119,7 +119,8 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
                                     {
                                         UE_LOG(RuleRanger,
                                                VeryVerbose,
-                                               TEXT("Rule %s indicated that following rules should be skipped for %s"),
+                                               TEXT("ProcessRule: Rule %s indicated that following "
+                                                    "rules should be skipped for %s"),
                                                *RuleSet->GetName(),
                                                *Object->GetName());
                                         ActionContext->ClearContext();
@@ -130,7 +131,7 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
                                 {
                                     UE_LOG(RuleRanger,
                                            Error,
-                                           TEXT("Invalid Rule skipped at index %d in "
+                                           TEXT("ProcessRule: Invalid Rule skipped at index %d in "
                                                 "rule set '%s' "
                                                 "from scope '%s' when analyzing object '%s'"),
                                            RuleIndex,
@@ -143,11 +144,12 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
                         }
                         else
                         {
-                            UE_LOG(RuleRanger,
-                                   Error,
-                                   TEXT("Invalid RuleSet skipped when processing rules for %s in scope %s"),
-                                   *Object->GetName(),
-                                   *RuleSetScope->GetName());
+                            UE_LOG(
+                                RuleRanger,
+                                Error,
+                                TEXT("ProcessRule: Invalid RuleSet skipped when processing rules for %s in scope %s"),
+                                *Object->GetName(),
+                                *RuleSetScope->GetName());
                         }
                     }
                 }
@@ -171,7 +173,7 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* InObject, const 
         auto RuleRangerRuleSetScopes = GetActiveRuleSetScopes();
         UE_LOG(RuleRanger,
                VeryVerbose,
-               TEXT("Located %d Rule Set Scope(s) when discovering rules for object %s"),
+               TEXT("IsMatchingRulePresent: Located %d Rule Set Scope(s) when discovering rules for object %s"),
                RuleRangerRuleSetScopes.Num(),
                *InObject->GetName());
         for (auto RuleSetScopeIt = RuleRangerRuleSetScopes.CreateIterator(); RuleSetScopeIt; ++RuleSetScopeIt)
@@ -186,7 +188,7 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* InObject, const 
                         {
                             UE_LOG(RuleRanger,
                                    VeryVerbose,
-                                   TEXT("Processing Rule Set %s for object %s"),
+                                   TEXT("IsMatchingRulePresent: Processing Rule Set %s for object %s"),
                                    *RuleSet->GetName(),
                                    *InObject->GetName());
                             int RuleIndex = 0;
@@ -204,7 +206,7 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* InObject, const 
                                 {
                                     UE_LOG(RuleRanger,
                                            Error,
-                                           TEXT("Invalid Rule skipped at index %d in "
+                                           TEXT("IsMatchingRulePresent: Invalid Rule skipped at index %d in "
                                                 "rule set '%s' "
                                                 "from scope '%s' when analyzing object '%s'"),
                                            RuleIndex,
@@ -219,7 +221,8 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* InObject, const 
                         {
                             UE_LOG(RuleRanger,
                                    Error,
-                                   TEXT("Invalid RuleSet skipped when processing rules for %s in scope %s"),
+                                   TEXT("IsMatchingRulePresent: Invalid RuleSet skipped when processing "
+                                        "rules for %s in scope %s"),
                                    *InObject->GetName(),
                                    *RuleSetScope->GetName());
                         }
@@ -230,7 +233,7 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* InObject, const 
             {
                 UE_LOG(RuleRanger,
                        Error,
-                       TEXT("Invalid RuleSetScope skipped when processing rules for %s"),
+                       TEXT("IsMatchingRulePresent: Invalid RuleSetScope skipped when processing rules for %s"),
                        *InObject->GetName());
             }
         }

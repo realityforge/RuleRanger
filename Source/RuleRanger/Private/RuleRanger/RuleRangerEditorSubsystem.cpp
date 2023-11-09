@@ -100,8 +100,7 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
             {
                 if (const auto Path = Object->GetPathName(); RuleSetScope->ScopeMatches(Path))
                 {
-                    for (const auto RuleSetIt = RuleSetScope->RuleSets.CreateIterator(); RuleSetScopeIt;
-                         ++RuleSetScopeIt)
+                    for (auto RuleSetIt = RuleSetScope->RuleSets.CreateIterator(); RuleSetIt; ++RuleSetIt)
                     {
                         if (const auto RuleSet = RuleSetIt->Get())
                         {
@@ -181,8 +180,7 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* InObject, const 
             {
                 if (const auto Path = InObject->GetPathName(); RuleSetScope->ScopeMatches(Path))
                 {
-                    for (const auto RuleSetIt = RuleSetScope->RuleSets.CreateIterator(); RuleSetScopeIt;
-                         ++RuleSetScopeIt)
+                    for (auto RuleSetIt = RuleSetScope->RuleSets.CreateIterator(); RuleSetIt; ++RuleSetIt)
                     {
                         if (const auto RuleSet = RuleSetIt->Get())
                         {

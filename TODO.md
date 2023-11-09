@@ -28,7 +28,6 @@ Shorthand notes of where to go next with this experiment:
 * Add check to ensure sRGB set only BaseColor textures where expected?
 * Add metadata to assets to track origin. (i.e. What license and where was it sourced from)
 * Add rule so that certain native classes only have Data-only subtypes. Use `FBlueprintEditorUtils::IsDataOnlyBlueprint(Blueprint)` (Maybe add this as a Matcher and then combine with a Fail action)
-* Add an action that always fails with a specified message. (Combined with matchers this will detect scenarios we have decided against supporting.)
 
 Add Action that applies a layout for textures based on metadata and types? Maybe something like:
 Possible Directory layout:

@@ -130,28 +130,33 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                         }
                     }
                 }
-                if (bNotifyIfNameConventionMissing)
+
+                // Only attempt to apply naming conventions to outermost packages
+                if (const UObject* OutermostObject = Object->GetOutermostObject(); OutermostObject == Object)
                 {
-                    FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
-                        .Warning()
-                        ->AddToken(FTextToken::Create(NSLOCTEXT("RuleRanger",
-                                                                "MissingNamingConvention",
-                                                                "Unable to locate Naming Convention for ")))
-                        ->AddToken(FUObjectToken::Create(Object))
-                        ->AddToken(FTextToken::Create(NSLOCTEXT("RuleRanger", "OfType", " of type ")))
-                        ->AddToken(FUObjectToken::Create(Object->GetClass()))
-                        ->AddToken(FTextToken::Create(NSLOCTEXT("RuleRanger", "In", " in ")))
-                        ->AddToken(FUObjectToken::Create(NameConventionsTable));
-                }
-                else
-                {
-                    UE_LOG(RuleRanger,
-                           VeryVerbose,
-                           TEXT("NameConventionRenameAction: Unable to locate Naming Convention for "
-                                "object '%s' of type '%s' in '%s'."),
-                           *OriginalName,
-                           *Object->GetClass()->GetName(),
-                           *NameConventionsTable->GetName());
+                    if (bNotifyIfNameConventionMissing)
+                    {
+                        FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
+                            .Warning()
+                            ->AddToken(FTextToken::Create(NSLOCTEXT("RuleRanger",
+                                                                    "MissingNamingConvention",
+                                                                    "Unable to locate Naming Convention for")))
+                            ->AddToken(FUObjectToken::Create(Object))
+                            ->AddToken(FTextToken::Create(NSLOCTEXT("RuleRanger", "OfType", "of type")))
+                            ->AddToken(FUObjectToken::Create(Object->GetClass()))
+                            ->AddToken(FTextToken::Create(NSLOCTEXT("RuleRanger", "In", " in ")))
+                            ->AddToken(FUObjectToken::Create(NameConventionsTable));
+                    }
+                    else
+                    {
+                        UE_LOG(RuleRanger,
+                               VeryVerbose,
+                               TEXT("NameConventionRenameAction: Unable to locate Naming Convention for "
+                                    "asset '%s' of type '%s' in '%s'."),
+                               *OriginalName,
+                               *Object->GetClass()->GetName(),
+                               *NameConventionsTable->GetName());
+                    }
                 }
             }
         }

@@ -94,7 +94,7 @@ void FRuleRangerUtilities::CollectInstanceHierarchy(UObject* Object, TArray<UObj
 
     if (Object->IsA<UMaterialInstance>())
     {
-        UMaterialInstance* Instance = Cast<UMaterialInstance>(Object);
+        const UMaterialInstance* Instance = Cast<UMaterialInstance>(Object);
         while (Instance)
         {
             if (Instance->Parent)

@@ -100,8 +100,9 @@ void FRuleRangerUtilities::CollectInstanceHierarchy(UObject* Object, TArray<UObj
             if (Instance->Parent)
             {
                 Instances.Add(Instance->Parent);
-            } // This will be null if we traverse from MaterialInstance parent to Material which will terminate this
-              // loop
+            }
+            // This will be null if we traverse from MaterialInstance parent to Material
+            // which will terminate this loop
             Instance = Cast<UMaterialInstance>(Instance->Parent);
         }
     }

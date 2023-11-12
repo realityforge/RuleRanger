@@ -21,12 +21,12 @@ bool UEditorPropertyMatcher::Test_Implementation(UObject* Object)
     if (Name != NAME_None && IsValid(Object))
     {
         TArray<UObject*> Instances;
-        RuleRangerUtilities::CollectInstanceHierarchy(Object, Instances);
+        FRuleRangerUtilities::CollectInstanceHierarchy(Object, Instances);
 
         for (const auto Instance : Instances)
         {
             TArray<UClass*> Classes;
-            RuleRangerUtilities::CollectTypeHierarchy(Instance, Classes);
+            FRuleRangerUtilities::CollectTypeHierarchy(Instance, Classes);
             for (const auto Class : Classes)
             {
                 if (const auto Property = Class->FindPropertyByName(Name))

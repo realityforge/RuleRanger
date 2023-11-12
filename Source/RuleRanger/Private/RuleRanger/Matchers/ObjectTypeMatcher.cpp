@@ -17,5 +17,5 @@
 
 bool UObjectTypeMatcher::Test_Implementation(UObject* Object)
 {
-    return RuleRangerUtilities::IsA(Object, ObjectType);
+    return FRuleRangerUtilities::IsA(Object, ObjectType);
 }

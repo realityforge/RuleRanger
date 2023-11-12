@@ -61,7 +61,7 @@ void URemoveNameSuffixAction::Apply_Implementation(TScriptInterface<IRuleRangerA
 
                     ActionContext->Info(Message);
 
-                    if (!RuleRangerUtilities::RenameAsset(Object, NewName))
+                    if (!FRuleRangerUtilities::RenameAsset(Object, NewName))
                     {
                         const auto InMessage =
                             FText::Format(NSLOCTEXT("RuleRanger",

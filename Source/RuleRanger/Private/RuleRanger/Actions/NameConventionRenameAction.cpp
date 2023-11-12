@@ -38,7 +38,7 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                 const FString OriginalName{ Object->GetName() };
 
                 TArray<UClass*> Classes;
-                RuleRangerUtilities::CollectTypeHierarchy(Object, Classes);
+                FRuleRangerUtilities::CollectTypeHierarchy(Object, Classes);
                 for (auto Class : Classes)
                 {
                     UE_LOG(RuleRanger,
@@ -113,7 +113,7 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
 
                                         ActionContext->Info(Message);
 
-                                        if (!RuleRangerUtilities::RenameAsset(Object, NewName))
+                                        if (!FRuleRangerUtilities::RenameAsset(Object, NewName))
                                         {
                                             const auto InMessage = FText::Format(
                                                 NSLOCTEXT("RuleRanger",

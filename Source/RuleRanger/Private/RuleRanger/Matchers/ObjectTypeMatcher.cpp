@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "RuleRanger/Matchers/ObjectTypeMatcher.h"
+#include "ObjectTypeMatcher.h"
 #include "Editor.h"
 #include "RuleRanger/RuleRangerUtilities.h"
 

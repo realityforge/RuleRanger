@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "RuleRanger/Matchers/EditorPropertyMatcher.h"
+#include "EditorPropertyMatcher.h"
 #include "Editor.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "RuleRanger/RuleRangerUtilities.h"

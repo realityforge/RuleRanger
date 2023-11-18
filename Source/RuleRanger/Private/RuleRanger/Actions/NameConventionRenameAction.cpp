@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-#include "RuleRanger/Actions/NameConventionRenameAction.h"
+#include "NameConventionRenameAction.h"
 #include "Editor.h"
 #include "Misc/UObjectToken.h"
 #include "RuleRanger/RuleRangerUtilities.h"

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-#include "RuleRanger/Actions/RemoveNamePrefixAction.h"
+#include "RemoveNamePrefixAction.h"
 #include "Editor.h"
 #include "RuleRanger/RuleRangerUtilities.h"
 #include "RuleRangerLogging.h"

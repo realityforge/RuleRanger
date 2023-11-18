@@ -29,7 +29,7 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
         {
             RebuildNameConventionsCacheIfNecessary();
 
-            if (!NameConventionsMap.IsEmpty())
+            if (!NameConventionsCache.IsEmpty())
             {
                 const auto Subsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>();
                 const auto Variant =
@@ -45,7 +45,7 @@ void UNameConventionRenameAction::Apply_Implementation(TScriptInterface<IRuleRan
                            VeryVerbose,
                            TEXT("NameConventionRenameAction: Looking for NamingConvention rules for class %s"),
                            *Class->GetName());
-                    if (TArray<FNameConvention>* NameConventions = NameConventionsMap.Find(Class))
+                    if (TArray<FNameConvention>* NameConventions = NameConventionsCache.Find(Class))
                     {
                         UE_LOG(RuleRanger,
                                VeryVerbose,
@@ -196,14 +196,14 @@ void UNameConventionRenameAction::ResetNameConventionsCache()
 {
     UE_LOG(RuleRanger, VeryVerbose, TEXT("NameConventionRenameAction: Resetting the Name Conventions Cache"));
 
-    NameConventionsMap.Empty();
+    NameConventionsCache.Empty();
     FCoreUObjectDelegates::OnObjectModified.Remove(OnObjectModifiedDelegateHandle);
     OnObjectModifiedDelegateHandle.Reset();
 }
 
 void UNameConventionRenameAction::RebuildNameConventionsCacheIfNecessary()
 {
-    if (NameConventionsMap.IsEmpty() && 0 != NameConventionsTable->GetTableData().Num())
+    if (NameConventionsCache.IsEmpty() && 0 != NameConventionsTable->GetTableData().Num())
     {
         ResetNameConventionsCache();
         // Add a callback for when ANY object is modified in the editor so that we can bust the cache
@@ -217,12 +217,12 @@ void UNameConventionRenameAction::RebuildNameConventionsCacheIfNecessary()
             const auto ObjectType = NameConvention->ObjectType.Get();
             if (NameConvention && IsValid(ObjectType))
             {
-                TArray<FNameConvention>& TypeConventions = NameConventionsMap.FindOrAdd(ObjectType);
+                TArray<FNameConvention>& TypeConventions = NameConventionsCache.FindOrAdd(ObjectType);
                 TypeConventions.Add(*NameConvention);
                 TypeConventions.Sort();
             }
         }
-        for (auto NameConventionEntry : NameConventionsMap)
+        for (auto NameConventionEntry : NameConventionsCache)
         {
             UE_LOG(RuleRanger,
                    VeryVerbose,

@@ -91,7 +91,7 @@ private:
     bool bNotifyIfNameConventionMissing;
 
     /** Cache for looking up rules. */
-    TMap<TObjectPtr<UClass>, TArray<FNameConvention>> NameConventionsMap;
+    TMap<TObjectPtr<UClass>, TArray<FNameConvention>> NameConventionsCache;
 
     /** Handle for delegate called when any object modified in editor. */
     FDelegateHandle OnObjectModifiedDelegateHandle;

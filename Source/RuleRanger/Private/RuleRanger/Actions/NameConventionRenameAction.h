@@ -27,7 +27,7 @@ inline static FString NameConvention_DefaultVariant{ TEXT("") };
 USTRUCT(BlueprintType)
 struct FNameConvention final : public FTableRowBase
 {
-    GENERATED_USTRUCT_BODY();
+    GENERATED_BODY();
 
     /** The object type that this name convention applied to. */
     UPROPERTY(EditAnywhere, meta = (AllowAbstract))

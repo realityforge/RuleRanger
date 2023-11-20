@@ -17,7 +17,6 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "RuleRangerAction.h"
-#include "RuleRangerLogging.h"
 #include "CheckTextureSubTypePartOfName.generated.h"
 
 /**

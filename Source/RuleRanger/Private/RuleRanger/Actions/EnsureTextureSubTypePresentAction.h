@@ -17,31 +17,8 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "RuleRangerAction.h"
-#include "CheckTextureSubTypePartOfName.generated.h"
-
-/**
- * The various texture subtypes in use.
- */
-UENUM(BlueprintType)
-enum class ETextureSubType : uint8
-{
-    AT_Roughness UMETA(DisplayName = "Roughness"),
-    AT_Opacity UMETA(DisplayName = "Alpha/Opacity"),
-    AT_AmbientOcclusion UMETA(DisplayName = "Ambient Occlusion"),
-    AT_BaseColor UMETA(DisplayName = "Base Color"),
-    AT_Specular UMETA(DisplayName = "Specular"),
-    AT_Metallic UMETA(DisplayName = "Metallic"),
-    AT_Normal UMETA(DisplayName = "Normal"),
-    AT_Emissive UMETA(DisplayName = "Emissive"),
-    AT_Height UMETA(DisplayName = "Height"),
-    AT_Mask UMETA(DisplayName = "Mask"),
-    AT_FlowMap UMETA(DisplayName = "Flow Map"),
-    AT_Displacement UMETA(DisplayName = "Displacement"),
-    AT_LightMap UMETA(DisplayName = "Light Map"),
-    AT_Unspecified UMETA(DisplayName = "Unspecified"),
-
-    AT_Max UMETA(Hidden)
-};
+#include "TextureSubType.h"
+#include "EnsureTextureSubTypePresentAction.generated.h"
 
 /**
  * The structure defining naming conventions for Texture extensions.
@@ -55,7 +32,7 @@ struct FTextureSubTypeNameConvention final : public FTableRowBase
      * The variant/subtype that this rule applies to.
      */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    ETextureSubType SubType{ ETextureSubType::AT_Unspecified };
+    ETextureSubType SubType{ ETextureSubType::AT_BaseColor };
 
     /** The prefix to add to the name (if any). */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -79,7 +56,7 @@ UCLASS(AutoExpandCategories = ("Rule Ranger"),
        CollapseCategories,
        DefaultToInstanced,
        EditInlineNew)
-class RULERANGER_API UCheckTextureSubTypePartOfName final : public URuleRangerAction
+class RULERANGER_API UEnsureTextureSubTypePresentAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 
@@ -88,6 +65,12 @@ public:
                                       UObject* Object) override;
 
     virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
+protected:
+    void ApplyRuleToTexture(TScriptInterface<IRuleRangerActionContext>& ActionContext, UTexture2D* Texture);
+    void ApplyRuleToTextureWithSubTypes(TScriptInterface<IRuleRangerActionContext>& ActionContext,
+                                        UTexture2D* Texture,
+                                        const TArray<ETextureSubType>& SubTypes);
 
 private:
     /** The table that contains the object naming rules */

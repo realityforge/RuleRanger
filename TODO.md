@@ -14,6 +14,11 @@ Shorthand notes of where to go next with this experiment:
 * Add check to ensure sRGB set only BaseColor textures where expected?
 * Add validation to ensure every texture is marked with a TextureGroup
 * Add metadata to assets to track origin. (i.e. What license and where was it sourced from)
+* Rather than statically defining `ETextureSubType`, define it in a table
+  * Merge `FTextureSubTypeNameConvention` into it
+  * Add component count for each SubType
+  * Add default/allowed modes (Color, Linear Color, Alpha etc)
+  * Add default/allowed compressions
 
 Add Action that applies a layout for textures based on metadata and types? Maybe something like:
 Possible Directory layout:

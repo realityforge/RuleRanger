@@ -15,15 +15,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "K2Node_FunctionEntry.h"
 #include "RuleRangerAction.h"
-#include "BaseAnalyzeFunctionAction.generated.h"
+#include "BaseAnalyzeVariableAction.generated.h"
 
 /**
- * Base class for analyzing the functions in a Blueprint Graph.
+ * Base class for analyzing the variables in a Blueprint.
  */
 UCLASS(Abstract, AutoExpandCategories = ("Rule Ranger"))
-class RULERANGER_API UBaseAnalyzeFunctionAction : public URuleRangerAction
+class RULERANGER_API UBaseAnalyzeVariableAction : public URuleRangerAction
 {
     GENERATED_BODY()
 
@@ -47,16 +46,16 @@ protected:
     virtual bool ShouldAnalyzeGraph(UEdGraph* Graph) const;
 
     /**
-     * Function to override to analyze a particular function.
+     * Function to override to analyze a particular variable.
      *
      * @param ActionContext The ActionContext.
      * @param Blueprint The root object (a.k.a. the Blueprint)
-     * @param FunctionEntry The node representing the function entry point.
-     * @param Graph The Function graph.
+     * @param Variable The Variable.
+     * @param Graph The Function graph if a local variable else nullptr.
      */
-    virtual void AnalyzeFunction(URuleRangerActionContext* ActionContext,
+    virtual void AnalyzeVariable(URuleRangerActionContext* ActionContext,
                                  UBlueprint* Blueprint,
-                                 UK2Node_FunctionEntry* FunctionEntry,
+                                 const FBPVariableDescription& Variable,
                                  UEdGraph* Graph);
 
 public:

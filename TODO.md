@@ -36,6 +36,7 @@ Shorthand notes of where to go next with this experiment:
   * Ensure parameters follow naming convention
   * Ensure that parameters of specific name/type exist on a material ... or a material property? (Useful when using to create dynamic material instance and use strings to match parameters)
   * Ensure that materials associated with Skeletons that have Material type animation curves, have materials with parameters that match.
+  * Ensure that there are no gangling nodes in material
 * Native Class checks:
   * Add naming convention check for native classes/structs
   * Add naming convention check for native classes/structs properties and functions
@@ -50,6 +51,7 @@ Shorthand notes of where to go next with this experiment:
   * Ensure variables have groups/categories and descriptions
   * Ensure that there are no loose nodes
   * Ensure that Blueprint is compiled
+  * Add "_FunctionLibrary" to ControlRigs that are just collections of functions and no ForwardSolve? Do it via Variants mechanism
 * Blueprint checks:
   * Add check to ensure that every Blueprint (that inherits from a specific class?) has a Thumbnail specified
   * Add check that all private Blueprint functions are called

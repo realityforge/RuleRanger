@@ -18,6 +18,7 @@
 #include "RuleRangerDeveloperSettings.h"
 #include "RuleRangerLogging.h"
 #include "RuleRangerRule.h"
+#include "RuleRangerRuleExclusion.h"
 #include "RuleRangerRuleSet.h"
 #include "Subsystems/EditorAssetSubsystem.h"
 #include "Subsystems/ImportSubsystem.h"
@@ -75,6 +76,114 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
     });
 }
 
+bool URuleRangerEditorSubsystem::ProcessRuleSetForObject(URuleRangerConfig* const Config,
+                                                         URuleRangerRuleSet* const RuleSet,
+                                                         TArray<URuleRangerRuleExclusion*> Exclusions,
+                                                         UObject* Object,
+                                                         const FRuleRangerRuleFn& ProcessRuleFunction)
+{
+    UE_LOG(RuleRanger,
+           VeryVerbose,
+           TEXT("ProcessRule: Processing Rule Set %s for object %s"),
+           *RuleSet->GetName(),
+           *Object->GetName());
+
+    for (auto ExclusionIt = Exclusions.CreateIterator(); ExclusionIt; ++ExclusionIt)
+    {
+        if (const auto Exclusion = *ExclusionIt)
+        {
+            if (Exclusion->RuleSets.Contains(RuleSet))
+            {
+                UE_LOG(RuleRanger,
+                       VeryVerbose,
+                       TEXT("ProcessRule: Rule Set %s excluded for object %s due to exclusion rule. Reason: %s"),
+                       *RuleSet->GetName(),
+                       *Object->GetName(),
+                       *Exclusion->Description.ToString());
+                return true;
+            }
+        }
+    }
+
+    for (auto RuleSetIt = RuleSet->RuleSets.CreateIterator(); RuleSetIt; ++RuleSetIt)
+    {
+        if (const auto NestedRuleSet = RuleSetIt->Get())
+        {
+            UE_LOG(RuleRanger,
+                   VeryVerbose,
+                   TEXT("ProcessRule: Processing Nested Rule Set %s for object %s"),
+                   *NestedRuleSet->GetName(),
+                   *Object->GetName());
+            if (!ProcessRuleSetForObject(Config, NestedRuleSet, Exclusions, Object, ProcessRuleFunction))
+            {
+                return false;
+            }
+            UE_LOG(RuleRanger,
+                   VeryVerbose,
+                   TEXT("ProcessRule: Completed processing of Nested Rule Set %s for object %s"),
+                   *NestedRuleSet->GetName(),
+                   *Object->GetName());
+        }
+        else
+        {
+            UE_LOG(RuleRanger,
+                   Error,
+                   TEXT("ProcessRule: Invalid RuleSet skipped when processing rules for %s in config %s"),
+                   *Object->GetName(),
+                   *Config->GetName());
+        }
+    }
+
+    int RuleIndex = 0;
+    for (const auto RulePtr : RuleSet->Rules)
+    {
+        // ReSharper disable once CppTooWideScopeInitStatement
+        if (const auto Rule = RulePtr.Get(); IsValid(Rule))
+        {
+            for (auto ExclusionIt = Exclusions.CreateIterator(); ExclusionIt; ++ExclusionIt)
+            {
+                if (const auto Exclusion = *ExclusionIt)
+                {
+                    if (Exclusion->Rules.Contains(Rule))
+                    {
+                        UE_LOG(RuleRanger,
+                               VeryVerbose,
+                               TEXT("ProcessRule: Rule %s excluded for object %s due to exclusion rule. Reason: %s"),
+                               *Rule->GetName(),
+                               *Object->GetName(),
+                               *Exclusion->Description.ToString());
+                        return true;
+                    }
+                }
+            }
+
+            if (!ProcessRuleFunction(Rule, Object))
+            {
+                UE_LOG(RuleRanger,
+                       VeryVerbose,
+                       TEXT("ProcessRule: Rule %s indicated that following rules should be skipped for %s"),
+                       *RuleSet->GetName(),
+                       *Object->GetName());
+                ActionContext->ClearContext();
+                return false;
+            }
+        }
+        else
+        {
+            UE_LOG(RuleRanger,
+                   Error,
+                   TEXT("ProcessRule: Invalid Rule skipped at index %d in rule set '%s' "
+                        "from config '%s' when analyzing object '%s'"),
+                   RuleIndex,
+                   *RuleSet->GetName(),
+                   *Config->GetName(),
+                   *Object->GetName());
+        }
+        RuleIndex++;
+    }
+    return true;
+}
+
 // ReSharper disable once CppMemberFunctionMayBeStatic
 void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerRuleFn& ProcessRuleFunction)
 {
@@ -92,7 +201,7 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
         const auto Path = Object->GetPathName();
         UE_LOG(RuleRanger,
                VeryVerbose,
-               TEXT("ProcessRule: Located %d Rule Set Scope(s) when discovering rules for object %s at %s"),
+               TEXT("ProcessRule: Located %d Rule Set Config(s) when discovering rules for object %s at %s"),
                Configs.Num(),
                *Object->GetName(),
                *Path);
@@ -102,46 +211,26 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
             {
                 if (Config->ConfigMatches(Path))
                 {
+
+                    TArray<URuleRangerRuleExclusion*> Exclusions;
+                    for (auto ExclusionIt = Config->Exclusions.CreateIterator(); ExclusionIt; ++ExclusionIt)
+                    {
+                        if (const auto Exclusion = ExclusionIt->Get())
+                        {
+                            if (Exclusion->ExclusionMatches(*Object, Path))
+                            {
+                                Exclusions.Add(Exclusion);
+                            }
+                        }
+                    }
+
                     for (auto RuleSetIt = Config->RuleSets.CreateIterator(); RuleSetIt; ++RuleSetIt)
                     {
                         if (const auto RuleSet = RuleSetIt->Get())
                         {
-                            UE_LOG(RuleRanger,
-                                   VeryVerbose,
-                                   TEXT("ProcessRule: Processing Rule Set %s for object %s"),
-                                   *RuleSet->GetName(),
-                                   *Object->GetName());
-                            int RuleIndex = 0;
-                            for (const auto RulePtr : RuleSet->Rules)
+                            if (!ProcessRuleSetForObject(Config, RuleSet, Exclusions, Object, ProcessRuleFunction))
                             {
-                                // ReSharper disable once CppTooWideScopeInitStatement
-                                if (const auto Rule = RulePtr.Get(); IsValid(Rule))
-                                {
-                                    if (!ProcessRuleFunction(Rule, Object))
-                                    {
-                                        UE_LOG(RuleRanger,
-                                               VeryVerbose,
-                                               TEXT("ProcessRule: Rule %s indicated that following "
-                                                    "rules should be skipped for %s"),
-                                               *RuleSet->GetName(),
-                                               *Object->GetName());
-                                        ActionContext->ClearContext();
-                                        return;
-                                    }
-                                }
-                                else
-                                {
-                                    UE_LOG(RuleRanger,
-                                           Error,
-                                           TEXT("ProcessRule: Invalid Rule skipped at index %d in "
-                                                "rule set '%s' "
-                                                "from scope '%s' when analyzing object '%s'"),
-                                           RuleIndex,
-                                           *RuleSet->GetName(),
-                                           *Config->GetName(),
-                                           *Object->GetName());
-                                }
-                                RuleIndex++;
+                                return;
                             }
                         }
                         else
@@ -149,7 +238,7 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
                             UE_LOG(
                                 RuleRanger,
                                 Error,
-                                TEXT("ProcessRule: Invalid RuleSet skipped when processing rules for %s in scope %s"),
+                                TEXT("ProcessRule: Invalid RuleSet skipped when processing rules for %s in config %s"),
                                 *Object->GetName(),
                                 *Config->GetName());
                         }
@@ -176,6 +265,44 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
     }
 }
 
+bool URuleRangerEditorSubsystem::IsMatchingRulePresentForObject(URuleRangerConfig* const Config,
+                                                                URuleRangerRuleSet* const RuleSet,
+                                                                UObject* InObject,
+                                                                const FRuleRangerRuleFn& ProcessRuleFunction)
+{
+    UE_LOG(RuleRanger,
+           VeryVerbose,
+           TEXT("IsMatchingRulePresent: Processing Rule Set %s for object %s"),
+           *RuleSet->GetName(),
+           *InObject->GetName());
+    int RuleIndex = 0;
+    for (const auto RulePtr : RuleSet->Rules)
+    {
+        // ReSharper disable once CppTooWideScopeInitStatement
+        if (const auto Rule = RulePtr.Get(); IsValid(Rule))
+        {
+            if (ProcessRuleFunction(Rule, InObject))
+            {
+                return true;
+            }
+        }
+        else
+        {
+            UE_LOG(RuleRanger,
+                   Error,
+                   TEXT("IsMatchingRulePresent: Invalid Rule skipped at index %d in "
+                        "rule set '%s' "
+                        "from config '%s' when analyzing object '%s'"),
+                   RuleIndex,
+                   *RuleSet->GetName(),
+                   *Config->GetName(),
+                   *InObject->GetName());
+        }
+        RuleIndex++;
+    }
+    return false;
+}
+
 bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* InObject, const FRuleRangerRuleFn& ProcessRuleFunction)
 {
     if (IsValid(InObject))
@@ -183,7 +310,7 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* InObject, const 
         auto Configs = GetCurrentRuleSetConfigs();
         UE_LOG(RuleRanger,
                VeryVerbose,
-               TEXT("IsMatchingRulePresent: Located %d Rule Set Scope(s) when discovering rules for object %s"),
+               TEXT("IsMatchingRulePresent: Located %d Rule Set Config(s) when discovering rules for object %s"),
                Configs.Num(),
                *InObject->GetName());
         for (auto ConfigIt = Configs.CreateIterator(); ConfigIt; ++ConfigIt)
@@ -196,55 +323,26 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* InObject, const 
                     {
                         if (const auto RuleSet = RuleSetIt->Get())
                         {
-                            UE_LOG(RuleRanger,
-                                   VeryVerbose,
-                                   TEXT("IsMatchingRulePresent: Processing Rule Set %s for object %s"),
-                                   *RuleSet->GetName(),
-                                   *InObject->GetName());
-                            int RuleIndex = 0;
-                            for (const auto RulePtr : RuleSet->Rules)
+                            if (IsMatchingRulePresentForObject(Config, RuleSet, InObject, ProcessRuleFunction))
                             {
-                                // ReSharper disable once CppTooWideScopeInitStatement
-                                if (const auto Rule = RulePtr.Get(); IsValid(Rule))
-                                {
-                                    if (ProcessRuleFunction(Rule, InObject))
-                                    {
-                                        return true;
-                                    }
-                                }
-                                else
-                                {
-                                    UE_LOG(RuleRanger,
-                                           Error,
-                                           TEXT("IsMatchingRulePresent: Invalid Rule skipped at index %d in "
-                                                "rule set '%s' "
-                                                "from scope '%s' when analyzing object '%s'"),
-                                           RuleIndex,
-                                           *RuleSet->GetName(),
-                                           *Config->GetName(),
-                                           *InObject->GetName());
-                                }
-                                RuleIndex++;
+                                return true;
                             }
-                        }
-                        else
-                        {
                             UE_LOG(RuleRanger,
                                    Error,
                                    TEXT("IsMatchingRulePresent: Invalid RuleSet skipped when processing "
-                                        "rules for %s in scope %s"),
+                                        "rules for %s in config %s"),
                                    *InObject->GetName(),
                                    *Config->GetName());
                         }
                     }
                 }
-            }
-            else
-            {
-                UE_LOG(RuleRanger,
-                       Error,
-                       TEXT("IsMatchingRulePresent: Invalid RuleSetConfig skipped when processing rules for %s"),
-                       *InObject->GetName());
+                else
+                {
+                    UE_LOG(RuleRanger,
+                           Error,
+                           TEXT("IsMatchingRulePresent: Invalid RuleSetConfig skipped when processing rules for %s"),
+                           *InObject->GetName());
+                }
             }
         }
     }
@@ -292,7 +390,7 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(const bool bIsReim
             ActionContext->ClearContext();
             return false;
         }
-        else if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
+        if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
         {
             UE_LOG(RuleRanger,
                    VeryVerbose,
@@ -345,7 +443,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerRule* Rule, UObjec
             ActionContext->ClearContext();
             return false;
         }
-        else if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
+        if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
         {
             UE_LOG(RuleRanger,
                    VeryVerbose,
@@ -398,7 +496,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerRule* Rule, 
             ActionContext->ClearContext();
             return false;
         }
-        else if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
+        if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
         {
             UE_LOG(RuleRanger,
                    VeryVerbose,

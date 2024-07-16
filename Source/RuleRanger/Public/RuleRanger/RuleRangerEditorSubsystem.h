@@ -16,10 +16,12 @@
 #include "CoreMinimal.h"
 #include "EditorSubsystem.h"
 #include "Factories/Factory.h"
+#include "RuleRangerRuleSet.h"
 #include "UObject/Object.h"
 #include <functional>
 #include "RuleRangerEditorSubsystem.generated.h"
 
+class URuleRangerRuleExclusion;
 class URuleRangerRule;
 class URuleRangerActionContext;
 class URuleRangerConfig;
@@ -50,6 +52,10 @@ public:
     void ScanAndFixObject(UObject* InObject);
 
     void ProcessRule(UObject* Object, const FRuleRangerRuleFn& ProcessRuleFunction);
+    bool IsMatchingRulePresentForObject(URuleRangerConfig* Config,
+                                        URuleRangerRuleSet* RuleSet,
+                                        UObject* InObject,
+                                        const FRuleRangerRuleFn& ProcessRuleFunction);
     bool IsMatchingRulePresent(UObject* InObject, const FRuleRangerRuleFn& ProcessRuleFunction);
 
     /** Return the set of RuleSetConfig objects configured for the current project. */
@@ -63,6 +69,12 @@ private:
     FDelegateHandle OnAssetPostImportDelegateHandle;
 
     void OnAssetPostImport(UFactory* Factory, UObject* Object);
+
+    bool ProcessRuleSetForObject(URuleRangerConfig* const Config,
+                                 URuleRangerRuleSet* const RuleSet,
+                                 TArray<URuleRangerRuleExclusion*> Exclusions,
+                                 UObject* Object,
+                                 const FRuleRangerRuleFn& ProcessRuleFunction);
 
     /**
      * Function invoked when each rule is applied to an object during import.

@@ -34,6 +34,9 @@ void UCheckFolderNamesAreValidAction::Apply_Implementation(URuleRangerActionCont
     }
     PathName.ParseIntoArray(Folders, TEXT("/"), true);
 
+    // Pop the last element so we are just checking folder and not asset name
+    Folders.Pop();
+
     const FRegexPattern Pattern(ValidFolderPattern,
                                 bCaseSensitive ? ERegexPatternFlags::None : ERegexPatternFlags::CaseInsensitive);
 

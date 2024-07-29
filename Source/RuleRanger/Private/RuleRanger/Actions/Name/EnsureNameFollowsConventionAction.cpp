@@ -56,15 +56,17 @@ void UEnsureNameFollowsConventionAction::Apply_Implementation(URuleRangerActionC
                             || NameConvention.Variant.Equals(NameConvention_DefaultVariant))
                         {
                             FString NewName{ OriginalName };
-                            if (!NameConvention.Prefix.IsEmpty() && !NewName.StartsWith(NameConvention.Prefix))
+                            if (!NameConvention.Prefix.IsEmpty()
+                                && !NewName.StartsWith(NameConvention.Prefix, ESearchCase::CaseSensitive))
                             {
                                 NewName.InsertAt(0, NameConvention.Prefix);
                             }
-                            if (!NameConvention.Suffix.IsEmpty() && !NewName.EndsWith(NameConvention.Suffix))
+                            if (!NameConvention.Suffix.IsEmpty()
+                                && !NewName.EndsWith(NameConvention.Suffix, ESearchCase::CaseSensitive))
                             {
                                 NewName.Append(NameConvention.Suffix);
                             }
-                            if (NewName.Equals(OriginalName))
+                            if (NewName.Equals(OriginalName, ESearchCase::CaseSensitive))
                             {
                                 LogInfo(Object, TEXT("Object matches naming convention. No action required."));
                             }

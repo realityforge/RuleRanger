@@ -76,10 +76,6 @@ TextureFilter FGLTFTextureUtilities::GetDefaultFilter(TextureGroup LODGroup)
   * Add matcher so can match native classes from specific modules
   * Add matcher so can match meta=(IsBlueprintBase=true)
 * ControlRig checks:
-  * Ensure functions have groups/categories and descriptions
-  * Ensure variables have groups/categories and descriptions
-  * Ensure that there are no loose nodes
-  * Ensure that Blueprint is compiled
   * Add "_FunctionLibrary" to ControlRigs that are just collections of functions and no ForwardSolve? Do it via Variants mechanism
 * Blueprint checks:
   * Add check to ensure that every Blueprint (that inherits from a specific class?) has a Thumbnail specified

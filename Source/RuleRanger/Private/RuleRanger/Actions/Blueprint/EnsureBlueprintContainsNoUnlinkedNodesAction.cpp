@@ -76,7 +76,9 @@ void UEnsureBlueprintContainsNoUnlinkedNodesAction::Apply_Implementation(URuleRa
                 int32 InputExecLinkCount = 0;
                 for (const auto Pin : Node->GetAllPins())
                 {
-                    const bool bIsExecPin = UEdGraphSchema_K2::IsExecPin(*Pin);
+                    // Exec pins in controlRig are identified
+                    const bool bIsExecPin =
+                        UEdGraphSchema_K2::IsExecPin(*Pin) || Pin->GetName().EndsWith(TEXT(".ExecuteContext"));
                     const bool bIsInputPin = EGPD_Input == Pin->Direction;
                     const bool bIsOutputPin = EGPD_Output == Pin->Direction;
                     const bool bPinLinked = 0 != Pin->LinkedTo.Num();

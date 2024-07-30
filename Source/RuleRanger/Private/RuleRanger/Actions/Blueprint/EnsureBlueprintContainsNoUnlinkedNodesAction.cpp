@@ -68,30 +68,24 @@ void UEnsureBlueprintContainsNoUnlinkedNodesAction::Apply_Implementation(URuleRa
                 // If the node has no exec pins then it is pure and must have a
                 // consumer of one (Data) output pin. If a node is not pure then
                 // it must be connected by one input exec pin
-                bool bHasExecPin = false;
-                bool bInputPin = false;
-                bool bOutputPin = false;
-                for (const auto Pin : Node->GetAllPins())
-                {
-                    if (UEdGraphSchema_K2::IsExecPin(*Pin))
-                    {
-                        bHasExecPin = true;
-                    }
-                    bInputPin |= Pin->Direction == EGPD_Input;
-                    bOutputPin |= Pin->Direction == EGPD_Output;
-                }
-
-                bool bInputExecNotLinked = false;
+                bool bHasOutputExecPin = false;
+                bool bHasInputExecPin = false;
+                bool bHasInputPins = false;
+                bool bHasOutputPins = false;
+                bool bHasInputExecNotLinked = false;
+                bool bHasOutputExecNotLinked = false;
                 int32 InputExecLinkCount = 0;
-                bool bOutputNonExecLinked = false;
                 for (const auto Pin : Node->GetAllPins())
                 {
+                    const bool bIsExecPin = UEdGraphSchema_K2::IsExecPin(*Pin);
+                    const bool bIsInputPin = EGPD_Input == Pin->Direction;
+                    const bool bIsOutputPin = EGPD_Output == Pin->Direction;
                     const bool bPinLinked = 0 != Pin->LinkedTo.Num();
-                    if (EGPD_Output == Pin->Direction && bPinLinked)
-                    {
-                        bOutputNonExecLinked = true;
-                    }
-                    else if (EGPD_Input == Pin->Direction && UEdGraphSchema_K2::IsExecPin(*Pin))
+                    bHasInputPins |= bIsInputPin;
+                    bHasOutputPins |= bIsOutputPin;
+                    bHasInputExecPin |= bIsInputPin && bIsExecPin;
+                    bHasOutputExecPin |= bIsOutputPin && bIsExecPin;
+                    if (bIsInputPin && bIsExecPin)
                     {
                         if (bPinLinked)
                         {
@@ -102,19 +96,19 @@ void UEnsureBlueprintContainsNoUnlinkedNodesAction::Apply_Implementation(URuleRa
                         }
                         else
                         {
-                            bInputExecNotLinked = true;
+                            bHasInputExecNotLinked = true;
+                        }
+                    }
+                    else if (bIsOutputPin && bIsExecPin)
+                    {
+                        if (!bPinLinked)
+                        {
+                            bHasOutputExecNotLinked = true;
                         }
                     }
                 }
 
-                if (Node.IsA(UAnimStateNode::StaticClass()))
-                {
-                    // State Machine Nodes always have outputs, and we do not care
-                    // when they are blank, so we fake a link to avoid the error
-                    bOutputNonExecLinked = true;
-                }
-
-                if (bInputExecNotLinked || (!bOutputNonExecLinked && !bHasExecPin && bOutputPin))
+                if (bHasInputExecNotLinked || bHasOutputExecNotLinked)
                 {
                     const FString NodeTitle = Node->GetNodeTitle(ENodeTitleType::FullTitle).ToString();
                     FGraphDisplayInfo Info;
@@ -130,22 +124,13 @@ void UEnsureBlueprintContainsNoUnlinkedNodesAction::Apply_Implementation(URuleRa
                             *NodeTitle,
                             *GraphName)));
                     }
-                    else if (bInputExecNotLinked && 0 == InputExecLinkCount)
+                    else if (bHasInputExecNotLinked && 0 == InputExecLinkCount)
                     {
                         ActionContext->Error(FText::FromString(
                             FString::Printf(TEXT("Blueprint has a node named '%s' in '%s' missing an exec input pin. "
                                                  "Remove node or connect pin."),
                                             *NodeTitle,
                                             *GraphName)));
-                    }
-                    else if (!bOutputNonExecLinked && !bHasExecPin && bOutputPin)
-                    {
-                        ActionContext->Error(FText::FromString(FString::Printf(
-                            TEXT(
-                                "Blueprint has a node named '%s' in '%s' that has no output pin linked but has no exec pin. "
-                                "Remove node or add a link to output pin."),
-                            *NodeTitle,
-                            *GraphName)));
                     }
                 }
             }

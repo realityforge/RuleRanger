@@ -14,7 +14,6 @@
 
 #include "EnsureBlueprintContainsNoUnlinkedNodesAction.h"
 #include "AnimGraphNode_TransitionResult.h"
-#include "AnimStateNode.h"
 #include "AnimStateTransitionNode.h"
 #include "EdGraphNode_Comment.h"
 

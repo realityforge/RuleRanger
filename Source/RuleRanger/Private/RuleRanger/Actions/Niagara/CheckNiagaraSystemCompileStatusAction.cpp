@@ -111,20 +111,6 @@ void UCheckNiagaraSystemCompileStatusAction::Apply_Implementation(URuleRangerAct
 {
     const auto System = CastChecked<UNiagaraSystem>(Object);
 
-    if (System->GetSystemSpawnScript()->IsCompilable())
-    {
-        if (!ValidateScript(ActionContext, Object, TEXT("the NiagaraSystem"), System->GetSystemSpawnScript()))
-        {
-            //            return;
-        }
-    }
-    if (System->GetSystemUpdateScript()->IsCompilable())
-    {
-        if (!ValidateScript(ActionContext, Object, TEXT("the NiagaraSystem"), System->GetSystemUpdateScript()))
-        {
-            return;
-        }
-    }
     if (System->NeedsRequestCompile())
     {
         // If the system needs a recompile and we attempt to get status, we will get an Unknown Status.
@@ -144,6 +130,21 @@ void UCheckNiagaraSystemCompileStatusAction::Apply_Implementation(URuleRangerAct
         }
         System->WaitForCompilationComplete(true);
         LogInfo(Object, FString::Printf(TEXT("NiagaraSystem compilation complete.")));
+    }
+
+    if (System->GetSystemSpawnScript()->IsCompilable())
+    {
+        if (!ValidateScript(ActionContext, Object, TEXT("the NiagaraSystem"), System->GetSystemSpawnScript()))
+        {
+            //            return;
+        }
+    }
+    if (System->GetSystemUpdateScript()->IsCompilable())
+    {
+        if (!ValidateScript(ActionContext, Object, TEXT("the NiagaraSystem"), System->GetSystemUpdateScript()))
+        {
+            return;
+        }
     }
     for (const FNiagaraEmitterHandle& Handle : System->GetEmitterHandles())
     {

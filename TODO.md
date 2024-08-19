@@ -33,12 +33,14 @@ Shorthand notes of where to go next with this experiment:
 * Blueprint checks:
   * Add flag to skip description and categorization requirements for private variables/functions
   * Blueprint Macros also have function rules applied. Should we restrict these rules as Macros are mostly internal? or maybe not as used by child classes?
-* Blueprint Functions:
-  * Default Return node requirement ... is a bit much if there is no return value.
 * Material Function checks:
   * Ensure that inputs names match pattern
   * Ensure that descriptions for inputs present
   * Ensure that the override name matches a pattern if exposed to library
+* Blueprint Enumerations:
+  * Add requirement that Enumerations are documented
+  * Add requirement that Enumerators are documented
+* Add the ability to add an exception for the a rule that was violated directly from within the MessageLog. Think "Click to to exclude".
 * Material checks:
   * Ensure Material is compiled
   * Ensure that parameters of specific name/type exist on a material ... or a material property? (Useful when using to create dynamic material instance and use strings to match parameters)

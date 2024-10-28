@@ -31,6 +31,10 @@ class RULERANGER_API UEnsureVariablesHaveDescriptionsAction final : public UBlue
     UPROPERTY(EditAnywhere)
     bool bCheckInstanceEditableVariables{ true };
 
+    /** Should the action check non-instance editable variables? */
+    UPROPERTY(EditAnywhere)
+    bool bCheckNonInstanceEditableVariables{ true };
+
     /** Should the action check transient variables? */
     UPROPERTY(EditAnywhere)
     bool bCheckTransientVariables{ false };

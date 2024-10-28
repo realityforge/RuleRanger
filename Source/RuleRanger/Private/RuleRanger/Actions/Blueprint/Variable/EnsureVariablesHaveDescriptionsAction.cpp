@@ -27,7 +27,13 @@ void UEnsureVariablesHaveDescriptionsAction::AnalyzeVariable(URuleRangerActionCo
                                                              UK2Node_FunctionEntry* FunctionEntry,
                                                              UEdGraph* Graph)
 {
-    bool bCheckVariable = true;
+    const bool bDisableEditOnInstance =
+        CPF_DisableEditOnInstance == (CPF_DisableEditOnInstance & Variable.PropertyFlags);
+    const bool bTransient = CPF_Transient == (CPF_Transient & Variable.PropertyFlags);
+    const auto Property = FindUFieldOrFProperty<FProperty>(Blueprint->GeneratedClass, Variable.VarName);
+    // ReSharper disable once CppTooWideScopeInitStatement
+    const bool bPrivate = Property && Property->GetBoolMetaData(FName("BlueprintPrivate"));
+
     if (!bCheckLocalVariables && Graph)
     {
         LogInfo(Blueprint,
@@ -36,44 +42,40 @@ void UEnsureVariablesHaveDescriptionsAction::AnalyzeVariable(URuleRangerActionCo
                                      "bCheckLocalVariables is set to false."),
                                 *Variable.VarName.ToString(),
                                 *Graph->GetName()));
-        bCheckVariable = false;
     }
-    else if (!bCheckInstanceEditableVariables
-             && CPF_DisableEditOnInstance != (CPF_DisableEditOnInstance & Variable.PropertyFlags))
+    else if (!bCheckInstanceEditableVariables && !bDisableEditOnInstance)
     {
         LogInfo(Blueprint,
                 FString::Printf(TEXT("Skipping check of variable named "
                                      "'%s' as bCheckInstanceEditableVariables is set to "
                                      "false and the variable is an instance editable variable."),
                                 *Variable.VarName.ToString()));
-        bCheckVariable = false;
     }
-
-    if (!Graph && bCheckVariable && !bCheckTransientVariables
-        && CPF_Transient == (CPF_Transient & Variable.PropertyFlags))
+    else if (!bCheckNonInstanceEditableVariables && bDisableEditOnInstance)
+    {
+        LogInfo(Blueprint,
+                FString::Printf(TEXT("Skipping check of variable named "
+                                     "'%s' as bCheckNonInstanceEditableVariables is set to "
+                                     "false and the variable is not an instance editable variable."),
+                                *Variable.VarName.ToString()));
+    }
+    else if (!Graph && !bCheckTransientVariables && bTransient)
     {
         LogInfo(Blueprint,
                 FString::Printf(TEXT("Skipping check of variable named "
                                      "'%s' as bCheckTransientVariables is set to "
                                      "false and the variable is a transient variable."),
                                 *Variable.VarName.ToString()));
-        bCheckVariable &= false;
     }
-
-    // ReSharper disable once CppTooWideScopeInitStatement
-    const auto Property = FindUFieldOrFProperty<FProperty>(Blueprint->GeneratedClass, Variable.VarName);
-    if (!Graph && bCheckVariable && !bCheckPrivateVariables
-        && (Property && Property->GetBoolMetaData(FName("BlueprintPrivate"))))
+    else if (!Graph && !bCheckPrivateVariables && bPrivate)
     {
         LogInfo(Blueprint,
                 FString::Printf(TEXT("Skipping check of variable named "
                                      "'%s' as bCheckPrivateVariables is set to "
                                      "false and the variable is a private variable."),
                                 *Variable.VarName.ToString()));
-        bCheckVariable &= false;
     }
-
-    if (bCheckVariable)
+    else
     {
         if (!Variable.HasMetaData(FBlueprintMetadata::MD_Tooltip)
             || 0 == Variable.GetMetaData(FBlueprintMetadata::MD_Tooltip).Len())

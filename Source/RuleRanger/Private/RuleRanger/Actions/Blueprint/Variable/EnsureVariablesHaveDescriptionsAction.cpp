@@ -82,22 +82,47 @@ void UEnsureVariablesHaveDescriptionsAction::AnalyzeVariable(URuleRangerActionCo
         {
             const FString Name = Variable.VarName.ToString();
             const FText TypeName = UEdGraphSchema_K2::TypeToText(Variable.VarType);
+            const auto& Hint1 = !bCheckPrivateVariables && !bPrivate
+                ? TEXT(" As bCheckPrivateVariables is false, this warning can be "
+                       "suppressed by marking the variable as private.")
+                : TEXT("");
+            const auto& Hint2 = !bCheckTransientVariables && !bTransient
+                ? TEXT(" As bCheckTransientVariables is false, this warning can be "
+                       "suppressed by marking the variable as transient.")
+                : TEXT("");
+            const auto& Hint3 = !bCheckNonInstanceEditableVariables && !bDisableEditOnInstance
+                ? TEXT(" As bCheckNonInstanceEditableVariables is false, this warning can be "
+                       "suppressed by disabling the Instance Editable setting.")
+                : TEXT("");
+            const auto& Hint4 = !bCheckInstanceEditableVariables && bDisableEditOnInstance
+                ? TEXT(" As bCheckInstanceEditableVariables is false, this warning can be "
+                       "suppressed by enabling the Instance Editable setting.")
+                : TEXT("");
+
             if (Graph)
             {
                 const auto& ErrorMessage = FString::Printf(TEXT("Blueprint contains a local variable "
                                                                 "named '%s' in the function "
                                                                 "named '%s' that is expected "
-                                                                "to have a description but does not."),
+                                                                "to have a description but does not.%s%s%s%s"),
                                                            *Name,
-                                                           *Graph->GetName());
+                                                           *Graph->GetName(),
+                                                           Hint1,
+                                                           Hint2,
+                                                           Hint3,
+                                                           Hint4);
                 ActionContext->Error(FText::FromString(ErrorMessage));
             }
             else
             {
                 const auto& ErrorMessage = FString::Printf(TEXT("Blueprint contains a variable "
                                                                 "named '%s' that is expected "
-                                                                "to have a description but does not."),
-                                                           *Name);
+                                                                "to have a description but does not.%s%s%s%s"),
+                                                           *Name,
+                                                           Hint1,
+                                                           Hint2,
+                                                           Hint3,
+                                                           Hint4);
                 ActionContext->Error(FText::FromString(ErrorMessage));
             }
         }

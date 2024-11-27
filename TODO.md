@@ -2,6 +2,7 @@
 
 Shorthand notes of where to go next with this experiment:
 
+* Remove variant extensions if not one of the variants (i.e. A Material that is not a LightFunction should not have _LF suffix)
 * RuleRanger should ALSO invoke validation on each object ... otherwise problems highlighted via IsDataValid will be missed.
 
 * Remove the "Actor/*" actions and replace with specific `IsDataValid()` implementations in each project. Maybe we expose the functionality as static utility functions.

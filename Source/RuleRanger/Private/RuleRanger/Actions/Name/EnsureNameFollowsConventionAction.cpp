@@ -17,6 +17,54 @@
 #include "RuleRanger/RuleRangerUtilities.h"
 #include "Subsystems/EditorAssetSubsystem.h"
 
+static FName NAME_RuleRanger_Variant("RuleRanger.Variant");
+
+bool UEnsureNameFollowsConventionAction::FindMatchingNameConvention(URuleRangerActionContext* ActionContext,
+                                                                    const UObject* Object,
+                                                                    const TArray<UClass*>& Classes,
+                                                                    const FString& Variant,
+                                                                    FNameConvention& MatchingConvention) const
+{
+    for (const auto& Class : Classes)
+    {
+        if (const auto Conventions = NameConventionsCache.Find(Class))
+        {
+            for (int32 Index = 0; Index < Conventions->Num(); ++Index)
+            {
+                // ReSharper disable once CppTooWideScopeInitStatement
+                const auto Convention = Conventions->GetData()[Index];
+                if (Convention.Variant.Equals(Variant) || Convention.Variant.Equals(NameConvention_DefaultVariant))
+                {
+                    LogInfo(Object,
+                            FString::Printf(TEXT("Located naming convention rule for "
+                                                 "(Class %s, Variant '%s') (Prefix = '%s', Suffix = '%s')"),
+                                            *Object->GetClass()->GetName(),
+                                            *Variant,
+                                            *Convention.Prefix,
+                                            *Convention.Suffix));
+                    MatchingConvention = Convention;
+                    return true;
+                }
+            }
+        }
+    }
+    const auto Message = FString::Printf(TEXT("Unable to locate naming convention rule for (Class %s, Variant '%s')"),
+                                         *Object->GetClass()->GetName(),
+                                         *Variant);
+    // ReSharper disable once CppTooWideScopeInitStatement
+    const auto OutermostObject = Object->GetOutermostObject();
+    if (bNotifyIfNameConventionMissing && OutermostObject == Object)
+    {
+        // Only attempt to apply naming conventions to outermost packages
+        ActionContext->Warning(FText::FromString(Message));
+    }
+    else
+    {
+        LogInfo(Object, Message);
+    }
+    return false;
+}
+
 void UEnsureNameFollowsConventionAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     if (!NameConventionsTables.IsEmpty())
@@ -26,129 +74,148 @@ void UEnsureNameFollowsConventionAction::Apply_Implementation(URuleRangerActionC
         if (!NameConventionsCache.IsEmpty())
         {
             const auto Subsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>();
-            const auto Variant = Subsystem ? Subsystem->GetMetadataTag(Object, FName("RuleRanger.Variant")) : TEXT("");
+            const auto Variant = Subsystem ? Subsystem->GetMetadataTag(Object, NAME_RuleRanger_Variant) : TEXT("");
 
             const FString OriginalName{ Object->GetName() };
 
             TArray<UClass*> Classes;
             FRuleRangerUtilities::CollectTypeHierarchy(Object, Classes);
-            for (auto Class : Classes)
+
+            // Find the naming convention that matches the object closely.
+            // i.e. The most specific type, with a matching variant.
+            FNameConvention MatchingNameConvention;
+            bool bMatched = FindMatchingNameConvention(ActionContext, Object, Classes, Variant, MatchingNameConvention);
+
+            FString NewName{ OriginalName };
+
+            for (const TPair<TObjectPtr<UClass>, TArray<FNameConvention>>& NameConventions : NameConventionsCache)
             {
-                LogInfo(Object,
-                        FString::Printf(TEXT("Looking for NamingConvention rules for class %s"), *Class->GetName()));
-                if (TArray<FNameConvention>* NameConventions = NameConventionsCache.Find(Class))
+                const auto Type = NameConventions.Key.Get();
+                if (const bool bMatchesTypeHierarchy = Classes.Contains(Type); !bMatchesTypeHierarchy)
                 {
-                    LogInfo(Object,
-                            FString::Printf(TEXT("Found %d NamingConvention rules for %s"),
-                                            NameConventions->Num(),
-                                            *Class->GetName()));
-                    for (int i = 0; i < NameConventions->Num(); i++)
+                    for (auto& NameConvention : NameConventions.Value)
                     {
-                        const FNameConvention& NameConvention = (*NameConventions)[i];
-                        LogInfo(Object,
-                                FString::Printf(TEXT("Attempting to match NameConvention "
-                                                     "Prefix=%s, Suffix=%s, Variant=%s against asset with Variant=%s"),
-                                                *NameConvention.Prefix,
-                                                *NameConvention.Suffix,
-                                                *NameConvention.Variant,
-                                                *Variant));
-                        if (NameConvention.Variant.Equals(Variant)
-                            || NameConvention.Variant.Equals(NameConvention_DefaultVariant))
+                        // First, we process all the rules that do not match:
+                        // - We remove a prefix if it is different from the matching convention prefix, and
+                        //   the prefix matches another convention's prefix in the convention list.
+                        // - We remove a suffix if it is different from the matching convention suffix, and
+                        //   is for a convention that matches the type.
+                        //
+                        // This assumes prefixes are primary determinants of type while suffixes are usually
+                        // discriminators of subtypes. i.e. `M_` indicates material type, `_BC` indicates the
+                        // "Base Color" material "subtype". The above rules help reinforce this.
+                        if (bMatched && MatchingNameConvention != NameConvention)
                         {
-                            FString NewName{ OriginalName };
                             if (!NameConvention.Prefix.IsEmpty()
-                                && !NewName.StartsWith(NameConvention.Prefix, ESearchCase::CaseSensitive))
+                                && NewName.StartsWith(NameConvention.Prefix, ESearchCase::CaseSensitive))
                             {
-                                NewName.InsertAt(0, NameConvention.Prefix);
+                                LogInfo(Object,
+                                        FString::Printf(TEXT("Removing prefix '%s' as the name convention "
+                                                             "(Class %s, Variant '%s') claimed that prefix"),
+                                                        *NameConvention.Prefix,
+                                                        *NameConvention.ObjectType->GetName(),
+                                                        *NameConvention.Variant));
+                                NewName = NewName.RightChop(NameConvention.Prefix.Len());
                             }
-                            if (!NameConvention.Suffix.IsEmpty()
-                                && !NewName.EndsWith(NameConvention.Suffix, ESearchCase::CaseSensitive))
-                            {
-                                NewName.Append(NameConvention.Suffix);
-                            }
-                            if (NewName.Equals(OriginalName, ESearchCase::CaseSensitive))
-                            {
-                                LogInfo(Object, TEXT("Object matches naming convention. No action required."));
-                            }
-                            else
-                            {
-                                if (ActionContext->IsDryRun())
-                                {
-                                    FFormatNamedArguments Arguments;
-                                    Arguments.Add(TEXT("OriginalName"), FText::FromString(OriginalName));
-                                    Arguments.Add(TEXT("NewName"), FText::FromString(NewName));
-                                    const FText Message =
-                                        FText::Format(NSLOCTEXT("RuleRanger",
-                                                                "ObjectRenameOmitted",
-                                                                "Object needs to be renamed from '{OriginalName}' "
-                                                                "to '{NewName}'. Action skipped in DryRun mode"),
-                                                      Arguments);
 
-                                    ActionContext->Warning(Message);
-                                }
-                                else if (!Object->IsAsset())
-                                {
-                                    FFormatNamedArguments Arguments;
-                                    Arguments.Add(TEXT("OriginalName"), FText::FromString(OriginalName));
-                                    Arguments.Add(TEXT("NewName"), FText::FromString(NewName));
-                                    const auto Message =
-                                        FText::Format(NSLOCTEXT("RuleRanger",
-                                                                "ObjectRenameOmittedForNonAsset",
-                                                                "Object needs to be renamed from '{OriginalName}' "
-                                                                "to '{NewName}'. Rename can not be automated "
-                                                                "as object is not an asset"),
-                                                      Arguments);
-
-                                    ActionContext->Error(Message);
-                                }
-                                else
-                                {
-                                    if (!FRuleRangerUtilities::RenameAsset(Object, NewName))
-                                    {
-                                        const auto InMessage =
-                                            FText::Format(NSLOCTEXT("RuleRanger",
-                                                                    "ObjectRenameFailed",
-                                                                    "Attempt to rename object '{0}' to '{1}' failed."),
-                                                          FText::FromString(OriginalName),
-                                                          FText::FromString(NewName));
-                                        ActionContext->Error(InMessage);
-                                    }
-                                    else
-                                    {
-                                        FFormatNamedArguments Arguments;
-                                        Arguments.Add(TEXT("OriginalName"), FText::FromString(OriginalName));
-                                        Arguments.Add(TEXT("NewName"), FText::FromString(NewName));
-                                        const auto Message =
-                                            FText::Format(NSLOCTEXT("RuleRanger",
-                                                                    "ObjectRenamed",
-                                                                    "Object named {OriginalName} has been renamed "
-                                                                    "to {NewName} to match convention."),
-                                                          Arguments);
-
-                                        ActionContext->Info(Message);
-                                    }
-                                }
+                            if (bMatchesTypeHierarchy && !NameConvention.Suffix.IsEmpty()
+                                && NewName.EndsWith(NameConvention.Suffix, ESearchCase::CaseSensitive))
+                            {
+                                LogInfo(Object,
+                                        FString::Printf(TEXT("Removing suffix '%s' as the name convention "
+                                                             "(Class %s, Variant '%s') claimed that suffix"),
+                                                        *NameConvention.Suffix,
+                                                        *NameConvention.ObjectType->GetName(),
+                                                        *NameConvention.Variant));
+                                NewName = NewName.LeftChop(NameConvention.Suffix.Len());
                             }
-                            return;
                         }
                     }
                 }
             }
 
-            // Only attempt to apply naming conventions to outermost packages
-            if (const UObject* OutermostObject = Object->GetOutermostObject(); OutermostObject == Object)
+            if (bMatched)
             {
-                const auto Message = FString::Printf(TEXT("Unable to locate naming convention for "
-                                                          "object of type '%ls' and variant '%ls'."),
-                                                     *Object->GetClass()->GetName(),
-                                                     *Variant);
-                if (bNotifyIfNameConventionMissing)
+
+                if (!MatchingNameConvention.Prefix.IsEmpty()
+                    && !NewName.StartsWith(MatchingNameConvention.Prefix, ESearchCase::CaseSensitive))
                 {
-                    ActionContext->Warning(FText::FromString(Message));
+                    NewName.InsertAt(0, MatchingNameConvention.Prefix);
+                }
+                if (!MatchingNameConvention.Suffix.IsEmpty()
+                    && !NewName.EndsWith(MatchingNameConvention.Suffix, ESearchCase::CaseSensitive))
+                {
+                    NewName.Append(MatchingNameConvention.Suffix);
+                }
+            }
+
+            if (NewName.Equals(OriginalName, ESearchCase::CaseSensitive))
+            {
+                if (bMatched)
+                {
+                    LogInfo(Object, TEXT("Object matches naming convention. No action required."));
                 }
                 else
                 {
-                    LogInfo(Object, Message);
+                    LogInfo(Object,
+                            TEXT("Object matches no naming convention and does use "
+                                 "reserved prefixes or suffixes. No action required."));
+                }
+            }
+            else
+            {
+                if (ActionContext->IsDryRun())
+                {
+                    FFormatNamedArguments Arguments;
+                    Arguments.Add(TEXT("OriginalName"), FText::FromString(OriginalName));
+                    Arguments.Add(TEXT("NewName"), FText::FromString(NewName));
+                    const FText Message = FText::Format(NSLOCTEXT("RuleRanger",
+                                                                  "ObjectRenameOmitted",
+                                                                  "Object needs to be renamed from '{OriginalName}' "
+                                                                  "to '{NewName}'. Action skipped in DryRun mode"),
+                                                        Arguments);
+
+                    ActionContext->Warning(Message);
+                }
+                else if (!Object->IsAsset())
+                {
+                    FFormatNamedArguments Arguments;
+                    Arguments.Add(TEXT("OriginalName"), FText::FromString(OriginalName));
+                    Arguments.Add(TEXT("NewName"), FText::FromString(NewName));
+                    const auto Message = FText::Format(NSLOCTEXT("RuleRanger",
+                                                                 "ObjectRenameOmittedForNonAsset",
+                                                                 "Object needs to be renamed from '{OriginalName}' "
+                                                                 "to '{NewName}'. Rename can not be automated "
+                                                                 "as object is not an asset"),
+                                                       Arguments);
+
+                    ActionContext->Error(Message);
+                }
+                else
+                {
+                    if (!FRuleRangerUtilities::RenameAsset(Object, NewName))
+                    {
+                        const auto InMessage =
+                            FText::Format(NSLOCTEXT("RuleRanger",
+                                                    "ObjectRenameFailed",
+                                                    "Attempt to rename object '{0}' to '{1}' failed."),
+                                          FText::FromString(OriginalName),
+                                          FText::FromString(NewName));
+                        ActionContext->Error(InMessage);
+                    }
+                    else
+                    {
+                        FFormatNamedArguments Arguments;
+                        Arguments.Add(TEXT("OriginalName"), FText::FromString(OriginalName));
+                        Arguments.Add(TEXT("NewName"), FText::FromString(NewName));
+                        const auto Message = FText::Format(NSLOCTEXT("RuleRanger",
+                                                                     "ObjectRenamed",
+                                                                     "Object named {OriginalName} has been renamed "
+                                                                     "to {NewName} to match convention."),
+                                                           Arguments);
+
+                        ActionContext->Info(Message);
+                    }
                 }
             }
         }

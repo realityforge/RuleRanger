@@ -97,6 +97,12 @@ class RULERANGER_API UEnsureNameFollowsConventionAction : public URuleRangerActi
     /** Method to build cache if necessary. */
     void RebuildNameConventionsCacheIfNecessary();
 
+    bool FindMatchingNameConvention(URuleRangerActionContext* ActionContext,
+                                    const UObject* Object,
+                                    const TArray<UClass*>& Classes,
+                                    const FString& Variant,
+                                    FNameConvention& MatchingConvention) const;
+
 public:
     virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
     virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;

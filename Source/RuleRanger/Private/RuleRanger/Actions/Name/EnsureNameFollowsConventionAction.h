@@ -42,11 +42,11 @@ struct FNameConvention final : public FTableRowBase
 
     /** The prefix to add to the name (if any). */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FString Prefix{ TEXT("") };
+    FString Prefix{ "" };
 
     /** The suffix to add to the name (if any). */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FString Suffix{ TEXT("") };
+    FString Suffix{ "" };
 
     FORCEINLINE bool operator<(const FNameConvention& Other) const
     {

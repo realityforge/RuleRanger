@@ -55,6 +55,14 @@ struct FNameConvention final : public FTableRowBase
             : Prefix != Other.Prefix                              ? Prefix < Other.Prefix
                                                                   : Suffix < Other.Suffix;
     }
+
+    FORCEINLINE bool operator!=(const FNameConvention& Other) const { return !(*this == Other); }
+
+    FORCEINLINE bool operator==(const FNameConvention& Other) const
+    {
+        return ObjectType == Other.ObjectType && Variant.Equals(Other.Variant) && Prefix.Equals(Other.Prefix)
+            && Suffix.Equals(Other.Suffix);
+    }
 };
 
 /**

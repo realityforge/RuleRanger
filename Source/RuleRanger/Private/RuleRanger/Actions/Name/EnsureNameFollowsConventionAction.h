@@ -72,7 +72,7 @@ class RULERANGER_API UEnsureNameFollowsConventionAction : public URuleRangerActi
 
     /** Should the action issue a message log when it attempts to process an object that has no naming convention? */
     UPROPERTY(EditAnywhere)
-    bool bNotifyIfNameConventionMissing;
+    bool bNotifyIfNameConventionMissing{ false };
 
     /** Cache for looking up rules. */
     TMap<TObjectPtr<UClass>, TArray<FNameConvention>> NameConventionsCache;

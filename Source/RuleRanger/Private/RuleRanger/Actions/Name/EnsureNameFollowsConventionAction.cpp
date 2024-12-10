@@ -17,8 +17,6 @@
 #include "RuleRanger/RuleRangerUtilities.h"
 #include "Subsystems/EditorAssetSubsystem.h"
 
-static FName NAME_RuleRanger_Variant("RuleRanger.Variant");
-
 bool UEnsureNameFollowsConventionAction::FindMatchingNameConvention(URuleRangerActionContext* ActionContext,
                                                                     const UObject* Object,
                                                                     const TArray<UClass*>& Classes,
@@ -67,6 +65,8 @@ bool UEnsureNameFollowsConventionAction::FindMatchingNameConvention(URuleRangerA
 
 void UEnsureNameFollowsConventionAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
 {
+    static FName NAME_RuleRanger_Variant("RuleRanger.Variant");
+
     if (!NameConventionsTables.IsEmpty())
     {
         RebuildNameConventionsCacheIfNecessary();

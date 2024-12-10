@@ -35,7 +35,7 @@ struct FRuleRangerTextureConvention final : public FTableRowBase
 
     /** An explanation of the convention. */
     UPROPERTY(EditAnywhere)
-    FString Description;
+    FString Description{ "" };
 
     /** The Suffix associated with this texture type. */
     UPROPERTY(EditAnywhere)

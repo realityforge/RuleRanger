@@ -7,11 +7,7 @@ Shorthand notes of where to go next with this experiment:
   - AbilitySet_ -> Ability Set
   - InputData_ -> (Lyra) Input Config
 
-* Remove variant extensions if not one of the variants (i.e. A Material that is not a LightFunction should not have _LF suffix)
 * RuleRanger should ALSO invoke validation on each object ... otherwise problems highlighted via IsDataValid will be missed.
-
-* Encode Remove_X_(Pre|Suf)fix_From(X) in a table and specify/use in `RRR_NamingConventions` and remove `RR_RemoveEnginePreAndPostFixes_Rules`
-* Automagically remove prefixes/suffixes from assets if they match prefix/suffix in database but the asset does not match database entry
 
 * Remove the "Actor/*" actions and replace with specific `IsDataValid()` implementations in each project. Maybe we expose the functionality as static utility functions.
 * Update NameConventions action to also grab data from context

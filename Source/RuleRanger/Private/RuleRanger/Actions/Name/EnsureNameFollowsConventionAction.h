@@ -69,8 +69,8 @@ struct FNameConvention final : public FTableRowBase
  * Deprecated Name conventions that should be removed before applying other naming rules.
  *
  * These rules are either ones builtin to the engine (i.e. `_Inst` suffix when creating
- * instances of various types from within the editor) or were used historically (Thus many
- * assets follow convention and we want an easy way to rename them to the new conventions).
+ * instances of various types from within the editor) or were used historically. (Thus many
+ * assets follow convention, and we want an easy way to rename them to the new conventions.)
  */
 USTRUCT(BlueprintType)
 struct FDeprecatedNameConvention final : public FTableRowBase

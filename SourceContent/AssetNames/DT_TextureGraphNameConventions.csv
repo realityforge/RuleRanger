@@ -1,2 +1,2 @@
----,ObjectType,Variant,Prefix,Suffix
-TextureGraph,"/Script/TextureGraph.TextureGraph","","TG_",""
+---,ObjectType,Variant,Prefix,Suffix,Description
+TextureGraph,"/Script/TextureGraph.TextureGraph","","TG_","",""

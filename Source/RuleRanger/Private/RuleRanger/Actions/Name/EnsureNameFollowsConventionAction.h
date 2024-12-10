@@ -48,6 +48,10 @@ struct FNameConvention final : public FTableRowBase
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FString Suffix{ "" };
 
+    /** An explanation of the convention. */
+    UPROPERTY(EditAnywhere)
+    FString Description{ "" };
+
     FORCEINLINE bool operator<(const FNameConvention& Other) const
     {
         return Variant.Equals(NameConvention_DefaultVariant)      ? false
@@ -88,6 +92,10 @@ struct FDeprecatedNameConvention final : public FTableRowBase
     /** The suffix to remove from the name (if any). */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FString Suffix{ "" };
+
+    /** An explanation of the deprecation. */
+    UPROPERTY(EditAnywhere)
+    FString Description{ "" };
 
     FORCEINLINE bool operator<(const FDeprecatedNameConvention& Other) const
     {

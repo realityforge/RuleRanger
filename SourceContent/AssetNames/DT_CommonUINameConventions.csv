@@ -1,2 +1,3 @@
----,ObjectType,Variant,Prefix,Suffix
-CommonButtonStyle,"/Script/CommonUI.CommonButtonStyle","","ButtonStyle_",""
+---,ObjectType,Variant,Prefix,Suffix,Description
+CommonButtonStyle,"/Script/CommonUI.CommonButtonStyle","","ButtonStyle_","",""
+CommonTextStyle,"/Script/CommonUI.CommonTextStyle","","TextStyle_","",""

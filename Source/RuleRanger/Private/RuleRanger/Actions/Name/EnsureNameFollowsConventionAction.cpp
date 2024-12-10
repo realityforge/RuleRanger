@@ -91,44 +91,42 @@ void UEnsureNameFollowsConventionAction::Apply_Implementation(URuleRangerActionC
             for (const TPair<TObjectPtr<UClass>, TArray<FNameConvention>>& NameConventions : NameConventionsCache)
             {
                 const auto Type = NameConventions.Key.Get();
-                if (const bool bMatchesTypeHierarchy = Classes.Contains(Type); !bMatchesTypeHierarchy)
+                const bool bMatchesTypeHierarchy = Classes.Contains(Type);
+                for (auto& NameConvention : NameConventions.Value)
                 {
-                    for (auto& NameConvention : NameConventions.Value)
+                    // First, we process all the rules that do not match:
+                    // - We remove a prefix if it is different from the matching convention prefix, and
+                    //   the prefix matches another convention's prefix in the convention list.
+                    // - We remove a suffix if it is different from the matching convention suffix, and
+                    //   is for a convention that matches the type.
+                    //
+                    // This assumes prefixes are primary determinants of type while suffixes are usually
+                    // discriminators of subtypes. i.e. `M_` indicates material type, `_BC` indicates the
+                    // "Base Color" material "subtype". The above rules help reinforce this.
+                    if (!bMatched || MatchingNameConvention != NameConvention)
                     {
-                        // First, we process all the rules that do not match:
-                        // - We remove a prefix if it is different from the matching convention prefix, and
-                        //   the prefix matches another convention's prefix in the convention list.
-                        // - We remove a suffix if it is different from the matching convention suffix, and
-                        //   is for a convention that matches the type.
-                        //
-                        // This assumes prefixes are primary determinants of type while suffixes are usually
-                        // discriminators of subtypes. i.e. `M_` indicates material type, `_BC` indicates the
-                        // "Base Color" material "subtype". The above rules help reinforce this.
-                        if (bMatched && MatchingNameConvention != NameConvention)
+                        if (!NameConvention.Prefix.IsEmpty()
+                            && NewName.StartsWith(NameConvention.Prefix, ESearchCase::CaseSensitive))
                         {
-                            if (!NameConvention.Prefix.IsEmpty()
-                                && NewName.StartsWith(NameConvention.Prefix, ESearchCase::CaseSensitive))
-                            {
-                                LogInfo(Object,
-                                        FString::Printf(TEXT("Removing prefix '%s' as the name convention "
-                                                             "(Class %s, Variant '%s') claimed that prefix"),
-                                                        *NameConvention.Prefix,
-                                                        *NameConvention.ObjectType->GetName(),
-                                                        *NameConvention.Variant));
-                                NewName = NewName.RightChop(NameConvention.Prefix.Len());
-                            }
+                            LogInfo(Object,
+                                    FString::Printf(TEXT("Removing prefix '%s' as the name convention "
+                                                         "(Class %s, Variant '%s') claimed that prefix"),
+                                                    *NameConvention.Prefix,
+                                                    *NameConvention.ObjectType->GetName(),
+                                                    *NameConvention.Variant));
+                            NewName = NewName.RightChop(NameConvention.Prefix.Len());
+                        }
 
-                            if (bMatchesTypeHierarchy && !NameConvention.Suffix.IsEmpty()
-                                && NewName.EndsWith(NameConvention.Suffix, ESearchCase::CaseSensitive))
-                            {
-                                LogInfo(Object,
-                                        FString::Printf(TEXT("Removing suffix '%s' as the name convention "
-                                                             "(Class %s, Variant '%s') claimed that suffix"),
-                                                        *NameConvention.Suffix,
-                                                        *NameConvention.ObjectType->GetName(),
-                                                        *NameConvention.Variant));
-                                NewName = NewName.LeftChop(NameConvention.Suffix.Len());
-                            }
+                        if (bMatchesTypeHierarchy && !NameConvention.Suffix.IsEmpty()
+                            && NewName.EndsWith(NameConvention.Suffix, ESearchCase::CaseSensitive))
+                        {
+                            LogInfo(Object,
+                                    FString::Printf(TEXT("Removing suffix '%s' as the name convention "
+                                                         "(Class %s, Variant '%s') claimed that suffix"),
+                                                    *NameConvention.Suffix,
+                                                    *NameConvention.ObjectType->GetName(),
+                                                    *NameConvention.Variant));
+                            NewName = NewName.LeftChop(NameConvention.Suffix.Len());
                         }
                     }
                 }

@@ -11,11 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "EnsureNameFollowsConventionAction.h"
 #include "Editor.h"
 #include "RuleRanger/RuleRangerUtilities.h"
 #include "Subsystems/EditorAssetSubsystem.h"
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureNameFollowsConventionAction)
 
 bool UEnsureNameFollowsConventionAction::FindMatchingNameConvention(URuleRangerActionContext* ActionContext,
                                                                     const UObject* Object,

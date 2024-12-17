@@ -11,8 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "EnsureVariablesHaveDescriptionsAction.h"
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureVariablesHaveDescriptionsAction)
 
 bool UEnsureVariablesHaveDescriptionsAction::ShouldAnalyzeFunction(UEdGraph* Graph,
                                                                    UK2Node_FunctionEntry* FunctionEntry) const

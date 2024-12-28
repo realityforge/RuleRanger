@@ -19,6 +19,9 @@ LICENSE text eol=native
 *.cpp text eol=native
 *.py text eol=native
 
+*.uplugin text eol=native
+*.uproject text eol=native
+
 *.uasset !text !filter !merge !diff
 *.fbx !text !filter !merge !diff
 *.png !text !filter !merge !diff

@@ -23,6 +23,7 @@ Shorthand notes of where to go next with this experiment:
   * Rules about max number of elements in directory
   * Rules indicate which folders you are allowed to reference
   * Rules have a priority order
+  * NOTE `AssetReferenceRestrictions` plugin has similar function but at a high granularity
     Possible Directory layout:
     `Characters/[CharacterName]/Animations`
     `Characters/[CharacterName]/Materials`

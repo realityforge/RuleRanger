@@ -14,6 +14,7 @@
 #include "EnsureNameFollowsConventionAction.h"
 #include "Editor.h"
 #include "RuleRanger/RuleRangerUtilities.h"
+#include "RuleRangerConfig.h"
 #include "Subsystems/EditorAssetSubsystem.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureNameFollowsConventionAction)
@@ -82,6 +83,7 @@ void UEnsureNameFollowsConventionAction::Apply_Implementation(URuleRangerActionC
 {
     static FName NAME_RuleRanger_Variant("RuleRanger.Variant");
 
+    RebuildConfigConventionsTables(ActionContext);
     RebuildCachesIfNecessary();
 
     const auto Subsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>();
@@ -303,15 +305,38 @@ void UEnsureNameFollowsConventionAction::ResetCaches()
     OnObjectModifiedDelegateHandle.Reset();
 }
 
+void UEnsureNameFollowsConventionAction::RebuildConfigConventionsTables(const URuleRangerActionContext* ActionContext)
+{
+    ConfigConventionsTables.Reset();
+    for (const auto DataTable : ActionContext->GetOwnerConfig()->DataTables)
+    {
+        if (IsValid(DataTable))
+        {
+            if (FNameConvention::StaticStruct() == DataTable->RowStruct)
+            {
+                LogInfo(
+                    nullptr,
+                    FString::Printf(TEXT("Adding DataTable '%s' registered in Config %s to set of conventions applied"),
+                                    *DataTable.GetName(),
+                                    *ActionContext->GetOwnerConfig()->GetName()));
+                ConfigConventionsTables.Add(DataTable);
+            }
+        }
+    }
+}
+
 void UEnsureNameFollowsConventionAction::RebuildConventionCacheIfNecessary()
 {
-    if (NameConventionsTables.IsEmpty() && !ConventionsCache.IsEmpty())
+    if (NameConventionsTables.IsEmpty() && ConfigConventionsTables.IsEmpty() && !ConventionsCache.IsEmpty())
     {
         ConventionsCache.Reset();
     }
 
+    TArray<TObjectPtr<UDataTable>> ConventionsTables;
+    ConventionsTables.Append(NameConventionsTables);
+    ConventionsTables.Append(ConfigConventionsTables);
     bool bTableDataPresent = false;
-    for (const auto& NameConventionsTable : NameConventionsTables)
+    for (const auto& NameConventionsTable : ConventionsTables)
     {
         if (NameConventionsTable && 0 != NameConventionsTable->GetTableData().Num())
         {
@@ -321,7 +346,7 @@ void UEnsureNameFollowsConventionAction::RebuildConventionCacheIfNecessary()
     }
     if (ConventionsCache.IsEmpty() && bTableDataPresent)
     {
-        for (const auto& NameConventionsTable : NameConventionsTables)
+        for (const auto& NameConventionsTable : ConventionsTables)
         {
             if (IsValid(NameConventionsTable))
             {

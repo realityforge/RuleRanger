@@ -127,6 +127,10 @@ class RULERANGER_API UEnsureNameFollowsConventionAction : public URuleRangerActi
     UPROPERTY(EditAnywhere, meta = (RequiredAssetDataTags = "RowStructure=/Script/RuleRanger.NameConvention"))
     TArray<TObjectPtr<UDataTable>> NameConventionsTables;
 
+    /** Cache of DataTables from Config. */
+    UPROPERTY(Transient)
+    TArray<TObjectPtr<UDataTable>> ConfigConventionsTables;
+
     /** Should the action issue a message log when it attempts to process an object that has no naming convention? */
     UPROPERTY(EditAnywhere)
     bool bNotifyIfNameConventionMissing{ false };
@@ -145,6 +149,9 @@ class RULERANGER_API UEnsureNameFollowsConventionAction : public URuleRangerActi
 
     /** Method to clear cache. */
     void ResetCaches();
+
+    /** Method to build ConfigConventionsTables. */
+    void RebuildConfigConventionsTables(const URuleRangerActionContext* ActionContext);
 
     /** Method to build convention cache if necessary. */
     void RebuildConventionCacheIfNecessary();

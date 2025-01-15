@@ -2,11 +2,6 @@
 
 Shorthand notes of where to go next with this experiment:
 
-* Consider incorporating naming conventions like Lyra. Although this may be a per-project thing.
-  - Phase_	-> Game Phase Abilities
-  - AbilitySet_ -> Ability Set
-  - InputData_ -> (Lyra) Input Config
-
 * Change the way that Texture conventions are driven so that suffix is driven by variant in NameConventions. Also change `DT_DefaultTextureConventions` so that ehy are driven by variants
 * Change naming convention so that if a variant is not specified but the type has variants and the name has a suffix that matches a variant then auto-set variant (i.e. importing a texture named `T_Blah_BC` will automatically set `BaseTexture`). Maybe add a flag per NameConvention row that allows auto-setting variant?
 

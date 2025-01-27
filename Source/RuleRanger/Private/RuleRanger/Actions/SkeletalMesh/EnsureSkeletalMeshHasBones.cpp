@@ -21,7 +21,7 @@ void UEnsureSkeletalMeshHasBones::Apply_Implementation(URuleRangerActionContext*
     const auto SkeletalMesh = CastChecked<USkeletalMesh>(Object);
     if (ensure(SkeletalMesh->GetSkeleton()))
     {
-        const USkeleton* Skeleton = SkeletalMesh->GetSkeleton();
+        const auto Skeleton = SkeletalMesh->GetSkeleton();
         for (const auto BoneName : Bones)
         {
             if (INDEX_NONE == Skeleton->GetReferenceSkeleton().FindBoneIndex(BoneName))

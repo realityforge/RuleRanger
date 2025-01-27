@@ -28,7 +28,7 @@ class RULERANGER_API UAndMatcher final : public URuleRangerMatcher
     GENERATED_BODY()
 
     /** The matchers to perform logical And operation on. */
-    UPROPERTY(Instanced, EditAnywhere)
+    UPROPERTY(Instanced, EditAnywhere, meta = (AllowAbstract = "false", ForceShowPluginContent = "true"))
     TArray<TObjectPtr<URuleRangerMatcher>> Matchers;
 
 public:

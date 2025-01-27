@@ -17,6 +17,7 @@
 
 void UEnsureSkeletalMeshHasBones::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
 {
+    // ReSharper disable once CppTooWideScopeInitStatement
     const auto SkeletalMesh = CastChecked<USkeletalMesh>(Object);
     if (ensure(SkeletalMesh->GetSkeleton()))
     {

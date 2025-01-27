@@ -32,5 +32,5 @@ class RULERANGER_API UNotMatcher final : public URuleRangerMatcher
     TObjectPtr<URuleRangerMatcher> Matcher;
 
 public:
-    bool Test_Implementation(UObject* Object) const override;
+    virtual bool Test_Implementation(UObject* Object) const override;
 };

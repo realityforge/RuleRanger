@@ -47,7 +47,7 @@ void URuleRangerRule::Apply_Implementation(URuleRangerActionContext* ActionConte
                     {
                         Action->LogError(Object,
                                          FString::Printf(TEXT("Attempt to run on Object that is not an "
-                                             "instance of the type %s."),
+                                                              "instance of the type %s."),
                                                          *Action->GetExpectedType()->GetName()));
                     }
                     const auto State = ActionContext->GetState();

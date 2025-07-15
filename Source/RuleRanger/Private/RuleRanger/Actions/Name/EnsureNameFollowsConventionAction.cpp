@@ -101,13 +101,6 @@ void UEnsureNameFollowsConventionAction::Apply_Implementation(URuleRangerActionC
         LogInfo(Object, TEXT("Object is an ObjectRedirector and can not be renamed. No action required."));
         return;
     }
-    else if (Classes.Contains(AActor::StaticClass()))
-    {
-        LogInfo(Object,
-                TEXT("Object is an Actor and actor naming is not managed the "
-                     "EnsureNameFollowsConventionAction. No action required."));
-        return;
-    }
 
     // Find the naming convention that matches the object closely.
     // i.e. The most specific type, with a matching variant.

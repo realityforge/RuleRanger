@@ -19,3 +19,5 @@ NiagaraParameterCollectionInstance,"/Script/Niagara.NiagaraParameterCollectionIn
 MaterialLayerBlendInstance,"/Script/Engine.MaterialFunctionMaterialLayerBlendInstance","","_Inst",""
 PoseAsset,"/Script/Engine.PoseAsset","","_PoseAsset",""
 PhysicsAsset,"/Script/Engine.PhysicsAsset","","_PhysicsAsset",""
+AIController,"/Script/AIModule.AIController","","AIController",""
+PlayerController,"/Script/Engine.PlayerController","","PlayerController",""

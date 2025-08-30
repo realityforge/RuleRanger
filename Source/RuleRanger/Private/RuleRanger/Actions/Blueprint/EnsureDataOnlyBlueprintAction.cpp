@@ -17,8 +17,27 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureDataOnlyBlueprintAction)
 
+static const FName RuleRangerDataOnlyPropertyName("RuleRangerDataOnly");
+
+static FString GetObjectTypesAsString(const TArray<TSubclassOf<UObject>>& ObjectTypes)
+{
+    TArray<FString> ClassNames;
+    ClassNames.Reserve(ObjectTypes.Num());
+
+    for (const auto& ObjectType : ObjectTypes)
+    {
+        if (ObjectType)
+        {
+            ClassNames.Add(ObjectType->GetPathName());
+        }
+    }
+
+    return FString::Join(ClassNames, TEXT(", "));
+}
+
 void UEnsureDataOnlyBlueprintAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
 {
+    bool bMatchedViaMetaProperty = false;
     TSubclassOf<UObject> MatchedObjectType{ nullptr };
     for (const auto ObjectType : ObjectTypes)
     {
@@ -27,13 +46,41 @@ void UEnsureDataOnlyBlueprintAction::Apply_Implementation(URuleRangerActionConte
             MatchedObjectType = ObjectType;
         }
     }
+    if (!MatchedObjectType)
+    {
+        TArray<UClass*> Classes;
+        FRuleRangerUtilities::CollectTypeHierarchy(Object, Classes);
+        for (const auto Class : Classes)
+        {
+            if (Class->HasMetaData(RuleRangerDataOnlyPropertyName))
+            {
+                MatchedObjectType = Class;
+                bMatchedViaMetaProperty = true;
+                break;
+            }
+        }
+    }
+
     // ReSharper disable once CppTooWideScopeInitStatement
-    const UBlueprint* Blueprint = CastChecked<UBlueprint>(Object);
+    const auto Blueprint = CastChecked<UBlueprint>(Object);
     if (MatchedObjectType && !FBlueprintEditorUtils::IsDataOnlyBlueprint(Blueprint))
     {
-        ActionContext->Error(FText::FromString(
-            FString::Printf(TEXT("Object extended type %s and is expected to be a DataOnlyBlueprint but is not"),
-                            *MatchedObjectType->GetOutermost()->GetName())));
+        if (!bMatchedViaMetaProperty)
+        {
+            ActionContext->Error(FText::FromString(
+                FString::Printf(TEXT("Object is not a DataOnlyBlueprint but it extends the type %s that is "
+                                     "part of the list of DataOnlyBlueprints: %s"),
+                                *MatchedObjectType->GetPathName(),
+                                *GetObjectTypesAsString(ObjectTypes))));
+        }
+        else
+        {
+            ActionContext->Error(FText::FromString(
+                FString::Printf(TEXT("Object is not a DataOnlyBlueprint but it extends the type %s that has "
+                                     "the meta property '%s'"),
+                                *MatchedObjectType->GetPathName(),
+                                *RuleRangerDataOnlyPropertyName.ToString())));
+        }
     }
 }
 

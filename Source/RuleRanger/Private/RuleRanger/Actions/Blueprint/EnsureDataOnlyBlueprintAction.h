@@ -19,6 +19,8 @@
 
 /**
  * Action to check that Blueprints assets that extend specific types are DataOnlyBlueprints.
+ * The action also checks that any Blueprints that extend a UCLASS with the (boolean) meta property
+ * 'RuleRangerDataOnly' must be a DataOnlyBlueprint.
  */
 UCLASS(DisplayName = "Ensure Blueprints derived from specific types are Data Only Blueprints")
 class RULERANGER_API UEnsureDataOnlyBlueprintAction final : public URuleRangerAction

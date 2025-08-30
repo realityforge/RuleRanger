@@ -33,9 +33,7 @@ public:
     UPROPERTY(EditDefaultsOnly, Category = "Rule Ranger", meta = (ContentDir))
     TArray<FDirectoryPath> Dirs;
 
-    /**
-     * A set of DataTables that are used to drive different actions.
-     */
+    /** A set of DataTables that are used to drive different actions. */
     UPROPERTY(EditDefaultsOnly,
               Category = "Rule Sets",
               meta = (DisplayThumbnail = "false", ForceShowPluginContent = "true"))

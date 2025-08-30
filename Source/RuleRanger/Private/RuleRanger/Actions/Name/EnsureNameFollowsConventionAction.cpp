@@ -73,9 +73,8 @@ void UEnsureNameFollowsConventionAction::RebuildCachesIfNecessary()
     if (!OnObjectModifiedDelegateHandle.IsValid())
     {
         // Add a callback for when ANY object is modified in the editor so that we can bust the cache
-        OnObjectModifiedDelegateHandle = FCoreUObjectDelegates::OnObjectModified.AddUObject(
-            this,
-            &UEnsureNameFollowsConventionAction::ResetCachesIfTablesModified);
+        OnObjectModifiedDelegateHandle =
+            FCoreUObjectDelegates::OnObjectModified.AddUObject(this, &ThisClass::ResetCachesIfTablesModified);
     }
 }
 
@@ -269,9 +268,10 @@ void UEnsureNameFollowsConventionAction::Apply_Implementation(URuleRangerActionC
 
 void UEnsureNameFollowsConventionAction::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-    const FName PropertyName = PropertyChangedEvent.Property ? PropertyChangedEvent.Property->GetFName() : NAME_None;
-    if ((GET_MEMBER_NAME_CHECKED(UEnsureNameFollowsConventionAction, DeprecatedConventionsTables)) == PropertyName
-        || (GET_MEMBER_NAME_CHECKED(UEnsureNameFollowsConventionAction, NameConventionsTables)) == PropertyName)
+    // ReSharper disable once CppTooWideScopeInitStatement
+    const auto PropertyName = PropertyChangedEvent.Property ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+    if ((GET_MEMBER_NAME_CHECKED(ThisClass, DeprecatedConventionsTables)) == PropertyName
+        || (GET_MEMBER_NAME_CHECKED(ThisClass, NameConventionsTables)) == PropertyName)
     {
         ResetCaches();
     }

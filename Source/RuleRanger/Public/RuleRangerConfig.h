@@ -54,4 +54,13 @@ public:
     TArray<TObjectPtr<URuleRangerRuleExclusion>> Exclusions;
 
     bool ConfigMatches(const FString& Path);
+
+    /**
+     * Collect the DataTables that are transitively defined in the RuleRangerConfig that have the specified
+     * RowStructure.
+     *
+     * @param RowStructure The type representing each row in data table.
+     * @param OutDataTables The variable in which to place matching DataTables.
+     */
+    void CollectDataTables(const UScriptStruct* RowStructure, TArray<TObjectPtr<UDataTable>>& OutDataTables) const;
 };

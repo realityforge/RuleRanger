@@ -305,20 +305,14 @@ void UEnsureNameFollowsConventionAction::ResetCaches()
 void UEnsureNameFollowsConventionAction::RebuildConfigConventionsTables(const URuleRangerActionContext* ActionContext)
 {
     ConfigConventionsTables.Reset();
-    for (const auto DataTable : ActionContext->GetOwnerConfig()->DataTables)
+    ActionContext->GetOwnerConfig()->CollectDataTables(FNameConvention::StaticStruct(), ConfigConventionsTables);
+    for (const auto DataTable : ConfigConventionsTables)
     {
-        if (IsValid(DataTable))
-        {
-            if (FNameConvention::StaticStruct() == DataTable->RowStruct)
-            {
-                LogInfo(
-                    nullptr,
-                    FString::Printf(TEXT("Adding DataTable '%s' registered in Config %s to set of conventions applied"),
-                                    *DataTable.GetName(),
-                                    *ActionContext->GetOwnerConfig()->GetName()));
-                ConfigConventionsTables.Add(DataTable);
-            }
-        }
+        LogInfo(nullptr,
+                FString::Printf(TEXT("Adding DataTable '%s' registered in Config %s to set of conventions applied"),
+                                *DataTable.GetName(),
+                                *ActionContext->GetOwnerConfig()->GetName()));
+        ConfigConventionsTables.Add(DataTable);
     }
 }
 

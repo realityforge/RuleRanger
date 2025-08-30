@@ -26,3 +26,15 @@ bool URuleRangerConfig::ConfigMatches(const FString& Path)
     }
     return false;
 }
+
+void URuleRangerConfig::CollectDataTables(const UScriptStruct* RowStructure,
+                                          TArray<TObjectPtr<UDataTable>>& OutDataTables) const
+{
+    for (const auto DataTable : DataTables)
+    {
+        if (IsValid(DataTable) && RowStructure == DataTable->RowStruct)
+        {
+            OutDataTables.Add(DataTable);
+        }
+    }
+}

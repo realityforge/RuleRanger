@@ -25,7 +25,7 @@ void UEnsureTextureFollowsConventionAction::PostEditChangeProperty(FPropertyChan
 {
     // ReSharper disable once CppTooWideScopeInitStatement
     const FName PropertyName = PropertyChangedEvent.Property ? PropertyChangedEvent.Property->GetFName() : NAME_None;
-    if ((GET_MEMBER_NAME_CHECKED(UEnsureTextureFollowsConventionAction, ConventionsTables)) == PropertyName)
+    if ((GET_MEMBER_NAME_CHECKED(ThisClass, ConventionsTables)) == PropertyName)
     {
         ResetConventionsCache();
     }

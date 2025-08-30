@@ -213,6 +213,10 @@ void UEnsureDataOnlyBlueprintAction::PostEditChangeProperty(FPropertyChangedEven
     {
         ResetCaches();
     }
+    else if ((GET_MEMBER_NAME_CHECKED(URuleRangerConfig, DataTables)) == PropertyName)
+    {
+        ResetCaches();
+    }
     Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 

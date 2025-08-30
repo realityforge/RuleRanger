@@ -14,6 +14,7 @@
 #include "EnsureDataOnlyBlueprintAction.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "RuleRanger/RuleRangerUtilities.h"
+#include "RuleRangerConfig.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureDataOnlyBlueprintAction)
 
@@ -35,15 +36,128 @@ static FString GetObjectTypesAsString(const TArray<TSubclassOf<UObject>>& Object
     return FString::Join(ClassNames, TEXT(", "));
 }
 
+void UEnsureDataOnlyBlueprintAction::ResetCachesIfTablesModified(UObject* Object)
+{
+    // This is called on any object edit in editor so match against tables and bust cache as appropriate
+    if (Object && DataOnlyBlueprintTables.Contains(Object))
+    {
+        ResetCaches();
+    }
+}
+
+void UEnsureDataOnlyBlueprintAction::ResetCaches()
+{
+    LogInfo(nullptr, TEXT("Resetting the Name Convention Caches"));
+
+    ConventionsCache.Empty();
+    FCoreUObjectDelegates::OnObjectModified.Remove(OnObjectModifiedDelegateHandle);
+    OnObjectModifiedDelegateHandle.Reset();
+}
+
+void UEnsureDataOnlyBlueprintAction::RebuildConfigConventionsTables(const URuleRangerActionContext* ActionContext)
+{
+    ConfigConventionsTables.Reset();
+    for (const auto DataTable : ActionContext->GetOwnerConfig()->DataTables)
+    {
+        if (IsValid(DataTable))
+        {
+            if (FDataOnlyBlueprintEntry::StaticStruct() == DataTable->RowStruct)
+            {
+                LogInfo(nullptr,
+                        FString::Printf(TEXT("Adding DataTable '%s' registered in Config %s to set "
+                                             "of DataOnlyBlueprint rules applied"),
+                                        *DataTable.GetName(),
+                                        *ActionContext->GetOwnerConfig()->GetName()));
+                ConfigConventionsTables.Add(DataTable);
+            }
+        }
+    }
+}
+
+void UEnsureDataOnlyBlueprintAction::RebuildConventionCacheIfNecessary()
+{
+    if (DataOnlyBlueprintTables.IsEmpty() && ConfigConventionsTables.IsEmpty() && !ConventionsCache.IsEmpty())
+    {
+        ConventionsCache.Reset();
+    }
+
+    TArray<TObjectPtr<UDataTable>> ConventionsTables;
+    ConventionsTables.Append(DataOnlyBlueprintTables);
+    ConventionsTables.Append(ConfigConventionsTables);
+    bool bTableDataPresent = false;
+    for (const auto& NameConventionsTable : ConventionsTables)
+    {
+        if (NameConventionsTable && 0 != NameConventionsTable->GetTableData().Num())
+        {
+            bTableDataPresent = true;
+            break;
+        }
+    }
+    if (ConventionsCache.IsEmpty() && bTableDataPresent)
+    {
+        for (const auto& ConventionsTable : ConventionsTables)
+        {
+            if (IsValid(ConventionsTable))
+            {
+                for (const auto& RowName : ConventionsTable->GetRowNames())
+                {
+                    const auto& Convention = ConventionsTable->FindRow<FDataOnlyBlueprintEntry>(RowName, TEXT(""));
+                    // ReSharper disable once CppTooWideScopeInitStatement
+                    const auto& ObjectType = Convention->ObjectType.Get();
+                    if (Convention && IsValid(ObjectType))
+                    {
+                        ConventionsCache.Add(ObjectType);
+                    }
+                }
+            }
+        }
+        LogInfo(nullptr,
+                FString::Printf(TEXT("ConventionsCache rebuilt: %d entries in cache"), ConventionsCache.Num()));
+    }
+}
+
+void UEnsureDataOnlyBlueprintAction::RebuildCachesIfNecessary()
+{
+    RebuildConventionCacheIfNecessary();
+
+    if (!OnObjectModifiedDelegateHandle.IsValid())
+    {
+        // Add a callback for when ANY object is modified in the editor so that we can bust the cache
+        OnObjectModifiedDelegateHandle =
+            FCoreUObjectDelegates::OnObjectModified.AddUObject(this, &ThisClass::ResetCachesIfTablesModified);
+    }
+}
+
 void UEnsureDataOnlyBlueprintAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
 {
+    RebuildConfigConventionsTables(ActionContext);
+    RebuildCachesIfNecessary();
+
     bool bMatchedViaMetaProperty = false;
+    bool bMatchedViaDataTableEntry = false;
     TSubclassOf<UObject> MatchedObjectType{ nullptr };
     for (const auto ObjectType : ObjectTypes)
     {
         if (FRuleRangerUtilities::IsA(Object, ObjectType))
         {
             MatchedObjectType = ObjectType;
+        }
+    }
+    if (!MatchedObjectType)
+    {
+        for (const auto SoftObjectType : ConventionsCache)
+        {
+            if (SoftObjectType.IsValid())
+            {
+                // ReSharper disable once CppTooWideScopeInitStatement
+                const auto ObjectType = SoftObjectType.Get();
+                if (ObjectType && FRuleRangerUtilities::IsA(Object, ObjectType))
+                {
+                    MatchedObjectType = ObjectType;
+                    bMatchedViaDataTableEntry = true;
+                    break;
+                }
+            }
         }
     }
     if (!MatchedObjectType)
@@ -65,15 +179,7 @@ void UEnsureDataOnlyBlueprintAction::Apply_Implementation(URuleRangerActionConte
     const auto Blueprint = CastChecked<UBlueprint>(Object);
     if (MatchedObjectType && !FBlueprintEditorUtils::IsDataOnlyBlueprint(Blueprint))
     {
-        if (!bMatchedViaMetaProperty)
-        {
-            ActionContext->Error(FText::FromString(
-                FString::Printf(TEXT("Object is not a DataOnlyBlueprint but it extends the type %s that is "
-                                     "part of the list of DataOnlyBlueprints: %s"),
-                                *MatchedObjectType->GetPathName(),
-                                *GetObjectTypesAsString(ObjectTypes))));
-        }
-        else
+        if (bMatchedViaMetaProperty)
         {
             ActionContext->Error(FText::FromString(
                 FString::Printf(TEXT("Object is not a DataOnlyBlueprint but it extends the type %s that has "
@@ -81,7 +187,33 @@ void UEnsureDataOnlyBlueprintAction::Apply_Implementation(URuleRangerActionConte
                                 *MatchedObjectType->GetPathName(),
                                 *RuleRangerDataOnlyPropertyName.ToString())));
         }
+        else if (bMatchedViaDataTableEntry)
+        {
+            ActionContext->Error(FText::FromString(
+                FString::Printf(TEXT("Object is not a DataOnlyBlueprint but it extends the type %s that has "
+                                     "been registered in a DataTable as expecting DataOnlyBlueprint subtypes"),
+                                *MatchedObjectType->GetPathName())));
+        }
+        else
+        {
+            ActionContext->Error(FText::FromString(
+                FString::Printf(TEXT("Object is not a DataOnlyBlueprint but it extends the type %s that is "
+                                     "part of the list of DataOnlyBlueprints: %s"),
+                                *MatchedObjectType->GetPathName(),
+                                *GetObjectTypesAsString(ObjectTypes))));
+        }
     }
+}
+
+void UEnsureDataOnlyBlueprintAction::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+    // ReSharper disable once CppTooWideScopeInitStatement
+    const auto PropertyName = PropertyChangedEvent.Property ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+    if ((GET_MEMBER_NAME_CHECKED(ThisClass, DataOnlyBlueprintTables)) == PropertyName)
+    {
+        ResetCaches();
+    }
+    Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 
 UClass* UEnsureDataOnlyBlueprintAction::GetExpectedType()

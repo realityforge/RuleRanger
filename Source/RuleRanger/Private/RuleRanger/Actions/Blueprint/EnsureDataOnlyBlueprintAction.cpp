@@ -66,7 +66,6 @@ void UEnsureDataOnlyBlueprintAction::RebuildConfigConventionsTables(const URuleR
                                      "of DataOnlyBlueprint rules applied"),
                                 *DataTable.GetName(),
                                 *ActionContext->GetOwnerConfig()->GetName()));
-        ConfigConventionsTables.Add(DataTable);
     }
 }
 

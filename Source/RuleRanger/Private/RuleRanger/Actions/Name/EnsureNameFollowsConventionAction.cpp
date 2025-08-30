@@ -312,7 +312,6 @@ void UEnsureNameFollowsConventionAction::RebuildConfigConventionsTables(const UR
                 FString::Printf(TEXT("Adding DataTable '%s' registered in Config %s to set of conventions applied"),
                                 *DataTable.GetName(),
                                 *ActionContext->GetOwnerConfig()->GetName()));
-        ConfigConventionsTables.Add(DataTable);
     }
 }
 

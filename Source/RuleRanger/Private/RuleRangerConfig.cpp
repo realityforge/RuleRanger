@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 #include "RuleRangerConfig.h"
+#include "RuleRangerRuleSet.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerConfig)
 
@@ -35,6 +36,13 @@ void URuleRangerConfig::CollectDataTables(const UScriptStruct* RowStructure,
         if (IsValid(DataTable) && RowStructure == DataTable->RowStruct)
         {
             OutDataTables.Add(DataTable);
+        }
+    }
+    for (const auto RuleSet : RuleSets)
+    {
+        if (IsValid(RuleSet))
+        {
+            RuleSet->CollectDataTables(RowStructure, OutDataTables);
         }
     }
 }

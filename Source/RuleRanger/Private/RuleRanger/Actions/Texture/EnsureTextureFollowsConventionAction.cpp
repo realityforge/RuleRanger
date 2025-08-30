@@ -15,6 +15,7 @@
 #include "EnsureTextureFollowsConventionAction.h"
 #include "RuleRanger/RuleRangerUtilities.h"
 #include "RuleRangerConfig.h"
+#include "RuleRangerRuleSet.h"
 #include "Subsystems/EditorAssetSubsystem.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureTextureFollowsConventionAction)
@@ -30,6 +31,10 @@ void UEnsureTextureFollowsConventionAction::PostEditChangeProperty(FPropertyChan
         ResetCaches();
     }
     else if ((GET_MEMBER_NAME_CHECKED(URuleRangerConfig, DataTables)) == PropertyName)
+    {
+        ResetCaches();
+    }
+    else if ((GET_MEMBER_NAME_CHECKED(URuleRangerRuleSet, DataTables)) == PropertyName)
     {
         ResetCaches();
     }

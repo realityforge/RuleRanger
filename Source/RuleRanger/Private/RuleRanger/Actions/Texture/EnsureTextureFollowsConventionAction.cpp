@@ -27,11 +27,11 @@ void UEnsureTextureFollowsConventionAction::PostEditChangeProperty(FPropertyChan
     const FName PropertyName = PropertyChangedEvent.Property ? PropertyChangedEvent.Property->GetFName() : NAME_None;
     if ((GET_MEMBER_NAME_CHECKED(ThisClass, ConventionsTables)) == PropertyName)
     {
-        ResetConventionsCache();
+        ResetCaches();
     }
     else if ((GET_MEMBER_NAME_CHECKED(URuleRangerConfig, DataTables)) == PropertyName)
     {
-        ResetConventionsCache();
+        ResetCaches();
     }
     Super::PostEditChangeProperty(PropertyChangedEvent);
 }
@@ -47,12 +47,12 @@ void UEnsureTextureFollowsConventionAction::ResetCacheIfTableModified(UObject* O
             LogInfo(nullptr,
                     FString::Printf(TEXT("ResetCacheIfTableModified invoked for %s and caused a reset"),
                                     *Object->GetName()));
-            ResetConventionsCache();
+            ResetCaches();
         }
     }
 }
 
-void UEnsureTextureFollowsConventionAction::ResetConventionsCache()
+void UEnsureTextureFollowsConventionAction::ResetCaches()
 {
     LogInfo(nullptr, TEXT("Resetting the Conventions Cache"));
 
@@ -81,7 +81,7 @@ void UEnsureTextureFollowsConventionAction::RebuildConventionsCacheIfNecessary()
 
     if (ConventionsCache.IsEmpty() && bTableDataPresent)
     {
-        ResetConventionsCache();
+        ResetCaches();
         // Add a callback for when ANY object is modified in the editor so that we can bust the cache
         OnObjectModifiedDelegateHandle = FCoreUObjectDelegates::OnObjectModified.AddUObject(
             this,

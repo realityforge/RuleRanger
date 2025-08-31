@@ -95,7 +95,7 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
 
 bool URuleRangerEditorSubsystem::ProcessRuleSetForObject(URuleRangerConfig* const Config,
                                                          URuleRangerRuleSet* const RuleSet,
-                                                         TArray<URuleRangerRuleExclusion*> Exclusions,
+                                                         TArray<FRuleRangerRuleExclusion> Exclusions,
                                                          UObject* Object,
                                                          const FRuleRangerRuleFn& ProcessRuleFunction)
 {
@@ -105,21 +105,18 @@ bool URuleRangerEditorSubsystem::ProcessRuleSetForObject(URuleRangerConfig* cons
               RuleSet->GetName(),
               Object->GetName());
 
-    for (auto ExclusionIt = Exclusions.CreateIterator(); ExclusionIt; ++ExclusionIt)
+    for (const auto& Exclusion : Exclusions)
     {
-        if (const auto Exclusion = *ExclusionIt)
+        if (Exclusion.RuleSets.Contains(RuleSet))
         {
-            if (Exclusion->RuleSets.Contains(RuleSet))
-            {
-                UE_LOGFMT(
-                    RuleRanger,
-                    VeryVerbose,
-                    "ProcessRule: Rule Set {RuleSet} excluded for object {Object} due to exclusion rule. Reason: {Reason}",
-                    RuleSet->GetName(),
-                    Object->GetName(),
-                    Exclusion->Description.ToString());
-                return true;
-            }
+            UE_LOGFMT(RuleRanger,
+                      VeryVerbose,
+                      "ProcessRule: Rule Set {RuleSet} excluded for object "
+                      "{Object} due to exclusion rule. Reason: {Reason}",
+                      RuleSet->GetName(),
+                      Object->GetName(),
+                      Exclusion.Description.ToString());
+            return true;
         }
     }
 
@@ -159,22 +156,20 @@ bool URuleRangerEditorSubsystem::ProcessRuleSetForObject(URuleRangerConfig* cons
         if (const auto Rule = RulePtr.Get(); IsValid(Rule))
         {
             bool bSkipRule = false;
-            for (auto ExclusionIt = Exclusions.CreateIterator(); ExclusionIt; ++ExclusionIt)
+
+            for (const auto& Exclusion : Exclusions)
             {
-                if (const auto Exclusion = *ExclusionIt)
+                if (Exclusion.Rules.Contains(Rule))
                 {
-                    if (Exclusion->Rules.Contains(Rule))
-                    {
-                        UE_LOGFMT(RuleRanger,
-                                  VeryVerbose,
-                                  "ProcessRule: Rule {Rule} from RuleSet {RuleSet} was excluded for "
-                                  "object {Object} due to exclusion rule. Reason: {Reason}",
-                                  Rule->GetName(),
-                                  RuleSet->GetName(),
-                                  Object->GetName(),
-                                  Exclusion->Description.ToString());
-                        bSkipRule = true;
-                    }
+                    UE_LOGFMT(RuleRanger,
+                              VeryVerbose,
+                              "ProcessRule: Rule {Rule} from RuleSet {RuleSet} was excluded for "
+                              "object {Object} due to exclusion rule. Reason: {Reason}",
+                              Rule->GetName(),
+                              RuleSet->GetName(),
+                              Object->GetName(),
+                              Exclusion.Description.ToString());
+                    bSkipRule = true;
                 }
             }
 
@@ -234,16 +229,10 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
             {
                 if (Config->ConfigMatches(Path))
                 {
-                    TArray<URuleRangerRuleExclusion*> Exclusions;
-                    for (auto ExclusionIt = Config->Exclusions.CreateIterator(); ExclusionIt; ++ExclusionIt)
+                    TArray<FRuleRangerRuleExclusion> Exclusions;
+                    for (auto& Exclusion : Config->Exclusions)
                     {
-                        if (const auto Exclusion = ExclusionIt->Get())
-                        {
-                            if (Exclusion->ExclusionMatches(*Object, Path))
-                            {
-                                Exclusions.Add(Exclusion);
-                            }
-                        }
+                        Exclusions.Add(Exclusion);
                     }
 
                     for (auto RuleSetIt = Config->RuleSets.CreateIterator(); RuleSetIt; ++RuleSetIt)

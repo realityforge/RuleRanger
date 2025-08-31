@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 #include "RuleRangerConfig.h"
+#include "RuleRangerRuleExclusion.h"
 #include "RuleRangerRuleSet.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerConfig)
@@ -44,5 +45,48 @@ void URuleRangerConfig::CollectDataTables(const UScriptStruct* RowStructure,
         {
             RuleSet->CollectDataTables(RowStructure, OutDataTables);
         }
+    }
+}
+
+void URuleRangerConfig::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+    Super::PostEditChangeProperty(PropertyChangedEvent);
+
+    if (PropertyChangedEvent.Property)
+    {
+        // ReSharper disable once CppTooWideScopeInitStatement
+        const auto PropertyName = PropertyChangedEvent.Property->GetFName();
+
+        if ((GET_MEMBER_NAME_CHECKED(ThisClass, Exclusions)) == PropertyName)
+        {
+            UpdateExclusionsEditorFriendlyTitles();
+        }
+    }
+}
+
+void URuleRangerConfig::PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent)
+{
+    Super::PostEditChangeChainProperty(PropertyChangedEvent);
+
+    // ReSharper disable once CppTooWideScopeInitStatement
+    const auto PropertyName = PropertyChangedEvent.PropertyChain.GetActiveMemberNode()->GetValue()->GetFName();
+
+    if ((GET_MEMBER_NAME_CHECKED(ThisClass, Exclusions)) == PropertyName)
+    {
+        UpdateExclusionsEditorFriendlyTitles();
+    }
+}
+
+void URuleRangerConfig::PostLoad()
+{
+    Super::PostLoad();
+    UpdateExclusionsEditorFriendlyTitles();
+}
+
+void URuleRangerConfig::UpdateExclusionsEditorFriendlyTitles()
+{
+    for (auto& Exclusion : Exclusions)
+    {
+        Exclusion.InitEditorFriendlyTitleProperty();
     }
 }

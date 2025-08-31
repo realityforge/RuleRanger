@@ -240,7 +240,7 @@ void UEnsureTextureFollowsConventionAction::PerformTextureGroupCheck(
         if (bApplyFix && Convention->TextureGroups.Num() > 0)
         {
             FFormatNamedArguments Arguments;
-            Arguments.Add(TEXT("OriginalGroup"), Enum->GetDisplayNameTextByValue(Texture->CompressionSettings));
+            Arguments.Add(TEXT("OriginalGroup"), Enum->GetDisplayNameTextByValue(Texture->LODGroup));
             Arguments.Add(TEXT("NewGroup"), Enum->GetDisplayNameTextByValue(Convention->TextureGroups[0]));
             if (ActionContext->IsDryRun())
             {

@@ -105,9 +105,9 @@ void UEnsureNameFollowsConventionAction::Apply_Implementation(URuleRangerActionC
     // Find the naming convention that matches the object closely.
     // i.e. The most specific type, with a matching variant.
     FNameConvention MatchingNameConvention;
-    const bool bMatched = FindMatchingNameConvention(ActionContext, Object, Classes, Variant, MatchingNameConvention);
-    const FString ExpectedPrefix{ bMatched ? MatchingNameConvention.Prefix : FString("") };
-    const FString ExpectedSuffix{ bMatched ? MatchingNameConvention.Suffix : FString("") };
+    const auto bMatched = FindMatchingNameConvention(ActionContext, Object, Classes, Variant, MatchingNameConvention);
+    const auto ExpectedPrefix{ bMatched ? MatchingNameConvention.Prefix : FString("") };
+    const auto ExpectedSuffix{ bMatched ? MatchingNameConvention.Suffix : FString("") };
 
     for (const auto& Conventions : DeprecatedConventionsCache)
     {
@@ -120,27 +120,26 @@ void UEnsureNameFollowsConventionAction::Apply_Implementation(URuleRangerActionC
                     && (NameConvention.Suffix.IsEmpty()
                         || NewName.EndsWith(NameConvention.Suffix, ESearchCase::CaseSensitive)))
                 {
-                    const FString PreRenameName{ NewName };
+                    const auto PreRenameName{ NewName };
                     NewName = NewName.RightChop(NameConvention.Prefix.Len()).LeftChop(NameConvention.Suffix.Len());
                     LogInfo(
                         Object,
-                        FString::Printf(
-                            TEXT(
-                                "Cleaning up deprecated name convention (Class %s, Prefix '%s', Suffix '%s'). Input name: %s, Output name: %s"),
-                            *NameConvention.ObjectType->GetName(),
-                            *NameConvention.Prefix,
-                            *NameConvention.Suffix,
-                            *PreRenameName,
-                            *NewName));
+                        FString::Printf(TEXT("Cleaning up deprecated name convention "
+                                             "(Class %s, Prefix '%s', Suffix '%s'). Input name: %s, Output name: %s"),
+                                        *NameConvention.ObjectType->GetName(),
+                                        *NameConvention.Prefix,
+                                        *NameConvention.Suffix,
+                                        *PreRenameName,
+                                        *NewName));
                 }
             }
         }
     }
 
-    for (const TPair<TObjectPtr<UClass>, TArray<FNameConvention>>& NameConventions : ConventionsCache)
+    for (const auto& NameConventions : ConventionsCache)
     {
         const auto Type = NameConventions.Key.Get();
-        const bool bMatchesTypeHierarchy = Classes.Contains(Type);
+        const auto bMatchesTypeHierarchy = Classes.Contains(Type);
         for (auto& NameConvention : NameConventions.Value)
         {
             // First, we process all the rules that do not match:

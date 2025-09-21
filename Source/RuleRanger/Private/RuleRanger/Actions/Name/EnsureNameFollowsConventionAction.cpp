@@ -154,7 +154,7 @@ void UEnsureNameFollowsConventionAction::Apply_Implementation(URuleRangerActionC
             // "Base Color" material "subtype". The above rules help reinforce this.
             if (!bMatched || MatchingNameConvention != NameConvention)
             {
-                if (!NameConvention.Prefix.IsEmpty()
+                if (!NameConvention.Prefix.IsEmpty() && NameConvention.bStripPrefixFromNonMatchingAssets
                     && (ExpectedPrefix.IsEmpty() || !ExpectedPrefix.StartsWith(NameConvention.Prefix))
                     && NewName.StartsWith(NameConvention.Prefix, ESearchCase::CaseSensitive))
                 {
@@ -168,6 +168,7 @@ void UEnsureNameFollowsConventionAction::Apply_Implementation(URuleRangerActionC
                 }
 
                 if (bMatchesTypeHierarchy && !NameConvention.Suffix.IsEmpty()
+                    && NameConvention.bStripPrefixFromNonMatchingAssets
                     && (ExpectedSuffix.IsEmpty() || !ExpectedSuffix.StartsWith(NameConvention.Suffix))
                     && NewName.EndsWith(NameConvention.Suffix, ESearchCase::CaseSensitive))
                 {

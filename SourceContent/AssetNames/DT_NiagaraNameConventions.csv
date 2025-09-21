@@ -1,8 +1,8 @@
----,ObjectType,Variant,Prefix,Suffix,Description
-NiagaraDynamicInputScript,"/Script/NiagaraEditor.NiagaraDynamicInputScriptFactory","","NDIS_","",""
-NiagaraEffectType,"/Script/Niagara.NiagaraEffectType","","NET_","",""
-NiagaraEmitter,"/Script/Niagara.NiagaraEmitter","","NE_","",""
-NiagaraFunctionScript,"/Script/NiagaraEditor.NiagaraFunctionScriptFactory","","NFS_","",""
-NiagaraParameterCollection,"/Script/Niagara.NiagaraParameterCollection","","NPC_","",""
-NiagaraParameterCollectionInstance,"/Script/Niagara.NiagaraParameterCollectionInstance","","NPCI_","",""
-NiagaraSystem,"/Script/Niagara.NiagaraSystem","","NS_","",""
+---,ObjectType,Variant,Prefix,Suffix,bStripPrefixFromNonMatchingAssets,bStripSuffixFromNonMatchingAssets,Description
+NiagaraDynamicInputScript,"/Script/NiagaraEditor.NiagaraDynamicInputScriptFactory","","NDIS_","","True","True",""
+NiagaraEffectType,"/Script/Niagara.NiagaraEffectType","","NET_","","True","True",""
+NiagaraEmitter,"/Script/Niagara.NiagaraEmitter","","NE_","","True","True",""
+NiagaraFunctionScript,"/Script/NiagaraEditor.NiagaraFunctionScriptFactory","","NFS_","","True","True",""
+NiagaraParameterCollection,"/Script/Niagara.NiagaraParameterCollection","","NPC_","","True","True",""
+NiagaraParameterCollectionInstance,"/Script/Niagara.NiagaraParameterCollectionInstance","","NPCI_","","True","True",""
+NiagaraSystem,"/Script/Niagara.NiagaraSystem","","NS_","","True","True",""

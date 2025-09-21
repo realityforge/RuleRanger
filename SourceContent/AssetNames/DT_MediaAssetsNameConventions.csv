@@ -1,4 +1,4 @@
----,ObjectType,Variant,Prefix,Suffix,Description
-FileMediaSource,"/Script/MediaAssets.FileMediaSource","","FMS_","",""
-MediaPlayer,"/Script/MediaAssets.MediaPlayer","","MP_","",""
-MediaTexture,"/Script/MediaAssets.MediaTexture","","MT_","",""
+---,ObjectType,Variant,Prefix,Suffix,bStripPrefixFromNonMatchingAssets,bStripSuffixFromNonMatchingAssets,Description
+FileMediaSource,"/Script/MediaAssets.FileMediaSource","","FMS_","","True","True",""
+MediaPlayer,"/Script/MediaAssets.MediaPlayer","","MP_","","True","True",""
+MediaTexture,"/Script/MediaAssets.MediaTexture","","MT_","","True","True",""

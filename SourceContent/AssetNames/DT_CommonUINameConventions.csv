@@ -1,4 +1,4 @@
----,ObjectType,Variant,Prefix,Suffix,Description
-CommonButtonStyle,"/Script/CommonUI.CommonButtonStyle","","ButtonStyle_","",""
-CommonTextStyle,"/Script/CommonUI.CommonTextStyle","","TextStyle_","",""
-CommonInputControllerData,"/Script/CommonInput.CommonInputBaseControllerData","","ControllerData_","",""
+---,ObjectType,Variant,Prefix,Suffix,bStripPrefixFromNonMatchingAssets,bStripSuffixFromNonMatchingAssets,Description
+CommonButtonStyle,"/Script/CommonUI.CommonButtonStyle","","ButtonStyle_","","True","True",""
+CommonTextStyle,"/Script/CommonUI.CommonTextStyle","","TextStyle_","","True","True",""
+CommonInputControllerData,"/Script/CommonInput.CommonInputBaseControllerData","","ControllerData_","","True","True",""

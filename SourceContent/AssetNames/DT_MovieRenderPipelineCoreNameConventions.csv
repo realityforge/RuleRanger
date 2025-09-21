@@ -1,4 +1,4 @@
----,ObjectType,Variant,Prefix,Suffix,Description
-MoviePipelineQueue,"/Script/MovieRenderPipelineCore.MoviePipelineQueue","","MRPQ_","",""
-MoviePipelineShotConfig,"/Script/MovieRenderPipelineCore.MoviePipelineShotConfig","","","_MoviePipelineShotConfig",""
-MoviePipelinePrimaryConfig,"/Script/MovieRenderPipelineCore.MoviePipelinePrimaryConfig","","","_MoviePipelinePrimaryConfig",""
+---,ObjectType,Variant,Prefix,Suffix,bStripPrefixFromNonMatchingAssets,bStripSuffixFromNonMatchingAssets,Description
+MoviePipelineQueue,"/Script/MovieRenderPipelineCore.MoviePipelineQueue","","MRPQ_","","True","True",""
+MoviePipelineShotConfig,"/Script/MovieRenderPipelineCore.MoviePipelineShotConfig","","","_MoviePipelineShotConfig","True","True",""
+MoviePipelinePrimaryConfig,"/Script/MovieRenderPipelineCore.MoviePipelinePrimaryConfig","","","_MoviePipelinePrimaryConfig","True","True",""

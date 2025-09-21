@@ -48,6 +48,14 @@ struct FNameConvention final : public FTableRowBase
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FString Suffix{ "" };
 
+    /** Strip Prefix from assets that do not match this convention. */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    bool bStripPrefixFromNonMatchingAssets{ true };
+
+    /** Strip Suffix from assets that do not match this convention. */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    bool bStripSuffixFromNonMatchingAssets{ true };
+
     /** An explanation of the convention. */
     UPROPERTY(EditAnywhere)
     FString Description{ "" };

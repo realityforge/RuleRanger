@@ -1,2 +1,2 @@
----,ObjectType,Variant,Prefix,Suffix,Description
-NewRow,"/Script/MetasoundEngine.MetaSoundSource","","SFX_","",""
+---,ObjectType,Variant,Prefix,Suffix,bStripPrefixFromNonMatchingAssets,bStripSuffixFromNonMatchingAssets,Description
+MetaSoundSource,"/Script/MetasoundEngine.MetaSoundSource","","SFX_","","True","True",""

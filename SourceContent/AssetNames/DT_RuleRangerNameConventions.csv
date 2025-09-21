@@ -1,6 +1,6 @@
----,ObjectType,Variant,Prefix,Suffix,Description
-RuleRangerAction,"/Script/RuleRanger.RuleRangerAction","","RRA_","",""
-RuleRangerMatcher,"/Script/RuleRanger.RuleRangerMatcher","","RRM_","",""
-RuleRangerRule,"/Script/RuleRanger.RuleRangerRule","","RRR_","",""
-RuleRangerRuleSet,"/Script/RuleRanger.RuleRangerRuleSet","","RR_","_Rules",""
-RuleRangerRuleSetScope,"/Script/RuleRanger.RuleRangerConfig","","RR_","_Config",""
+---,ObjectType,Variant,Prefix,Suffix,bStripPrefixFromNonMatchingAssets,bStripSuffixFromNonMatchingAssets,Description
+RuleRangerAction,"/Script/RuleRanger.RuleRangerAction","","RRA_","","True","True",""
+RuleRangerMatcher,"/Script/RuleRanger.RuleRangerMatcher","","RRM_","","True","True",""
+RuleRangerRule,"/Script/RuleRanger.RuleRangerRule","","RRR_","","True","True",""
+RuleRangerRuleSet,"/Script/RuleRanger.RuleRangerRuleSet","","RR_","_Rules","True","True",""
+RuleRangerRuleSetScope,"/Script/RuleRanger.RuleRangerConfig","","RR_","_Config","True","True",""

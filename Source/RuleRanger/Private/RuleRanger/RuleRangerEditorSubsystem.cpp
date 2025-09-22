@@ -432,7 +432,7 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(URuleRangerConfig*
                       Rule->GetName());
             return false;
         }
-        if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
+        else if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
         {
             UE_LOGFMT(LogRuleRanger,
                       VeryVerbose,
@@ -441,6 +441,10 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(URuleRangerConfig*
                       InObject->GetName(),
                       Rule->GetName());
             return false;
+        }
+        else
+        {
+            return true;
         }
     }
     else
@@ -452,8 +456,8 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(URuleRangerConfig*
                   InObject->GetName(),
                   Rule->GetName(),
                   bIsReimport ? TEXT("reimport") : TEXT("import"));
+        return true;
     }
-    return true;
 }
 
 bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerConfig* const Config,
@@ -488,7 +492,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerConfig* const Conf
                       Rule->GetName());
             return false;
         }
-        if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
+        else if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
         {
             UE_LOGFMT(LogRuleRanger,
                       VeryVerbose,
@@ -497,6 +501,10 @@ bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerConfig* const Conf
                       InObject->GetName(),
                       Rule->GetName());
             return false;
+        }
+        else
+        {
+            return true;
         }
     }
     else
@@ -507,8 +515,8 @@ bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerConfig* const Conf
                   "rule does not enable rule on demand.",
                   InObject->GetName(),
                   Rule->GetName());
+        return true;
     }
-    return true;
 }
 
 bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerConfig* const Config,
@@ -533,6 +541,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerConfig* cons
         // ReSharper disable once CppTooWideScopeInitStatement
         const auto State = ActionContext->GetState();
         ActionContext->ClearContext();
+
         if (ERuleRangerActionState::AS_Fatal == State)
         {
             UE_LOGFMT(LogRuleRanger,
@@ -543,7 +552,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerConfig* cons
                       Rule->GetName());
             return false;
         }
-        if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
+        else if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
         {
             UE_LOGFMT(LogRuleRanger,
                       VeryVerbose,
@@ -552,6 +561,10 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerConfig* cons
                       InObject->GetName(),
                       Rule->GetName());
             return false;
+        }
+        else
+        {
+            return true;
         }
     }
     else
@@ -562,6 +575,6 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerConfig* cons
                   "rule does not enable rule on demand.",
                   InObject->GetName(),
                   Rule->GetName());
+        return true;
     }
-    return true;
 }

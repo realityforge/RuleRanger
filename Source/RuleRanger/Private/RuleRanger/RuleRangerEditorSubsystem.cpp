@@ -95,7 +95,7 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
 
 bool URuleRangerEditorSubsystem::ProcessRuleSetForObject(URuleRangerConfig* const Config,
                                                          URuleRangerRuleSet* const RuleSet,
-                                                         TArray<FRuleRangerRuleExclusion> Exclusions,
+                                                         const TArray<FRuleRangerRuleExclusion>& Exclusions,
                                                          UObject* Object,
                                                          const FRuleRangerRuleFn& ProcessRuleFunction)
 {
@@ -389,7 +389,7 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* InObject, const 
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-TArray<TSoftObjectPtr<URuleRangerConfig>> URuleRangerEditorSubsystem::GetCurrentRuleSetConfigs()
+const TArray<TSoftObjectPtr<URuleRangerConfig>>& URuleRangerEditorSubsystem::GetCurrentRuleSetConfigs()
 {
     const auto DeveloperSettings = GetMutableDefault<URuleRangerDeveloperSettings>();
     check(IsValid(DeveloperSettings));

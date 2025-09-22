@@ -60,7 +60,7 @@ public:
     bool IsMatchingRulePresent(UObject* InObject, const FRuleRangerRuleFn& ProcessRuleFunction);
 
     /** Return the set of RuleSetConfig objects configured for the current project. */
-    TArray<TSoftObjectPtr<URuleRangerConfig>> GetCurrentRuleSetConfigs();
+    const TArray<TSoftObjectPtr<URuleRangerConfig>>& GetCurrentRuleSetConfigs();
 
 private:
     UPROPERTY(Transient)
@@ -73,7 +73,7 @@ private:
 
     bool ProcessRuleSetForObject(URuleRangerConfig* const Config,
                                  URuleRangerRuleSet* const RuleSet,
-                                 TArray<FRuleRangerRuleExclusion> Exclusions,
+                                 const TArray<FRuleRangerRuleExclusion>& Exclusions,
                                  UObject* Object,
                                  const FRuleRangerRuleFn& ProcessRuleFunction);
 

@@ -420,6 +420,8 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(URuleRangerConfig*
 
         ActionContext->EmitMessageLogs();
         const auto State = ActionContext->GetState();
+        ActionContext->ClearContext();
+
         if (ERuleRangerActionState::AS_Fatal == State)
         {
             UE_LOGFMT(LogRuleRanger,
@@ -428,7 +430,6 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(URuleRangerConfig*
                       "Processing rules will not continue.",
                       InObject->GetName(),
                       Rule->GetName());
-            ActionContext->ClearContext();
             return false;
         }
         if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
@@ -439,7 +440,6 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(URuleRangerConfig*
                       "Processing rules will not continue as ContinueOnError=False.",
                       InObject->GetName(),
                       Rule->GetName());
-            ActionContext->ClearContext();
             return false;
         }
     }
@@ -453,7 +453,6 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(URuleRangerConfig*
                   Rule->GetName(),
                   bIsReimport ? TEXT("reimport") : TEXT("import"));
     }
-    ActionContext->ClearContext();
     return true;
 }
 
@@ -477,6 +476,8 @@ bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerConfig* const Conf
 
         ActionContext->EmitMessageLogs();
         const auto State = ActionContext->GetState();
+        ActionContext->ClearContext();
+
         if (ERuleRangerActionState::AS_Fatal == State)
         {
             UE_LOGFMT(LogRuleRanger,
@@ -485,7 +486,6 @@ bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerConfig* const Conf
                       "Processing rules will not continue.",
                       InObject->GetName(),
                       Rule->GetName());
-            ActionContext->ClearContext();
             return false;
         }
         if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
@@ -496,7 +496,6 @@ bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerConfig* const Conf
                       "Processing rules will not continue as ContinueOnError=False.",
                       InObject->GetName(),
                       Rule->GetName());
-            ActionContext->ClearContext();
             return false;
         }
     }
@@ -509,7 +508,6 @@ bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerConfig* const Conf
                   InObject->GetName(),
                   Rule->GetName());
     }
-    ActionContext->ClearContext();
     return true;
 }
 
@@ -534,6 +532,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerConfig* cons
         ActionContext->EmitMessageLogs();
         // ReSharper disable once CppTooWideScopeInitStatement
         const auto State = ActionContext->GetState();
+        ActionContext->ClearContext();
         if (ERuleRangerActionState::AS_Fatal == State)
         {
             UE_LOGFMT(LogRuleRanger,
@@ -542,7 +541,6 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerConfig* cons
                       "Processing rules will not continue.",
                       InObject->GetName(),
                       Rule->GetName());
-            ActionContext->ClearContext();
             return false;
         }
         if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
@@ -553,7 +551,6 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerConfig* cons
                       "Processing rules will not continue as ContinueOnError=False.",
                       InObject->GetName(),
                       Rule->GetName());
-            ActionContext->ClearContext();
             return false;
         }
     }
@@ -566,6 +563,5 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerConfig* cons
                   InObject->GetName(),
                   Rule->GetName());
     }
-    ActionContext->ClearContext();
     return true;
 }

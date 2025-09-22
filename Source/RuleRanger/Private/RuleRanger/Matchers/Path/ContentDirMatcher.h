@@ -31,5 +31,5 @@ class RULERANGER_API UContentDirMatcher final : public URuleRangerMatcher
     FDirectoryPath Dir{ TEXT("") };
 
 public:
-    bool Test_Implementation(UObject* Object) const override;
+    virtual bool Test_Implementation(UObject* Object) const override;
 };

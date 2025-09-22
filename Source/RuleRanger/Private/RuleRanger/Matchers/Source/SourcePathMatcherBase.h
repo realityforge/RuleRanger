@@ -27,7 +27,7 @@ class RULERANGER_API USourcePathMatcherBase : public URuleRangerMatcher
     GENERATED_BODY()
 
 public:
-    bool Test_Implementation(UObject* Object) const override;
+    virtual bool Test_Implementation(UObject* Object) const override;
 
 protected:
     /** A flag controlling whether matching is Case Sensitive or not. */

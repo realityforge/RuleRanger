@@ -37,5 +37,5 @@ class RULERANGER_API UPathFolderMatcher final : public URuleRangerMatcher
     bool bCaseSensitive{ true };
 
 public:
-    bool Test_Implementation(UObject* Object) const override;
+    virtual bool Test_Implementation(UObject* Object) const override;
 };

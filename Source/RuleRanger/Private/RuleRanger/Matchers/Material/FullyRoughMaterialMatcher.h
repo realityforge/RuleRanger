@@ -31,5 +31,5 @@ class RULERANGER_API UFullyRoughMaterialMatcher final : public URuleRangerMatche
     bool bFullyRough{ true };
 
 public:
-    bool Test_Implementation(UObject* Object) const override;
+    virtual bool Test_Implementation(UObject* Object) const override;
 };

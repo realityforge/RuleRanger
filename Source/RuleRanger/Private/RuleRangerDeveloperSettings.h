@@ -40,4 +40,6 @@ public:
 
     UPROPERTY(Config, EditAnywhere, Category = "Rule Ranger", meta = (DisplayThumbnail = "false"))
     TArray<TSoftObjectPtr<URuleRangerConfig>> Configs;
+
+    virtual void PostEditChangeProperty(FPropertyChangedEvent& Event) override;
 };

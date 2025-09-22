@@ -33,22 +33,27 @@ void URuleRangerEditorSubsystem::Initialize(FSubsystemCollectionBase& Collection
     // Register delegate for OnAssetPostImport callback
     if (const auto Subsystem = GEditor->GetEditorSubsystem<UImportSubsystem>())
     {
-        OnAssetPostImportDelegateHandle =
-            Subsystem->OnAssetPostImport.AddUObject(this, &URuleRangerEditorSubsystem::OnAssetPostImport);
+        OnAssetPostImportDelegateHandle = Subsystem->OnAssetPostImport.AddUObject(this, &ThisClass::OnAssetPostImport);
+        OnAssetReimportDelegateHandle = Subsystem->OnAssetReimport.AddUObject(this, &ThisClass::OnAssetReimport);
     }
 }
 
 void URuleRangerEditorSubsystem::Deinitialize()
 {
-    // Deregister delegate for OnAssetPostImport callback
-    if (OnAssetPostImportDelegateHandle.IsValid())
+    if (const auto Subsystem = GEditor->GetEditorSubsystem<UImportSubsystem>())
     {
-        if (const auto Subsystem = GEditor->GetEditorSubsystem<UImportSubsystem>())
+        // Deregister delegate for OnAssetPostImport callback
+        if (OnAssetPostImportDelegateHandle.IsValid())
         {
             Subsystem->OnAssetPostImport.Remove(OnAssetPostImportDelegateHandle);
-            OnAssetPostImportDelegateHandle.Reset();
+        }
+        if (OnAssetReimportDelegateHandle.IsValid())
+        {
+            Subsystem->OnAssetReimport.Remove(OnAssetReimportDelegateHandle);
         }
     }
+    OnAssetPostImportDelegateHandle.Reset();
+    OnAssetReimportDelegateHandle.Reset();
 }
 
 void URuleRangerEditorSubsystem::ScanObject(UObject* InObject)
@@ -74,9 +79,51 @@ void URuleRangerEditorSubsystem::ScanAndFixObject(UObject* InObject)
     // TODO: Run data validation maybe?
 }
 
+TConstArrayView<TWeakObjectPtr<URuleRangerConfig>> URuleRangerEditorSubsystem::GetCachedRuleSetConfigs()
+{
+    if (bRuleSetConfigCacheDirty)
+    {
+        CachedRuleSetConfigs.Reset();
+
+        const auto DevSettings = GetDefault<URuleRangerDeveloperSettings>();
+        if (IsValid(DevSettings))
+        {
+            for (const auto& SoftConfig : DevSettings->Configs)
+            {
+                if (const auto Config = SoftConfig.LoadSynchronous())
+                {
+                    CachedRuleSetConfigs.Add(Config);
+                }
+            }
+            UE_LOGFMT(LogRuleRanger,
+                      Log,
+                      "RuleSetConfigCache populated with {Count} entries.",
+                      CachedRuleSetConfigs.Num());
+
+            bRuleSetConfigCacheDirty = false;
+        }
+    }
+    return CachedRuleSetConfigs;
+}
+
+void URuleRangerEditorSubsystem::MarkdRuleSetConfigCacheDirty()
+{
+    if (!bRuleSetConfigCacheDirty)
+    {
+        CachedRuleSetConfigs.Reset();
+        bRuleSetConfigCacheDirty = true;
+        UE_LOGFMT(LogRuleRanger, Log, "Clearing the RuleSetConfig cache");
+    }
+}
+
 // ReSharper disable once CppMemberFunctionMayBeStatic
 void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Factory, UObject* Object)
 {
+    if (Object->IsA<URuleRangerConfig>())
+    {
+        MarkdRuleSetConfigCacheDirty();
+    }
+
     const auto Subsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>();
 
     const static FName NAME_ImportMarkerKey = FName(TEXT("RuleRanger.ImportProcessed"));
@@ -91,6 +138,21 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
                                     UObject* InObject) {
                     return ProcessOnAssetPostImportRule(Config, RuleSet, Rule, bIsReimport, InObject);
                 });
+}
+
+void URuleRangerEditorSubsystem::OnAssetReimport(UObject* Object)
+{
+    if (Object->IsA<URuleRangerConfig>())
+    {
+        MarkdRuleSetConfigCacheDirty();
+    }
+
+    ProcessRule(
+        Object,
+        [this](URuleRangerConfig* const Config,
+               URuleRangerRuleSet* const RuleSet,
+               URuleRangerRule* Rule,
+               UObject* InObject) { return ProcessOnAssetPostImportRule(Config, RuleSet, Rule, true, InObject); });
 }
 
 bool URuleRangerEditorSubsystem::ProcessRuleSetForObject(URuleRangerConfig* const Config,
@@ -214,7 +276,7 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
             ActionContext = NewObject<URuleRangerActionContext>(this, URuleRangerActionContext::StaticClass());
         }
 
-        auto Configs = GetCurrentRuleSetConfigs();
+        const auto Configs = GetCachedRuleSetConfigs();
         const auto Path = Object->GetPathName();
         UE_LOGFMT(LogRuleRanger,
                   VeryVerbose,
@@ -223,9 +285,9 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
                   Configs.Num(),
                   Object->GetName(),
                   Path);
-        for (auto ConfigIt = Configs.CreateIterator(); ConfigIt; ++ConfigIt)
+        for (const auto ConfigPtr : Configs)
         {
-            if (const auto Config = ConfigIt->LoadSynchronous())
+            if (const auto Config = ConfigPtr.Get())
             {
                 if (Config->ConfigMatches(Path))
                 {
@@ -341,16 +403,16 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* InObject, const 
 {
     if (IsValid(InObject))
     {
-        auto Configs = GetCurrentRuleSetConfigs();
+        const auto Configs = GetCachedRuleSetConfigs();
         UE_LOGFMT(
             LogRuleRanger,
             VeryVerbose,
             "IsMatchingRulePresent: Located {Count} Rule Set Config(s) when discovering rules for object {Object}",
             Configs.Num(),
             InObject->GetName());
-        for (auto ConfigIt = Configs.CreateIterator(); ConfigIt; ++ConfigIt)
+        for (auto ConfigPtr : Configs)
         {
-            if (const auto Config = ConfigIt->LoadSynchronous())
+            if (const auto Config = ConfigPtr.Get())
             {
                 if (const auto Path = InObject->GetPathName(); Config->ConfigMatches(Path))
                 {
@@ -386,14 +448,6 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* InObject, const 
         }
     }
     return false;
-}
-
-// ReSharper disable once CppMemberFunctionMayBeStatic
-const TArray<TSoftObjectPtr<URuleRangerConfig>>& URuleRangerEditorSubsystem::GetCurrentRuleSetConfigs()
-{
-    const auto DeveloperSettings = GetMutableDefault<URuleRangerDeveloperSettings>();
-    check(IsValid(DeveloperSettings));
-    return DeveloperSettings->Configs;
 }
 
 bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(URuleRangerConfig* const Config,

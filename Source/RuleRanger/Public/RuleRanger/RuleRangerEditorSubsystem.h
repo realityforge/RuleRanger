@@ -59,17 +59,25 @@ public:
                                         const FRuleRangerRuleFn& ProcessRuleFunction);
     bool IsMatchingRulePresent(UObject* InObject, const FRuleRangerRuleFn& ProcessRuleFunction);
 
-    /** Return the set of RuleSetConfig objects configured for the current project. */
-    const TArray<TSoftObjectPtr<URuleRangerConfig>>& GetCurrentRuleSetConfigs();
+    void MarkdRuleSetConfigCacheDirty();
 
 private:
     UPROPERTY(Transient)
+    TArray<TWeakObjectPtr<URuleRangerConfig>> CachedRuleSetConfigs;
+
+    bool bRuleSetConfigCacheDirty{ true };
+
+    TConstArrayView<TWeakObjectPtr<URuleRangerConfig>> GetCachedRuleSetConfigs();
+
+    UPROPERTY(Transient)
     URuleRangerActionContext* ActionContext{ nullptr };
 
-    // Handle for delegate that has been registered.
     FDelegateHandle OnAssetPostImportDelegateHandle;
+    FDelegateHandle OnAssetReimportDelegateHandle;
 
     void OnAssetPostImport(UFactory* Factory, UObject* Object);
+
+    void OnAssetReimport(UObject* Object);
 
     bool ProcessRuleSetForObject(URuleRangerConfig* const Config,
                                  URuleRangerRuleSet* const RuleSet,

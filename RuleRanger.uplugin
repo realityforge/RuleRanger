@@ -22,6 +22,10 @@
     {
       "Name": "Niagara",
       "Enabled": true
+    },
+    {
+      "Name": "Metasound",
+      "Enabled": false
     }
   ],
   "Modules": [

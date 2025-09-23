@@ -1,2 +1,3 @@
 ---,ObjectType,Variant,Prefix,Suffix,bStripPrefixFromNonMatchingAssets,bStripSuffixFromNonMatchingAssets,Description
-MetaSoundSource,"/Script/MetasoundEngine.MetaSoundSource","","SFX_","","True","True",""
+MetaSoundSourcePreset,"/Script/MetasoundEngine.MetaSoundSource","Preset","MSP_","","True","True",""
+MetaSoundSource,"/Script/MetasoundEngine.MetaSoundSource","","MS_","","True","True",""

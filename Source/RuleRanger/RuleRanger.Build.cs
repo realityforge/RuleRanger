@@ -20,41 +20,44 @@ public class RuleRanger : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicDependencyModuleNames.AddRange(new[] { "ContentBrowser", "Core" });
-        // clang-format off
-        PrivateDependencyModuleNames.AddRange(new[] {
-                "AnimGraph",
-                "AssetTools",
-                "CoreUObject",
-                "BlueprintGraph",
-                "DataValidation",
-                "DeveloperSettings",
-                "EditorSubsystem",
-                "Engine",
-                "Kismet",
-                "Projects", // IPluginManager
-                "MessageLog",
-                "NiagaraEditor",
-                "Niagara",
-                "Slate",
-                "SlateCore",
-                "UnrealEd"
-            });
-		// clang-format on                    
-        PrivateIncludePathModuleNames.AddRange(new[] { "MessageLog" });
-    }
-		if (IsPluginEnabled("MetaSound"))
-		{
-			PublicDefinitions.Add("WITH_RULERANGER_METASOUND_RULES=1");
-			PrivateDependencyModuleNames.Add("MetasoundEngine");
-		}
-		else
-		{
-			PublicDefinitions.Add("WITH_RULERANGER_METASOUND_RULES=0");
-		}
-	}
 
-	private static bool IsPluginEnabled(string PluginName)
-	{
-		return Plugins.GetPlugin(PluginName) is not null;
-	}
+        // clang-format off
+		PrivateDependencyModuleNames.AddRange(new[]
+		{
+			"AnimGraph",
+			"AssetTools",
+			"CoreUObject",
+			"BlueprintGraph",
+			"DataValidation",
+			"DeveloperSettings",
+			"EditorSubsystem",
+			"Engine",
+			"Kismet",
+			"Projects",
+			"MessageLog",
+			"NiagaraEditor",
+			"Niagara",
+			"Slate",
+			"SlateCore",
+			"UnrealEd"
+		});
+        // clang-format on
+
+        PrivateIncludePathModuleNames.Add("MessageLog");
+
+        if (IsPluginEnabled("MetaSound"))
+        {
+            PublicDefinitions.Add("WITH_RULERANGER_METASOUND_RULES=1");
+            PrivateDependencyModuleNames.Add("MetasoundEngine");
+        }
+        else
+        {
+            PublicDefinitions.Add("WITH_RULERANGER_METASOUND_RULES=0");
+        }
+    }
+
+    private static bool IsPluginEnabled(string PluginName)
+    {
+        return Plugins.GetPlugin(PluginName) is not null;
+    }
 }

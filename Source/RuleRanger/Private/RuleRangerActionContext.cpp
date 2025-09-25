@@ -111,16 +111,19 @@ void URuleRangerActionContext::Info(const FText& InMessage)
 {
     InfoMessages.Add(ToMessage(InMessage));
 }
+
 void URuleRangerActionContext::Warning(const FText& InMessage)
 {
     WarningMessages.Add(ToMessage(InMessage));
     ActionState = ActionState < ERuleRangerActionState::AS_Warning ? ERuleRangerActionState::AS_Warning : ActionState;
 }
+
 void URuleRangerActionContext::Error(const FText& InMessage)
 {
     ErrorMessages.Add(ToMessage(InMessage));
     ActionState = ActionState < ERuleRangerActionState::AS_Error ? ERuleRangerActionState::AS_Error : ActionState;
 }
+
 void URuleRangerActionContext::Fatal(const FText& InMessage)
 {
     FatalMessages.Add(ToMessage(InMessage));

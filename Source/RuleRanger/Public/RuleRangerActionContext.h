@@ -59,9 +59,11 @@ enum class ERuleRangerActionState : uint8
  * Context object passed to an action so that the action can be provided context.
  */
 UCLASS(BlueprintType, Transient)
-class RULERANGER_API URuleRangerActionContext : public UObject
+class RULERANGER_API URuleRangerActionContext final : public UObject
 {
     GENERATED_BODY()
+    friend class URuleRangerEditorSubsystem;
+    friend class URuleRangerEditorValidator;
 
 public:
     /**
@@ -92,6 +94,7 @@ public:
      */
     void Fatal(const FText& InMessage);
 
+protected:
     void ResetContext(URuleRangerConfig* const InConfig,
                       URuleRangerRuleSet* const InRuleSet,
                       URuleRangerRule* InRule,

@@ -59,13 +59,9 @@ EDataValidationResult URuleRangerEditorValidator::ValidateLoadedAsset_Implementa
     const auto SubSystem = GEditor ? GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>() : nullptr;
     if (SubSystem)
     {
-        SubSystem->ProcessRule(InAsset,
-                               [this, &Context](URuleRangerConfig* const Config,
-                                                URuleRangerRuleSet* const RuleSet,
-                                                URuleRangerRule* Rule,
-                                                UObject* InObject) mutable {
-                                   return ProcessRule(Config, RuleSet, Rule, InObject, Context);
-                               });
+        SubSystem->ProcessRule(InAsset, [this, &Context](auto Config, auto RuleSet, auto Rule, auto InObject) mutable {
+            return ProcessRule(Config, RuleSet, Rule, InObject, Context);
+        });
     }
     else
     {
@@ -172,19 +168,14 @@ bool URuleRangerEditorValidator::CanValidateAsset_Implementation(const FAssetDat
     bool Result = false;
     if (const auto SubSystem = GEditor ? GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>() : nullptr)
     {
-        SubSystem->ProcessRule(
-            InAsset,
-            [this, &InContext, &Result](URuleRangerConfig* const Config,
-                                        URuleRangerRuleSet* const RuleSet,
-                                        const URuleRangerRule* Rule,
-                                        UObject* InObject) {
-                if (WillRuleRunInDataValidationUsecase(Rule, InObject, InContext.GetValidationUsecase())
-                    && Rule->Match(ActionContext, InObject))
-                {
-                    Result = true;
-                }
-                return true;
-            });
+        SubSystem->ProcessRule(InAsset, [this, &InContext, &Result](auto, auto, auto Rule, auto InObject) {
+            if (WillRuleRunInDataValidationUsecase(Rule, InObject, InContext.GetValidationUsecase())
+                && Rule->Match(ActionContext, InObject))
+            {
+                Result = true;
+            }
+            return true;
+        });
     }
     else
     {

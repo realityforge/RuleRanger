@@ -59,6 +59,9 @@ void URuleRangerActionContext::ResetContext(URuleRangerConfig* const InConfig,
 
 void URuleRangerActionContext::ClearContext()
 {
+    Config = nullptr;
+    RuleSet = nullptr;
+    Rule = nullptr;
     Object = nullptr;
     ActionTrigger = ERuleRangerActionTrigger::AT_Report;
     ActionState = ERuleRangerActionState::AS_Success;

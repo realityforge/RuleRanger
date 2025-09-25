@@ -88,9 +88,8 @@ void UEnsureTextureFollowsConventionAction::RebuildConventionsCacheIfNecessary()
     {
         ResetCaches();
         // Add a callback for when ANY object is modified in the editor so that we can bust the cache
-        OnObjectModifiedDelegateHandle = FCoreUObjectDelegates::OnObjectModified.AddUObject(
-            this,
-            &UEnsureTextureFollowsConventionAction::ResetCacheIfTableModified);
+        OnObjectModifiedDelegateHandle =
+            FCoreUObjectDelegates::OnObjectModified.AddUObject(this, &ThisClass::ResetCacheIfTableModified);
         for (const auto& ConventionsTable : Tables)
         {
             if (IsValid(ConventionsTable))

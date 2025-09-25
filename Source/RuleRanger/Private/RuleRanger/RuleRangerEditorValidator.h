@@ -14,7 +14,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DataValidationModule.h"
 #include "EditorValidatorBase.h"
 #include "RuleRangerResultHandler.h"
 #include "RuleRangerEditorValidator.generated.h"

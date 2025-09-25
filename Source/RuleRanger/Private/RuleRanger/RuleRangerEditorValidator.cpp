@@ -13,6 +13,7 @@
  */
 #include "RuleRanger/RuleRangerEditorValidator.h"
 #include "Logging/StructuredLog.h"
+#include "Misc/DataValidation.h"
 #include "RuleRanger/RuleRangerEditorSubsystem.h"
 #include "RuleRangerActionContext.h"
 #include "RuleRangerLogging.h"

@@ -450,8 +450,7 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(URuleRangerConfig*
                   InObject->GetName(),
                   Rule->GetName(),
                   bIsReimport ? TEXT("reimport") : TEXT("import"));
-        const ERuleRangerActionTrigger Trigger =
-            bIsReimport ? ERuleRangerActionTrigger::AT_Reimport : ERuleRangerActionTrigger::AT_Import;
+        const auto Trigger = bIsReimport ? ERuleRangerActionTrigger::AT_Reimport : ERuleRangerActionTrigger::AT_Import;
         ActionContext->ResetContext(Config, RuleSet, Rule, InObject, Trigger);
 
         Rule->Apply(ActionContext, InObject);

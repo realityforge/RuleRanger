@@ -70,28 +70,28 @@ void URuleRangerActionContext::ClearContext()
 
 void URuleRangerActionContext::EmitMessageLogs()
 {
-    for (int i = 0; i < InfoMessages.Num(); i++)
+    for (auto i = 0; i < InfoMessages.Num(); i++)
     {
         FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
             .Info()
             ->AddToken(FUObjectToken::Create(Object))
             ->AddToken(FTextToken::Create(InfoMessages[i]));
     }
-    for (int i = 0; i < WarningMessages.Num(); i++)
+    for (auto i = 0; i < WarningMessages.Num(); i++)
     {
         FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
             .Warning()
             ->AddToken(FUObjectToken::Create(Object))
             ->AddToken(FTextToken::Create(WarningMessages[i]));
     }
-    for (int i = 0; i < ErrorMessages.Num(); i++)
+    for (auto i = 0; i < ErrorMessages.Num(); i++)
     {
         FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
             .Error()
             ->AddToken(FUObjectToken::Create(Object))
             ->AddToken(FTextToken::Create(ErrorMessages[i]));
     }
-    for (int i = 0; i < FatalMessages.Num(); i++)
+    for (auto i = 0; i < FatalMessages.Num(); i++)
     {
         FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
             .Error()

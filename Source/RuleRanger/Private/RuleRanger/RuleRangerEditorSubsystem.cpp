@@ -383,57 +383,6 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresentForObject(URuleRangerConfi
     return false;
 }
 
-bool URuleRangerEditorSubsystem::IsMatchingRulePresent(UObject* InObject, const FRuleRangerRuleFn& ProcessRuleFunction)
-{
-    if (IsValid(InObject))
-    {
-        const auto Configs = GetCachedRuleSetConfigs();
-        UE_LOGFMT(
-            LogRuleRanger,
-            VeryVerbose,
-            "IsMatchingRulePresent: Located {Count} Rule Set Config(s) when discovering rules for object {Object}",
-            Configs.Num(),
-            InObject->GetName());
-        for (auto ConfigPtr : Configs)
-        {
-            if (const auto Config = ConfigPtr.Get())
-            {
-                if (const auto Path = InObject->GetPathName(); Config->ConfigMatches(Path))
-                {
-                    for (auto RuleSetIt = Config->RuleSets.CreateIterator(); RuleSetIt; ++RuleSetIt)
-                    {
-                        if (const auto RuleSet = RuleSetIt->Get())
-                        {
-                            if (IsMatchingRulePresentForObject(Config, RuleSet, InObject, ProcessRuleFunction))
-                            {
-                                return true;
-                            }
-                        }
-                        else
-                        {
-                            UE_LOGFMT(LogRuleRanger,
-                                      Error,
-                                      "IsMatchingRulePresent: Invalid RuleSet skipped when processing "
-                                      "rules for {Object} in config {Config}",
-                                      InObject->GetName(),
-                                      Config->GetName());
-                        }
-                    }
-                }
-            }
-            else
-            {
-                UE_LOGFMT(LogRuleRanger,
-                          Error,
-                          "IsMatchingRulePresent: Invalid RuleSetConfig skipped when "
-                          "processing rules for {Object}",
-                          InObject->GetName());
-            }
-        }
-    }
-    return false;
-}
-
 bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(URuleRangerConfig* const Config,
                                                               URuleRangerRuleSet* const RuleSet,
                                                               URuleRangerRule* Rule,

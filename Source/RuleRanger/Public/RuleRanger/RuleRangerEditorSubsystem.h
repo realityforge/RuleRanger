@@ -57,7 +57,6 @@ public:
                                         URuleRangerRuleSet* RuleSet,
                                         UObject* InObject,
                                         const FRuleRangerRuleFn& ProcessRuleFunction);
-    bool IsMatchingRulePresent(UObject* InObject, const FRuleRangerRuleFn& ProcessRuleFunction);
 
     void MarkdRuleSetConfigCacheDirty();
 

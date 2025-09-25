@@ -65,31 +65,6 @@ class RULERANGER_API URuleRangerActionContext : public UObject
 
 public:
     /**
-     * Return the current state of the action.
-     *
-     * @return the current state of the action.
-     */
-    UFUNCTION(BlueprintCallable, Category = "Rule Ranger")
-    virtual ERuleRangerActionState GetState();
-
-    /**
-     * Return the trigger for the current action. i.e. Why was this action invoked.
-     *
-     * @return the trigger for the current action
-     */
-    UFUNCTION(BlueprintCallable, Category = "Rule Ranger")
-    virtual ERuleRangerActionTrigger GetActionTrigger();
-
-    /**
-     * Return true if this action is a "Dry" run and should just issue warnings on non-compliance
-     * and info on action that would take to fix compliance.
-     *
-     * @return true if the action should be a dry run.
-     */
-    UFUNCTION(BlueprintCallable, Category = "Rule Ranger")
-    virtual bool IsDryRun();
-
-    /**
      * Generate an informational message from action.
      *
      * @param InMessage the message.
@@ -174,6 +149,34 @@ public:
     FORCEINLINE const URuleRangerRuleSet* GetRuleSet() const { return RuleSet; }
     FORCEINLINE const URuleRangerRule* GetRule() const { return Rule; }
     FORCEINLINE const UObject* GetObject() const { return Object; }
+
+    /**
+     * Return true if this action is a "Dry" run and should just issue warnings on non-compliance
+     * and info on action that would take to fix compliance.
+     *
+     * @return true if the action should be a dry run.
+     */
+    FORCEINLINE bool IsDryRun() const
+    {
+        return !(ERuleRangerActionTrigger::AT_Save == ActionTrigger
+                 || ERuleRangerActionTrigger::AT_Import == ActionTrigger
+                 || ERuleRangerActionTrigger::AT_Reimport == ActionTrigger
+                 || ERuleRangerActionTrigger::AT_Fix == ActionTrigger);
+    }
+
+    /**
+     * Return the trigger for the current action. i.e. Why was this action invoked.
+     *
+     * @return the trigger for the current action
+     */
+    FORCEINLINE ERuleRangerActionTrigger GetActionTrigger() const { return ActionTrigger; }
+
+    /**
+     * Return the current state of the action.
+     *
+     * @return the current state of the action.
+     */
+    FORCEINLINE ERuleRangerActionState GetState() const { return ActionState; }
 
     FORCEINLINE const TArray<FText>& GetInfoMessages() { return InfoMessages; }
     FORCEINLINE const TArray<FText>& GetWarningMessages() { return WarningMessages; }

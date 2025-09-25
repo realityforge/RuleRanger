@@ -174,8 +174,8 @@ private:
     FText ToMessage(const FText& InMessage) const;
 
 public:
-    FORCEINLINE URuleRangerConfig const* GetOwnerConfig() const { return Config; }
-    FORCEINLINE URuleRangerRuleSet const* GetOwnerRuleSet() const { return RuleSet; }
+    FORCEINLINE const URuleRangerConfig* GetConfig() const { return Config; }
+    FORCEINLINE const URuleRangerRuleSet* GetRuleSet() const { return RuleSet; }
 
     FORCEINLINE TArray<FText>& GetInfoMessages() { return InfoMessages; }
     FORCEINLINE TArray<FText>& GetWarningMessages() { return WarningMessages; }

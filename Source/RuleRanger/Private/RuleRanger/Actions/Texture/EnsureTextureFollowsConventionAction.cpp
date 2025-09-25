@@ -501,14 +501,14 @@ void UEnsureTextureFollowsConventionAction::RebuildConfigConventionsTables(
     const URuleRangerActionContext* ActionContext)
 {
     ConfigConventionsTables.Reset();
-    ActionContext->GetOwnerConfig()->CollectDataTables(FRuleRangerTextureConvention::StaticStruct(),
-                                                       ConfigConventionsTables);
+    ActionContext->GetConfig()->CollectDataTables(FRuleRangerTextureConvention::StaticStruct(),
+                                                  ConfigConventionsTables);
     for (const auto DataTable : ConfigConventionsTables)
     {
         LogInfo(nullptr,
                 FString::Printf(TEXT("Adding DataTable '%s' registered in Config %s to set of conventions applied"),
                                 *DataTable.GetName(),
-                                *ActionContext->GetOwnerConfig()->GetName()));
+                                *ActionContext->GetConfig()->GetName()));
     }
 }
 

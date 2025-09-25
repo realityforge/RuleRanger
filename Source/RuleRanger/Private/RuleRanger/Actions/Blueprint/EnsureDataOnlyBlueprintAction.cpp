@@ -58,15 +58,14 @@ void UEnsureDataOnlyBlueprintAction::ResetCaches()
 void UEnsureDataOnlyBlueprintAction::RebuildConfigConventionsTables(const URuleRangerActionContext* ActionContext)
 {
     ConfigConventionsTables.Reset();
-    ActionContext->GetOwnerConfig()->CollectDataTables(FDataOnlyBlueprintEntry::StaticStruct(),
-                                                       ConfigConventionsTables);
+    ActionContext->GetConfig()->CollectDataTables(FDataOnlyBlueprintEntry::StaticStruct(), ConfigConventionsTables);
     for (const auto DataTable : ConfigConventionsTables)
     {
         LogInfo(nullptr,
                 FString::Printf(TEXT("Adding DataTable '%s' registered in Config %s to set "
                                      "of DataOnlyBlueprint rules applied"),
                                 *DataTable.GetName(),
-                                *ActionContext->GetOwnerConfig()->GetName()));
+                                *ActionContext->GetConfig()->GetName()));
     }
 }
 

@@ -58,25 +58,16 @@ void URuleRangerEditorSubsystem::Deinitialize()
 
 void URuleRangerEditorSubsystem::ScanObject(UObject* InObject)
 {
-    ProcessRule(
-        InObject,
-        [this](URuleRangerConfig* const Config,
-               URuleRangerRuleSet* const RuleSet,
-               URuleRangerRule* Rule,
-               UObject* InnerInObject) mutable { return ProcessDemandScan(Config, RuleSet, Rule, InnerInObject); });
-    // TODO: Run data validation maybe?
+    ProcessRule(InObject, [this](auto Config, auto RuleSet, auto Rule, auto InnerInObject) mutable {
+        return ProcessDemandScan(Config, RuleSet, Rule, InnerInObject);
+    });
 }
 
 void URuleRangerEditorSubsystem::ScanAndFixObject(UObject* InObject)
 {
-    ProcessRule(InObject,
-                [this](URuleRangerConfig* const Config,
-                       URuleRangerRuleSet* const RuleSet,
-                       URuleRangerRule* Rule,
-                       UObject* InnerInObject) mutable {
-                    return ProcessDemandScanAndFix(Config, RuleSet, Rule, InnerInObject);
-                });
-    // TODO: Run data validation maybe?
+    ProcessRule(InObject, [this](auto Config, auto RuleSet, auto Rule, auto InnerInObject) mutable {
+        return ProcessDemandScanAndFix(Config, RuleSet, Rule, InnerInObject);
+    });
 }
 
 TConstArrayView<TWeakObjectPtr<URuleRangerConfig>> URuleRangerEditorSubsystem::GetCachedRuleSetConfigs()
@@ -131,13 +122,9 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
     // identify this through the presence of tag.
     const bool bIsReimport = Subsystem && Subsystem->GetMetadataTag(Object, NAME_ImportMarkerKey) == ImportMarkerValue;
 
-    ProcessRule(Object,
-                [this, bIsReimport](URuleRangerConfig* const Config,
-                                    URuleRangerRuleSet* const RuleSet,
-                                    URuleRangerRule* Rule,
-                                    UObject* InObject) {
-                    return ProcessOnAssetPostImportRule(Config, RuleSet, Rule, bIsReimport, InObject);
-                });
+    ProcessRule(Object, [this, bIsReimport](auto Config, auto RuleSet, auto Rule, auto InObject) {
+        return ProcessOnAssetPostImportRule(Config, RuleSet, Rule, bIsReimport, InObject);
+    });
 }
 
 void URuleRangerEditorSubsystem::OnAssetReimport(UObject* Object)
@@ -147,12 +134,9 @@ void URuleRangerEditorSubsystem::OnAssetReimport(UObject* Object)
         MarkdRuleSetConfigCacheDirty();
     }
 
-    ProcessRule(
-        Object,
-        [this](URuleRangerConfig* const Config,
-               URuleRangerRuleSet* const RuleSet,
-               URuleRangerRule* Rule,
-               UObject* InObject) { return ProcessOnAssetPostImportRule(Config, RuleSet, Rule, true, InObject); });
+    ProcessRule(Object, [this](auto Config, auto RuleSet, auto Rule, auto InObject) {
+        return ProcessOnAssetPostImportRule(Config, RuleSet, Rule, true, InObject);
+    });
 }
 
 bool URuleRangerEditorSubsystem::ProcessRuleSetForObject(URuleRangerConfig* const Config,

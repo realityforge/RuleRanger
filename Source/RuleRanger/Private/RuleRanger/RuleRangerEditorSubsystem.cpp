@@ -16,6 +16,7 @@
 #include "Logging/StructuredLog.h"
 #include "RuleRangerActionContext.h"
 #include "RuleRangerConfig.h"
+#include "RuleRangerDefaultResultHandler.h"
 #include "RuleRangerDeveloperSettings.h"
 #include "RuleRangerLogging.h"
 #include "RuleRangerRule.h"
@@ -36,6 +37,8 @@ void URuleRangerEditorSubsystem::Initialize(FSubsystemCollectionBase& Collection
         OnAssetPostImportDelegateHandle = Subsystem->OnAssetPostImport.AddUObject(this, &ThisClass::OnAssetPostImport);
         OnAssetReimportDelegateHandle = Subsystem->OnAssetReimport.AddUObject(this, &ThisClass::OnAssetReimport);
     }
+    DefaultResultHandler =
+        NewObject<URuleRangerDefaultResultHandler>(this, URuleRangerDefaultResultHandler::StaticClass());
 }
 
 void URuleRangerEditorSubsystem::Deinitialize()
@@ -105,6 +108,11 @@ void URuleRangerEditorSubsystem::MarkdRuleSetConfigCacheDirty()
         bRuleSetConfigCacheDirty = true;
         UE_LOGFMT(LogRuleRanger, Log, "Clearing the RuleSetConfig cache");
     }
+}
+
+IRuleRangerResultHandler* URuleRangerEditorSubsystem::GetDefaultResultHandler() const
+{
+    return DefaultResultHandler.GetInterface();
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic

@@ -16,6 +16,7 @@
 #include "CoreMinimal.h"
 #include "EditorSubsystem.h"
 #include "Factories/Factory.h"
+#include "RuleRangerResultHandler.h"
 #include "RuleRangerRuleSet.h"
 #include "UObject/Object.h"
 #include <functional>
@@ -56,7 +57,12 @@ public:
 
     void MarkdRuleSetConfigCacheDirty();
 
+    IRuleRangerResultHandler* GetDefaultResultHandler() const;
+
 private:
+    UPROPERTY(Transient)
+    TScriptInterface<IRuleRangerResultHandler> DefaultResultHandler{ nullptr };
+
     UPROPERTY(Transient)
     TArray<TWeakObjectPtr<URuleRangerConfig>> CachedRuleSetConfigs;
 

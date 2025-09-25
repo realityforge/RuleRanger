@@ -59,18 +59,73 @@ void URuleRangerEditorSubsystem::Deinitialize()
     OnAssetReimportDelegateHandle.Reset();
 }
 
-void URuleRangerEditorSubsystem::ScanObject(UObject* InObject)
+void URuleRangerEditorSubsystem::ScanObject(UObject* InObject, IRuleRangerResultHandler* InResultHandler)
 {
-    ProcessRule(InObject, [this](auto Config, auto RuleSet, auto Rule, auto InnerInObject) mutable {
-        return ProcessDemandScan(Config, RuleSet, Rule, InnerInObject);
+    const auto Handler = InResultHandler ? InResultHandler : DefaultResultHandler.GetInterface();
+    ProcessRule(InObject, [this, Handler](auto Config, auto RuleSet, auto Rule, auto InnerInObject) mutable {
+        return ProcessDemandScan(Config, RuleSet, Rule, InnerInObject, Handler);
     });
 }
 
-void URuleRangerEditorSubsystem::ScanAndFixObject(UObject* InObject)
+void URuleRangerEditorSubsystem::ScanAndFixObject(UObject* InObject, IRuleRangerResultHandler* InResultHandler)
 {
-    ProcessRule(InObject, [this](auto Config, auto RuleSet, auto Rule, auto InnerInObject) mutable {
-        return ProcessDemandScanAndFix(Config, RuleSet, Rule, InnerInObject);
+    const auto Handler = InResultHandler ? InResultHandler : DefaultResultHandler.GetInterface();
+    ProcessRule(InObject, [this, Handler](auto Config, auto RuleSet, auto Rule, auto InnerInObject) mutable {
+        return ProcessDemandScanAndFix(Config, RuleSet, Rule, InnerInObject, Handler);
     });
+}
+
+void URuleRangerEditorSubsystem::ValidateObject(UObject* InObject,
+                                                bool bIsSave,
+                                                IRuleRangerResultHandler* InResultHandler)
+{
+    const auto Handler = InResultHandler ? InResultHandler : DefaultResultHandler.GetInterface();
+    ProcessRule(InObject, [this, bIsSave, Handler](auto Config, auto RuleSet, auto Rule, auto InnerInObject) mutable {
+        return ProcessOnAssetValidateRule(Config, RuleSet, Rule, InnerInObject, bIsSave, Handler);
+    });
+}
+
+bool URuleRangerEditorSubsystem::CanValidateObject(UObject* InObject, bool bIsSave)
+{
+    bool Result = false;
+    ProcessRule(InObject, [this, &Result, bIsSave](auto, auto, auto Rule, auto InnerObject) {
+        if (CanValidateObject(Rule, InnerObject, bIsSave) && Rule->Match(ActionContext, InnerObject))
+        {
+            Result = true;
+        }
+        return true;
+    });
+    return Result;
+}
+
+// ReSharper disable once CppMemberFunctionMayBeStatic
+bool URuleRangerEditorSubsystem::CanValidateObject(const URuleRangerRule* Rule,
+                                                   const UObject* InObject,
+                                                   const bool bIsSave) const
+{
+    // ReSharper disable once CppTooWideScopeInitStatement
+    if (!bIsSave && Rule->bApplyOnValidate)
+    {
+        UE_LOGFMT(LogRuleRanger,
+                  VeryVerbose,
+                  "CanValidateObject({Object}) detected applicable rule {Rule} for non-save validate.",
+                  InObject->GetName(),
+                  Rule->GetName());
+        return true;
+    }
+    else if (bIsSave && Rule->bApplyOnSave)
+    {
+        UE_LOGFMT(LogRuleRanger,
+                  VeryVerbose,
+                  "CanValidateAsset({Object}) detected applicable rule {Rule} for save validate.",
+                  InObject->GetName(),
+                  Rule->GetName());
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 TConstArrayView<TWeakObjectPtr<URuleRangerConfig>> URuleRangerEditorSubsystem::GetCachedRuleSetConfigs()
@@ -131,7 +186,12 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
     const bool bIsReimport = Subsystem && Subsystem->GetMetadataTag(Object, NAME_ImportMarkerKey) == ImportMarkerValue;
 
     ProcessRule(Object, [this, bIsReimport](auto Config, auto RuleSet, auto Rule, auto InObject) {
-        return ProcessOnAssetPostImportRule(Config, RuleSet, Rule, bIsReimport, InObject);
+        return ProcessOnAssetPostImportRule(Config,
+                                            RuleSet,
+                                            Rule,
+                                            bIsReimport,
+                                            InObject,
+                                            DefaultResultHandler.GetInterface());
     });
 }
 
@@ -143,7 +203,7 @@ void URuleRangerEditorSubsystem::OnAssetReimport(UObject* Object)
     }
 
     ProcessRule(Object, [this](auto Config, auto RuleSet, auto Rule, auto InObject) {
-        return ProcessOnAssetPostImportRule(Config, RuleSet, Rule, true, InObject);
+        return ProcessOnAssetPostImportRule(Config, RuleSet, Rule, true, InObject, DefaultResultHandler.GetInterface());
     });
 }
 
@@ -329,73 +389,48 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
     }
 }
 
-// ReSharper disable once CppMemberFunctionMayBeStatic
-bool URuleRangerEditorSubsystem::IsMatchingRulePresentForObject(URuleRangerConfig* const Config,
-                                                                URuleRangerRuleSet* const RuleSet,
-                                                                UObject* InObject,
-                                                                const FRuleRangerRuleFn& ProcessRuleFunction)
+bool URuleRangerEditorSubsystem::ProcessOnAssetValidateRule(URuleRangerConfig* const Config,
+                                                            URuleRangerRuleSet* const RuleSet,
+                                                            URuleRangerRule* Rule,
+                                                            UObject* InObject,
+                                                            const bool bIsSave,
+                                                            IRuleRangerResultHandler* InResultHandler) const
 {
-    UE_LOGFMT(LogRuleRanger,
-              VeryVerbose,
-              "IsMatchingRulePresentForObject: Processing Rule Set {RuleSet} for object {Object}",
-              RuleSet->GetName(),
-              InObject->GetName());
-
-    int RuleSetIndex = 0;
-    for (auto RuleSetIt = RuleSet->RuleSets.CreateIterator(); RuleSetIt; ++RuleSetIt)
+    if ((!bIsSave && Rule->bApplyOnValidate) || (bIsSave && Rule->bApplyOnSave))
     {
-        if (const auto ChildRuleSet = RuleSetIt->Get())
-        {
-            if (IsMatchingRulePresentForObject(Config, ChildRuleSet, InObject, ProcessRuleFunction))
-            {
-                return true;
-            }
-        }
-        else
-        {
-            UE_LOGFMT(LogRuleRanger,
-                      Error,
-                      "IsMatchingRulePresentForObject: Invalid RuleSet skipped at index {Index} "
-                      "processing child rulesets of ruleset named {RuleSet} for object {Object}",
-                      RuleSetIndex,
-                      RuleSet->GetName(),
-                      InObject->GetName());
-        }
-        RuleSetIndex++;
-    }
+        UE_LOGFMT(LogRuleRanger,
+                  VeryVerbose,
+                  "OnAssetValidate({Object}) detected applicable rule {Rule}.",
+                  InObject->GetName(),
+                  Rule->GetName());
 
-    int RuleIndex = 0;
-    for (const auto RulePtr : RuleSet->Rules)
-    {
-        // ReSharper disable once CppTooWideScopeInitStatement
-        if (const auto Rule = RulePtr.Get(); IsValid(Rule))
-        {
-            if (ProcessRuleFunction(Config, RuleSet, Rule, InObject))
-            {
-                return true;
-            }
-        }
-        else
-        {
-            UE_LOGFMT(LogRuleRanger,
-                      Error,
-                      "IsMatchingRulePresentForObject: Invalid Rule skipped at index {RuleIndex} in "
-                      "rule set '{RuleSet}' from config '{Config}' when analyzing object '{Object}'",
-                      RuleIndex,
-                      RuleSet->GetName(),
-                      Config->GetName(),
-                      InObject->GetName());
-        }
-        RuleIndex++;
+        ActionContext->ResetContext(Config,
+                                    RuleSet,
+                                    Rule,
+                                    InObject,
+                                    bIsSave ? ERuleRangerActionTrigger::AT_Save
+                                            : ERuleRangerActionTrigger::AT_Validate);
+
+        Rule->Apply(ActionContext, InObject);
+
+        InResultHandler->OnRuleApplied(ActionContext);
+
+        const auto State = ActionContext->GetState();
+        ActionContext->ClearContext();
+        return ERuleRangerActionState::AS_Fatal != State;
     }
-    return false;
+    else
+    {
+        return true;
+    }
 }
 
 bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(URuleRangerConfig* const Config,
                                                               URuleRangerRuleSet* const RuleSet,
                                                               URuleRangerRule* Rule,
                                                               const bool bIsReimport,
-                                                              UObject* InObject) const
+                                                              UObject* InObject,
+                                                              IRuleRangerResultHandler* ResultHandler) const
 {
     check(ActionContext);
 
@@ -412,7 +447,8 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(URuleRangerConfig*
 
         Rule->Apply(ActionContext, InObject);
 
-        ActionContext->EmitMessageLogs();
+        ResultHandler->OnRuleApplied(ActionContext);
+
         const auto State = ActionContext->GetState();
         ActionContext->ClearContext();
 
@@ -457,7 +493,8 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(URuleRangerConfig*
 bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerConfig* const Config,
                                                    URuleRangerRuleSet* const RuleSet,
                                                    URuleRangerRule* Rule,
-                                                   UObject* InObject) const
+                                                   UObject* InObject,
+                                                   IRuleRangerResultHandler* ResultHandler) const
 {
     check(ActionContext);
 
@@ -472,7 +509,8 @@ bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerConfig* const Conf
 
         Rule->Apply(ActionContext, InObject);
 
-        ActionContext->EmitMessageLogs();
+        ResultHandler->OnRuleApplied(ActionContext);
+
         const auto State = ActionContext->GetState();
         ActionContext->ClearContext();
 
@@ -516,7 +554,8 @@ bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerConfig* const Conf
 bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerConfig* const Config,
                                                          URuleRangerRuleSet* const RuleSet,
                                                          URuleRangerRule* Rule,
-                                                         UObject* InObject) const
+                                                         UObject* InObject,
+                                                         IRuleRangerResultHandler* ResultHandler) const
 {
     check(ActionContext);
 
@@ -531,7 +570,8 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerConfig* cons
 
         Rule->Apply(ActionContext, InObject);
 
-        ActionContext->EmitMessageLogs();
+        ResultHandler->OnRuleApplied(ActionContext);
+
         // ReSharper disable once CppTooWideScopeInitStatement
         const auto State = ActionContext->GetState();
         ActionContext->ClearContext();

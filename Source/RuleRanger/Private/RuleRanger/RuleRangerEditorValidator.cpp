@@ -20,48 +20,22 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerEditorValidator)
 
+class UEditorAssetSubsystem;
+
 URuleRangerEditorValidator::URuleRangerEditorValidator()
 {
     bIsEnabled = true;
-}
-
-static FString DescribeDataValidationUsecase(const EDataValidationUsecase InDataValidationUsecase)
-{
-    switch (InDataValidationUsecase)
-    {
-        case EDataValidationUsecase::None:
-            return TEXT("None");
-        case EDataValidationUsecase::Manual:
-            return TEXT("Manual");
-        case EDataValidationUsecase::Commandlet:
-            return TEXT("Commandlet");
-        case EDataValidationUsecase::Save:
-            return TEXT("Save");
-        case EDataValidationUsecase::PreSubmit:
-            return TEXT("PreSubmit");
-        case EDataValidationUsecase::Script:
-        default:
-            return TEXT("Script");
-    }
 }
 
 EDataValidationResult URuleRangerEditorValidator::ValidateLoadedAsset_Implementation(const FAssetData& InAssetData,
                                                                                      UObject* InAsset,
                                                                                      FDataValidationContext& Context)
 {
-    if (!ActionContext)
-    {
-        UE_LOGFMT(LogRuleRanger, VeryVerbose, "RuleRangerEditorSubsystem: Creating the initial ActionContext");
-        ActionContext = NewObject<URuleRangerActionContext>(this, URuleRangerActionContext::StaticClass());
-    }
-
     // ReSharper disable once CppTooWideScope
-    const auto SubSystem = GEditor ? GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>() : nullptr;
-    if (SubSystem)
+    if (const auto SubSystem = GEditor ? GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>() : nullptr)
     {
-        SubSystem->ProcessRule(InAsset, [this, &Context](auto Config, auto RuleSet, auto Rule, auto InObject) mutable {
-            return ProcessRule(Config, RuleSet, Rule, InObject, Context);
-        });
+        const bool bIsSave = EDataValidationUsecase::Save == Context.GetValidationUsecase();
+        SubSystem->ValidateObject(InAsset, bIsSave, this);
     }
     else
     {
@@ -78,86 +52,31 @@ EDataValidationResult URuleRangerEditorValidator::ValidateLoadedAsset_Implementa
     return GetValidationResult();
 }
 
-bool URuleRangerEditorValidator::ProcessRule(URuleRangerConfig* const Config,
-                                             URuleRangerRuleSet* const RuleSet,
-                                             URuleRangerRule* Rule,
-                                             UObject* InObject,
-                                             const FDataValidationContext& Context)
+void URuleRangerEditorValidator::OnRuleApplied(URuleRangerActionContext* InActionContext)
 {
-    // ReSharper disable once CppTooWideScopeInitStatement
-    const bool bIsSave = EDataValidationUsecase::Save == Context.GetValidationUsecase();
-    if ((!bIsSave && Rule->bApplyOnValidate) || (bIsSave && Rule->bApplyOnSave))
+    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
     {
-        UE_LOGFMT(LogRuleRanger,
-                  VeryVerbose,
-                  "OnAssetValidate({Object}) detected applicable rule {Rule}.",
-                  InObject->GetName(),
-                  Rule->GetName());
-
-        ActionContext->ResetContext(Config,
-                                    RuleSet,
-                                    Rule,
-                                    InObject,
-                                    bIsSave ? ERuleRangerActionTrigger::AT_Save
-                                            : ERuleRangerActionTrigger::AT_Validate);
-
-        Rule->Apply(ActionContext, InObject);
-
-        ActionContext->EmitMessageLogs();
-
-        for (int i = 0; i < ActionContext->GetWarningMessages().Num(); i++)
+        if (const auto ResultHandler = Subsystem->GetDefaultResultHandler())
         {
-            AssetWarning(InObject, ActionContext->GetWarningMessages()[i]);
+            ResultHandler->OnRuleApplied(InActionContext);
         }
-        for (int i = 0; i < ActionContext->GetErrorMessages().Num(); i++)
-        {
-            AssetFails(InObject, ActionContext->GetErrorMessages()[i]);
-        }
-        for (int i = 0; i < ActionContext->GetFatalMessages().Num(); i++)
-        {
-            AssetFails(InObject, ActionContext->GetFatalMessages()[i]);
-        }
-        const auto State = ActionContext->GetState();
-        ActionContext->ClearContext();
-        return ERuleRangerActionState::AS_Fatal != State;
     }
-    else
-    {
-        return true;
-    }
-}
 
-// ReSharper disable once CppMemberFunctionMayBeStatic
-bool URuleRangerEditorValidator::WillRuleRunInDataValidationUsecase(
-    const URuleRangerRule* Rule,
-    const UObject* InObject,
-    const EDataValidationUsecase DataValidationUsecase) const
-{
-    // ReSharper disable once CppTooWideScopeInitStatement
-    const bool bIsSave = EDataValidationUsecase::Save == DataValidationUsecase;
-    if (!bIsSave && Rule->bApplyOnValidate)
+    const auto InObject = InActionContext->GetObject();
+    const auto WarningMessages = InActionContext->GetWarningMessages();
+    for (int i = 0; i < WarningMessages.Num(); i++)
     {
-        UE_LOGFMT(LogRuleRanger,
-                  VeryVerbose,
-                  "CanValidateAsset({Object}) detected applicable rule {Rule} in usecase {Usecase}.",
-                  InObject->GetName(),
-                  Rule->GetName(),
-                  DescribeDataValidationUsecase(DataValidationUsecase));
-        return true;
+        AssetWarning(InObject, WarningMessages[i]);
     }
-    else if (bIsSave && Rule->bApplyOnSave)
+    const auto ErrorMessages = InActionContext->GetErrorMessages();
+    for (int i = 0; i < ErrorMessages.Num(); i++)
     {
-        UE_LOGFMT(LogRuleRanger,
-                  VeryVerbose,
-                  "CanValidateAsset({Object}) detected applicable rule {Rule} in usecase {Usecase}.",
-                  InObject->GetName(),
-                  Rule->GetName(),
-                  DescribeDataValidationUsecase(DataValidationUsecase));
-        return true;
+        AssetFails(InObject, ErrorMessages[i]);
     }
-    else
+    const auto FatalMessages = InActionContext->GetFatalMessages();
+    for (int i = 0; i < FatalMessages.Num(); i++)
     {
-        return false;
+        AssetFails(InObject, FatalMessages[i]);
     }
 }
 
@@ -165,17 +84,10 @@ bool URuleRangerEditorValidator::CanValidateAsset_Implementation(const FAssetDat
                                                                  UObject* InAsset,
                                                                  FDataValidationContext& InContext) const
 {
-    bool Result = false;
     if (const auto SubSystem = GEditor ? GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>() : nullptr)
     {
-        SubSystem->ProcessRule(InAsset, [this, &InContext, &Result](auto, auto, auto Rule, auto InObject) {
-            if (WillRuleRunInDataValidationUsecase(Rule, InObject, InContext.GetValidationUsecase())
-                && Rule->Match(ActionContext, InObject))
-            {
-                Result = true;
-            }
-            return true;
-        });
+        const bool bIsSave = EDataValidationUsecase::Save == InContext.GetValidationUsecase();
+        return SubSystem->CanValidateObject(InAsset, bIsSave);
     }
     else
     {
@@ -184,6 +96,5 @@ bool URuleRangerEditorValidator::CanValidateAsset_Implementation(const FAssetDat
                   "CanValidateAsset_Implementation({Asset}) unable to locate RuleRangerEditorSubsystem.",
                   InAsset->GetName());
     }
-
-    return Result;
+    return false;
 }

@@ -16,6 +16,7 @@
 #include "CoreMinimal.h"
 #include "DataValidationModule.h"
 #include "EditorValidatorBase.h"
+#include "RuleRangerResultHandler.h"
 #include "RuleRangerEditorValidator.generated.h"
 
 class URuleRangerRuleSet;
@@ -27,7 +28,7 @@ class URuleRangerRule;
  * Validator extension that applies the RuleRanger rules in a validation mode.
  */
 UCLASS()
-class URuleRangerEditorValidator : public UEditorValidatorBase
+class URuleRangerEditorValidator final : public UEditorValidatorBase, public IRuleRangerResultHandler
 {
     GENERATED_BODY()
 
@@ -40,27 +41,5 @@ public:
                                                                      UObject* InAsset,
                                                                      FDataValidationContext& Context) override;
 
-private:
-    UPROPERTY(VisibleAnywhere)
-    URuleRangerActionContext* ActionContext{ nullptr };
-
-    /**
-     * Function invoked when each rule is applied to an object.
-     *
-     * @param Config The config that transitively contained the Rule.
-     * @param RuleSet The RuleSet that directly contained the Rule.
-     * @param Rule The rule to apply.
-     * @param InObject the object to apply rule to.
-     * @param Context the validation context.
-     * @return true to keep processing, false if no more rules should be applied to object.
-     */
-    bool ProcessRule(URuleRangerConfig* const Config,
-                     URuleRangerRuleSet* const RuleSet,
-                     URuleRangerRule* Rule,
-                     UObject* InObject,
-                     const FDataValidationContext& Context);
-
-    bool WillRuleRunInDataValidationUsecase(const URuleRangerRule* Rule,
-                                            const UObject* InObject,
-                                            EDataValidationUsecase DataValidationUsecase) const;
+    virtual void OnRuleApplied(URuleRangerActionContext* InActionContext) override;
 };

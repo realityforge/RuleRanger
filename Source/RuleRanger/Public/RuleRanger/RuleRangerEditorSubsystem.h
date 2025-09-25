@@ -50,10 +50,13 @@ public:
     /** Implement this for deinitialization of instances of the system */
     virtual void Deinitialize() override;
 
-    void ScanObject(UObject* InObject);
-    void ScanAndFixObject(UObject* InObject);
+    void ScanObject(UObject* InObject, IRuleRangerResultHandler* InResultHandler = nullptr);
 
-    void ProcessRule(UObject* Object, const FRuleRangerRuleFn& ProcessRuleFunction);
+    void ScanAndFixObject(UObject* InObject, IRuleRangerResultHandler* InResultHandler = nullptr);
+
+    void ValidateObject(UObject* InObject, bool bIsSave, IRuleRangerResultHandler* InResultHandler = nullptr);
+
+    bool CanValidateObject(UObject* InObject, bool bIsSave);
 
     void MarkdRuleSetConfigCacheDirty();
 
@@ -76,20 +79,37 @@ private:
     FDelegateHandle OnAssetPostImportDelegateHandle;
     FDelegateHandle OnAssetReimportDelegateHandle;
 
+    void ProcessRule(UObject* Object, const FRuleRangerRuleFn& ProcessRuleFunction);
+
     void OnAssetPostImport(UFactory* Factory, UObject* Object);
 
     void OnAssetReimport(UObject* Object);
-
-    bool IsMatchingRulePresentForObject(URuleRangerConfig* Config,
-                                        URuleRangerRuleSet* RuleSet,
-                                        UObject* InObject,
-                                        const FRuleRangerRuleFn& ProcessRuleFunction);
 
     bool ProcessRuleSetForObject(URuleRangerConfig* const Config,
                                  URuleRangerRuleSet* const RuleSet,
                                  const TArray<FRuleRangerRuleExclusion>& Exclusions,
                                  UObject* Object,
                                  const FRuleRangerRuleFn& ProcessRuleFunction);
+
+    bool CanValidateObject(const URuleRangerRule* Rule, const UObject* InObject, const bool bIsSave) const;
+
+    /**
+     * Function invoked when each rule is applied to an object.
+     *
+     * @param Config The config that transitively contained the Rule.
+     * @param RuleSet The RuleSet that directly contained the Rule.
+     * @param Rule The rule to apply.
+     * @param InObject the object to apply rule to.
+     * @param bIsSave flag indicating whether the validation is a result of a save.
+     * @param InResultHandler the ResultHandler to use for reporting rule results.
+     * @return true to keep processing, false if no more rules should be applied to object.
+     */
+    bool ProcessOnAssetValidateRule(URuleRangerConfig* const Config,
+                                    URuleRangerRuleSet* const RuleSet,
+                                    URuleRangerRule* Rule,
+                                    UObject* InObject,
+                                    const bool bIsSave,
+                                    IRuleRangerResultHandler* InResultHandler) const;
 
     /**
      * Function invoked when each rule is applied to an object during import.
@@ -99,13 +119,15 @@ private:
      * @param Rule The rule to apply.
      * @param bIsReimport A flag indicating whether it is an import or re-import action.
      * @param InObject the object to apply rule to.
+     * @param ResultHandler the ResultHandler to forward results to.
      * @return true to keep processing, false if no more rules should be applied to object.
      */
     bool ProcessOnAssetPostImportRule(URuleRangerConfig* const Config,
                                       URuleRangerRuleSet* const RuleSet,
                                       URuleRangerRule* Rule,
                                       const bool bIsReimport,
-                                      UObject* InObject) const;
+                                      UObject* InObject,
+                                      IRuleRangerResultHandler* ResultHandler) const;
 
     /**
      * Function invoked when each rule is applied to an object when user requested an explicit scan.
@@ -114,12 +136,14 @@ private:
      * @param RuleSet The RuleSet that contains the Rule.
      * @param Rule The rule to apply.
      * @param InObject the object to apply rule to.
+     * @param ResultHandler the ResultHandler to forward results to.
      * @return true to keep processing, false if no more rules should be applied to object.
      */
     bool ProcessDemandScan(URuleRangerConfig* const Config,
                            URuleRangerRuleSet* const RuleSet,
                            URuleRangerRule* Rule,
-                           UObject* InObject) const;
+                           UObject* InObject,
+                           IRuleRangerResultHandler* ResultHandler) const;
 
     /**
      * Function invoked when each rule is applied to an object when user requested an explicit scan and autofix.
@@ -128,10 +152,12 @@ private:
      * @param RuleSet The RuleSet that contains the Rule.
      * @param Rule The rule to apply.
      * @param InObject the object to apply rule to.
+     * @param ResultHandler the ResultHandler to forward results to.
      * @return true to keep processing, false if no more rules should be applied to object.
      */
     bool ProcessDemandScanAndFix(URuleRangerConfig* const Config,
                                  URuleRangerRuleSet* const RuleSet,
                                  URuleRangerRule* Rule,
-                                 UObject* InObject) const;
+                                 UObject* InObject,
+                                 IRuleRangerResultHandler* ResultHandler) const;
 };

@@ -94,32 +94,28 @@ public:
      *
      * @param InMessage the message.
      */
-    UFUNCTION(BlueprintCallable, Category = "Rule Ranger")
-    virtual void Info(const FText& InMessage);
+    void Info(const FText& InMessage);
 
     /**
      * Generate a warning message from the action.
      *
      * @param InMessage the message.
      */
-    UFUNCTION(BlueprintCallable, Category = "Rule Ranger")
-    virtual void Warning(const FText& InMessage);
+    void Warning(const FText& InMessage);
 
     /**
      * Generate an error message from the action.
      *
      * @param InMessage the message.
      */
-    UFUNCTION(BlueprintCallable, Category = "Rule Ranger")
-    virtual void Error(const FText& InMessage);
+    void Error(const FText& InMessage);
 
     /**
      * Generate an error message from the action.
      *
      * @param InMessage the message.
      */
-    UFUNCTION(BlueprintCallable, Category = "Rule Ranger")
-    virtual void Fatal(const FText& InMessage);
+    void Fatal(const FText& InMessage);
 
     void ResetContext(URuleRangerConfig* const InConfig,
                       URuleRangerRuleSet* const InRuleSet,

@@ -329,7 +329,7 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresentForObject(URuleRangerConfi
 {
     UE_LOGFMT(LogRuleRanger,
               VeryVerbose,
-              "IsMatchingRulePresent: Processing Rule Set {RuleSet} for object {Object}",
+              "IsMatchingRulePresentForObject: Processing Rule Set {RuleSet} for object {Object}",
               RuleSet->GetName(),
               InObject->GetName());
 
@@ -371,7 +371,7 @@ bool URuleRangerEditorSubsystem::IsMatchingRulePresentForObject(URuleRangerConfi
         {
             UE_LOGFMT(LogRuleRanger,
                       Error,
-                      "IsMatchingRulePresent: Invalid Rule skipped at index {RuleIndex} in "
+                      "IsMatchingRulePresentForObject: Invalid Rule skipped at index {RuleIndex} in "
                       "rule set '{RuleSet}' from config '{Config}' when analyzing object '{Object}'",
                       RuleIndex,
                       RuleSet->GetName(),

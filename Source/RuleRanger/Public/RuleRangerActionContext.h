@@ -173,8 +173,8 @@ public:
     FORCEINLINE const URuleRangerConfig* GetConfig() const { return Config; }
     FORCEINLINE const URuleRangerRuleSet* GetRuleSet() const { return RuleSet; }
 
-    FORCEINLINE TArray<FText>& GetInfoMessages() { return InfoMessages; }
-    FORCEINLINE TArray<FText>& GetWarningMessages() { return WarningMessages; }
-    FORCEINLINE TArray<FText>& GetErrorMessages() { return ErrorMessages; }
-    FORCEINLINE TArray<FText>& GetFatalMessages() { return FatalMessages; }
+    FORCEINLINE const TArray<FText>& GetInfoMessages() { return InfoMessages; }
+    FORCEINLINE const TArray<FText>& GetWarningMessages() { return WarningMessages; }
+    FORCEINLINE const TArray<FText>& GetErrorMessages() { return ErrorMessages; }
+    FORCEINLINE const TArray<FText>& GetFatalMessages() { return FatalMessages; }
 };

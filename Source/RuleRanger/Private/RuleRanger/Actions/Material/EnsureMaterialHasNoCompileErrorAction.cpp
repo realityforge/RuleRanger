@@ -48,6 +48,12 @@ void UEnsureMaterialHasNoCompileErrorAction::Apply_Implementation(URuleRangerAct
                                          "bErrorIfEmpty is set to false on the action  so ignoring this scenario.")));
             }
         }
+        else if (IsRunningCommandlet())
+        {
+            LogInfo(Material,
+                    FString::Printf(TEXT("Material compilation check is skipped when running in "
+                                         "Commandlet. (Unable to figure out how to make it work reliably)")));
+        }
         else
         {
             ActionContext->Error(

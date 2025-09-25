@@ -18,23 +18,6 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerActionContext)
 
-ERuleRangerActionState URuleRangerActionContext::GetState()
-{
-    return ActionState;
-}
-
-ERuleRangerActionTrigger URuleRangerActionContext::GetActionTrigger()
-{
-    return ActionTrigger;
-}
-
-bool URuleRangerActionContext::IsDryRun()
-{
-    return !(ERuleRangerActionTrigger::AT_Save == ActionTrigger || ERuleRangerActionTrigger::AT_Import == ActionTrigger
-             || ERuleRangerActionTrigger::AT_Reimport == ActionTrigger
-             || ERuleRangerActionTrigger::AT_Fix == ActionTrigger);
-}
-
 void URuleRangerActionContext::ResetContext(URuleRangerConfig* const InConfig,
                                             URuleRangerRuleSet* const InRuleSet,
                                             URuleRangerRule* const InRule,

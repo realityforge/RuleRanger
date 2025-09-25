@@ -53,10 +53,6 @@ public:
     void ScanAndFixObject(UObject* InObject);
 
     void ProcessRule(UObject* Object, const FRuleRangerRuleFn& ProcessRuleFunction);
-    bool IsMatchingRulePresentForObject(URuleRangerConfig* Config,
-                                        URuleRangerRuleSet* RuleSet,
-                                        UObject* InObject,
-                                        const FRuleRangerRuleFn& ProcessRuleFunction);
 
     void MarkdRuleSetConfigCacheDirty();
 
@@ -77,6 +73,11 @@ private:
     void OnAssetPostImport(UFactory* Factory, UObject* Object);
 
     void OnAssetReimport(UObject* Object);
+
+    bool IsMatchingRulePresentForObject(URuleRangerConfig* Config,
+                                        URuleRangerRuleSet* RuleSet,
+                                        UObject* InObject,
+                                        const FRuleRangerRuleFn& ProcessRuleFunction);
 
     bool ProcessRuleSetForObject(URuleRangerConfig* const Config,
                                  URuleRangerRuleSet* const RuleSet,

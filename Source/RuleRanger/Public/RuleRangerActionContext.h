@@ -172,6 +172,8 @@ private:
 public:
     FORCEINLINE const URuleRangerConfig* GetConfig() const { return Config; }
     FORCEINLINE const URuleRangerRuleSet* GetRuleSet() const { return RuleSet; }
+    FORCEINLINE const URuleRangerRule* GetRule() const { return Rule; }
+    FORCEINLINE const UObject* GetObject() const { return Object; }
 
     FORCEINLINE const TArray<FText>& GetInfoMessages() { return InfoMessages; }
     FORCEINLINE const TArray<FText>& GetWarningMessages() { return WarningMessages; }

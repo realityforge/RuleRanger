@@ -32,6 +32,7 @@ public class RuleRanger : ModuleRules
 			"DeveloperSettings",
 			"EditorSubsystem",
 			"Engine",
+			"Json",
 			"Kismet",
 			"Projects",
 			"MessageLog",

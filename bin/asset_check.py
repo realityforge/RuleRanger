@@ -105,13 +105,11 @@ try:
         print(f" -> Assets {asset_paths}")
 
     asset_paths_str = ",".join(asset_paths)
-    report_file = os.path.abspath("RuleRangerReport.json")
-
     command_args = [
         f"-run=RuleRanger",
         f"-paths={asset_paths_str}",
-        f"-report={report_file}",
     ]
+
     if not args.verbose:
         command_args.append("-quiet")
     if args.report:

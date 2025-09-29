@@ -19,6 +19,8 @@
 #endif
 #include "RuleRangerActionContext.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureMetaSoundAuthorBlankAction)
+
 UClass* UEnsureMetaSoundAuthorBlankAction::GetExpectedType()
 {
 #if WITH_RULERANGER_METASOUND_RULES

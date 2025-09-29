@@ -25,7 +25,8 @@
     },
     {
       "Name": "Metasound",
-      "Enabled": false
+      "Enabled": true,
+      "Optional": true
     }
   ],
   "Modules": [

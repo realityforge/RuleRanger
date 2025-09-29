@@ -50,6 +50,7 @@ public class RuleRanger : ModuleRules
         {
             PublicDefinitions.Add("WITH_RULERANGER_METASOUND_RULES=1");
             PrivateDependencyModuleNames.Add("MetasoundEngine");
+            PrivateDependencyModuleNames.Add("MetasoundFrontend");
         }
         else
         {

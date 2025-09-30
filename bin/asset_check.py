@@ -37,7 +37,7 @@ args = parser.parse_args()
 if args.verbose:
     print(f"Performing Rule Ranger Asset Checking")
 
-if args.staged_only and 0 != len(args.asset_path):
+if args.staged_only and args.asset_path and 0 != len(args.asset_path):
     print(f"--staged-only is not compatible with --asset-path", file=sys.stderr)
     sys.exit(1)
 

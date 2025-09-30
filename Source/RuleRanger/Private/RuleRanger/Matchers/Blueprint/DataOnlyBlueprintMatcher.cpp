@@ -16,7 +16,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(DataOnlyBlueprintMatcher)
 
-bool UDataOnlyBlueprintMatcher::Test_Implementation(UObject* Object) const
+bool UDataOnlyBlueprintMatcher::Test(UObject* Object) const
 {
     const UBlueprint* Blueprint = Cast<UBlueprint>(Object);
     return Blueprint && FBlueprintEditorUtils::IsDataOnlyBlueprint(Blueprint);

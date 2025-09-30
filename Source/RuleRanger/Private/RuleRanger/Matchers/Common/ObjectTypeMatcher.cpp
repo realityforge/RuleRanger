@@ -17,7 +17,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(ObjectTypeMatcher)
 
-bool UObjectTypeMatcher::Test_Implementation(UObject* Object) const
+bool UObjectTypeMatcher::Test(UObject* Object) const
 {
     return bTraverseAllTypeHierarchies ? FRuleRangerUtilities::IsA(Object, ObjectType) : Object->IsA(ObjectType);
 }

@@ -16,7 +16,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(ContentDirMatcher)
 
-bool UContentDirMatcher::Test_Implementation(UObject* Object) const
+bool UContentDirMatcher::Test(UObject* Object) const
 {
     return Object->GetPathName().StartsWith(Dir.Path);
 }

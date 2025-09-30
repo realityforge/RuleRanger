@@ -15,7 +15,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(PathFolderMatcher)
 
-bool UPathFolderMatcher::Test_Implementation(UObject* Object) const
+bool UPathFolderMatcher::Test(UObject* Object) const
 {
     TArray<FString> Folders;
     Object->GetPathName().ParseIntoArray(Folders, TEXT("/"), true);

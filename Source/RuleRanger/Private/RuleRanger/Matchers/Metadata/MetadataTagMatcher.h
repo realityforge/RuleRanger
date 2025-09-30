@@ -35,5 +35,5 @@ class UMetadataTagMatcher final : public URuleRangerMatcher
     FString Value{ TEXT("") };
 
 public:
-    virtual bool Test_Implementation(UObject* Object) const override;
+    virtual bool Test(UObject* Object) const override;
 };

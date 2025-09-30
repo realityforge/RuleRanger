@@ -16,7 +16,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(NameRegexMatcher)
 
-bool UNameRegexMatcher::Test_Implementation(UObject* Object) const
+bool UNameRegexMatcher::Test(UObject* Object) const
 {
     const FRegexPattern Pattern(RegexPattern,
                                 bCaseSensitive ? ERegexPatternFlags::None : ERegexPatternFlags::CaseInsensitive);

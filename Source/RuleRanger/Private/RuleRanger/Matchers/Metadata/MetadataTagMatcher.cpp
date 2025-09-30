@@ -17,7 +17,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(MetadataTagMatcher)
 
-bool UMetadataTagMatcher::Test_Implementation(UObject* Object) const
+bool UMetadataTagMatcher::Test(UObject* Object) const
 {
     if (Key != NAME_None && IsValid(Object))
     {

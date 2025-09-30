@@ -17,7 +17,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(SourcePathMatcherBase)
 
-bool USourcePathMatcherBase::Test_Implementation(UObject* Object) const
+bool USourcePathMatcherBase::Test(UObject* Object) const
 {
     if (IsValid(Object))
     {

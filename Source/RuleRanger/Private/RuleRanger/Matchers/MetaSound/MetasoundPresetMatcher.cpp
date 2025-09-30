@@ -18,7 +18,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(MetasoundPresetMatcher)
 
-bool UMetasoundPresetMatcher::Test_Implementation(UObject* Object) const
+bool UMetasoundPresetMatcher::Test(UObject* Object) const
 {
 #if WITH_RULERANGER_METASOUND_RULES
     if (Object->IsA(UMetaSoundSource::StaticClass()))

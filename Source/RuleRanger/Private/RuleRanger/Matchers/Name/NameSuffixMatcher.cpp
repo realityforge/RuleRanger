@@ -16,7 +16,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(NameSuffixMatcher)
 
-bool UNameSuffixMatcher::Test_Implementation(UObject* Object) const
+bool UNameSuffixMatcher::Test(UObject* Object) const
 {
     return Object->GetName().EndsWith(Suffix, bCaseSensitive ? ESearchCase::CaseSensitive : ESearchCase::IgnoreCase);
 }

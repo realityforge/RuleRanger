@@ -16,7 +16,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(PathLengthMatcher)
 
-bool UPathLengthMatcher::Test_Implementation(UObject* Object) const
+bool UPathLengthMatcher::Test(UObject* Object) const
 {
     const FString PathName = Object->GetPackage()->GetPathName();
     return PathName.Len() >= MaxPathLength + 5 /* Length of "/Game" */;

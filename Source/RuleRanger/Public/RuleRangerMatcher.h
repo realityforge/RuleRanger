@@ -33,6 +33,5 @@ public:
      * @param Object the object to test.
      * @return true if the asset is a match, false otherwise.
      */
-    UFUNCTION(BlueprintNativeEvent, Category = "Rule Ranger")
-    bool Test(UObject* Object) const;
+    virtual bool Test(UObject* Object) const;
 };

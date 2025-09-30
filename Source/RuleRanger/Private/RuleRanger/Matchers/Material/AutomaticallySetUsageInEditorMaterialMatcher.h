@@ -31,5 +31,5 @@ class UAutomaticallySetUsageInEditorMaterialMatcher final : public URuleRangerMa
     bool bAutomaticallySetUsageInEditor{ true };
 
 public:
-    virtual bool Test_Implementation(UObject* Object) const override;
+    virtual bool Test(UObject* Object) const override;
 };

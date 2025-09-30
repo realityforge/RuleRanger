@@ -25,7 +25,7 @@ bool UEditorPropertyMatcherBase::TestEditorProperty(UObject* Object,
     return false;
 }
 
-bool UEditorPropertyMatcherBase::Test_Implementation(UObject* Object) const
+bool UEditorPropertyMatcherBase::Test(UObject* Object) const
 {
     if (Name != NAME_None && IsValid(Object))
     {

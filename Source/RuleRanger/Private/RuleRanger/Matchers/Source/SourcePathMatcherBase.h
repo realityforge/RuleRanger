@@ -27,7 +27,7 @@ class USourcePathMatcherBase : public URuleRangerMatcher
     GENERATED_BODY()
 
 public:
-    virtual bool Test_Implementation(UObject* Object) const override;
+    virtual bool Test(UObject* Object) const override;
 
 protected:
     /** A flag controlling whether matching is Case Sensitive or not. */

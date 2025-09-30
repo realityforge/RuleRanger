@@ -23,7 +23,7 @@
  * Action to ensure that every RuleRangerSet asset specifies a non-empty description.
  */
 UCLASS(DisplayName = "Ensure that every RuleRangerSet asset specifies a non-empty description")
-class RULERANGER_API UEnsureRuleRangerSetHasDescriptionAction final : public URuleRangerAction
+class UEnsureRuleRangerSetHasDescriptionAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

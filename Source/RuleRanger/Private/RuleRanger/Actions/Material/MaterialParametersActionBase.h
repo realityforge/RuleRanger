@@ -22,7 +22,7 @@
  * Base actions for analyzing Material Parameters.
  */
 UCLASS(Abstract)
-class RULERANGER_API UMaterialParametersActionBase : public URuleRangerAction
+class UMaterialParametersActionBase : public URuleRangerAction
 {
     GENERATED_BODY()
 

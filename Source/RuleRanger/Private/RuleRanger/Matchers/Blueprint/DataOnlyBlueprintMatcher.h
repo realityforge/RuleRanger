@@ -22,7 +22,7 @@
  * Matcher that matches if the object is a DataOnly Blueprint.
  */
 UCLASS()
-class RULERANGER_API UDataOnlyBlueprintMatcher final : public URuleRangerMatcher
+class UDataOnlyBlueprintMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

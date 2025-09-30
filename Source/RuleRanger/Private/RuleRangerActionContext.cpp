@@ -54,38 +54,6 @@ void URuleRangerActionContext::ClearContext()
     FatalMessages.Reset();
 }
 
-void URuleRangerActionContext::EmitMessageLogs()
-{
-    for (auto i = 0; i < InfoMessages.Num(); i++)
-    {
-        FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
-            .Info()
-            ->AddToken(FUObjectToken::Create(Object))
-            ->AddToken(FTextToken::Create(InfoMessages[i]));
-    }
-    for (auto i = 0; i < WarningMessages.Num(); i++)
-    {
-        FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
-            .Warning()
-            ->AddToken(FUObjectToken::Create(Object))
-            ->AddToken(FTextToken::Create(WarningMessages[i]));
-    }
-    for (auto i = 0; i < ErrorMessages.Num(); i++)
-    {
-        FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
-            .Error()
-            ->AddToken(FUObjectToken::Create(Object))
-            ->AddToken(FTextToken::Create(ErrorMessages[i]));
-    }
-    for (auto i = 0; i < FatalMessages.Num(); i++)
-    {
-        FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
-            .Error()
-            ->AddToken(FUObjectToken::Create(Object))
-            ->AddToken(FTextToken::Create(FatalMessages[i]));
-    }
-}
-
 FText URuleRangerActionContext::ToMessage(const FText& InMessage) const
 {
     return FText::FromString(FString::Printf(TEXT("%s (Emitted from rule %s)"),

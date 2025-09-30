@@ -22,7 +22,7 @@
  * Matcher that returns true if object has a name with the specified regex pattern.
  */
 UCLASS()
-class RULERANGER_API UNameRegexMatcher final : public URuleRangerMatcher
+class UNameRegexMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

@@ -23,7 +23,7 @@
  * Abstract action to analyze functions that allows filtering based on access level.
  */
 UCLASS(Abstract)
-class RULERANGER_API UBlueprintFunctionAccessFilteringActionBase : public UBlueprintFunctionActionBase
+class UBlueprintFunctionAccessFilteringActionBase : public UBlueprintFunctionActionBase
 {
     GENERATED_BODY()
 

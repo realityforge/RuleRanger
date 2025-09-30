@@ -23,7 +23,7 @@
  * Action to remove a suffix from a name.
  */
 UCLASS(DisplayName = "Remove Name Suffix")
-class RULERANGER_API URemoveNameSuffixAction final : public URuleRangerAction
+class URemoveNameSuffixAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

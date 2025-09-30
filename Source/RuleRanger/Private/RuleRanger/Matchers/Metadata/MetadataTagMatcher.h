@@ -22,7 +22,7 @@
  * Matcher that returns true if object has metadata tag with the specified key and value
  */
 UCLASS()
-class RULERANGER_API UMetadataTagMatcher final : public URuleRangerMatcher
+class UMetadataTagMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

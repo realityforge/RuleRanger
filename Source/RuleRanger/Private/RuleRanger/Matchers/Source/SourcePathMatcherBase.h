@@ -22,7 +22,7 @@
  * Abstract matcher for matching against SourcePath.
  */
 UCLASS(Abstract)
-class RULERANGER_API USourcePathMatcherBase : public URuleRangerMatcher
+class USourcePathMatcherBase : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

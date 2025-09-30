@@ -21,7 +21,7 @@
  * Action that ensures that the Author field of a MetaSoundSource is blank.
  */
 UCLASS(DisplayName = "Ensure MetaSound Author Blank")
-class RULERANGER_API UEnsureMetaSoundAuthorBlankAction final : public URuleRangerAction
+class UEnsureMetaSoundAuthorBlankAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

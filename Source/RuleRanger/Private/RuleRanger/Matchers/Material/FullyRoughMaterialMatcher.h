@@ -22,7 +22,7 @@
  * Matcher that matches if the object is a Material with FullyRough set to specified value.
  */
 UCLASS()
-class RULERANGER_API UFullyRoughMaterialMatcher final : public URuleRangerMatcher
+class UFullyRoughMaterialMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

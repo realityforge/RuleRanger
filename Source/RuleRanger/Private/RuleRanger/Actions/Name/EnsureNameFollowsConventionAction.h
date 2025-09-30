@@ -123,7 +123,7 @@ struct FDeprecatedNameConvention final : public FTableRowBase
  * The action may optionally issue warnings if applied to an asset that has no NamingConvention specified.
  */
 UCLASS(DisplayName = "Ensure Name Follows Convention")
-class RULERANGER_API UEnsureNameFollowsConventionAction : public URuleRangerAction
+class UEnsureNameFollowsConventionAction : public URuleRangerAction
 {
     GENERATED_BODY()
 

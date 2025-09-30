@@ -24,7 +24,7 @@
  * Action to check that a Texture has a valid NeverStream value.
  */
 UCLASS(DisplayName = "Ensure Texture NeverStream setting is Valid")
-class RULERANGER_API UEnsureNeverStreamValidAction final : public UTexture2DActionBase
+class UEnsureNeverStreamValidAction final : public UTexture2DActionBase
 {
     GENERATED_BODY()
 

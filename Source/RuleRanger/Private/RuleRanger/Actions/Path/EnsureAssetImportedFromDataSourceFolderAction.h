@@ -27,7 +27,7 @@
  *  The Data Source Folder must be set in the Editor Preferences.
  */
 UCLASS(DisplayName = "Ensure Asset Imported From Data Source Folder")
-class RULERANGER_API UEnsureAssetImportedFromDataSourceFolderAction final : public URuleRangerAction
+class UEnsureAssetImportedFromDataSourceFolderAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

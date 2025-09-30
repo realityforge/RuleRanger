@@ -22,7 +22,7 @@
  * Matcher that checks that the Object represents the outermost object in a package.
  */
 UCLASS()
-class RULERANGER_API UIsOutermostObjectMatcher final : public URuleRangerMatcher
+class UIsOutermostObjectMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

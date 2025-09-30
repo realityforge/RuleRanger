@@ -22,7 +22,7 @@ class URuleRangerRuleSet;
 /**
  * Configuration indicating that one or more rules should be excluded when checking certain assets.
  */
-USTRUCT(BlueprintType)
+USTRUCT()
 struct FRuleRangerRuleExclusion final
 {
     GENERATED_BODY()

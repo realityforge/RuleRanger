@@ -23,7 +23,7 @@
  * matchers returns true and stops evaluating at that point.
  */
 UCLASS()
-class RULERANGER_API UNotMatcher final : public URuleRangerMatcher
+class UNotMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

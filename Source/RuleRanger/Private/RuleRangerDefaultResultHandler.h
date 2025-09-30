@@ -21,7 +21,7 @@
  * The default handler that emits messages to the MessageLog.
  */
 UCLASS()
-class RULERANGER_API URuleRangerDefaultResultHandler final : public UObject, public IRuleRangerResultHandler
+class URuleRangerDefaultResultHandler final : public UObject, public IRuleRangerResultHandler
 {
     GENERATED_BODY()
 

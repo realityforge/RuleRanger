@@ -23,7 +23,7 @@
  * returns true and stops evaluating at that point.
  */
 UCLASS()
-class RULERANGER_API UOrMatcher final : public URuleRangerMatcher
+class UOrMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

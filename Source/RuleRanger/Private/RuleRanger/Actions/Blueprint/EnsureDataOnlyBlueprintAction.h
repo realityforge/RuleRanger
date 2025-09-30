@@ -35,7 +35,7 @@ struct FDataOnlyBlueprintEntry final : public FTableRowBase
  * 'RuleRangerDataOnly' must be a DataOnlyBlueprint.
  */
 UCLASS(DisplayName = "Ensure Blueprints derived from specific types are Data Only Blueprints")
-class RULERANGER_API UEnsureDataOnlyBlueprintAction final : public URuleRangerAction
+class UEnsureDataOnlyBlueprintAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

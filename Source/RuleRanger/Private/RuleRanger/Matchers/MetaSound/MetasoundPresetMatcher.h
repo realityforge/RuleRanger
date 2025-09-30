@@ -22,7 +22,7 @@
  * Matcher that returns true if the object is a UMetaSoundSource that is also a preset.
  */
 UCLASS()
-class RULERANGER_API UMetasoundPresetMatcher final : public URuleRangerMatcher
+class UMetasoundPresetMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

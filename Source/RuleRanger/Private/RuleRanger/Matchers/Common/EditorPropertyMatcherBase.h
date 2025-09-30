@@ -22,7 +22,7 @@
  * Abstract base class for matchers that inspect editor properties.
  */
 UCLASS(Abstract)
-class RULERANGER_API UEditorPropertyMatcherBase : public URuleRangerMatcher
+class UEditorPropertyMatcherBase : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

@@ -24,7 +24,7 @@
  * (We let the EnsureNoUnlinkedNodesAction verify that the result node is connected).
  */
 UCLASS(DisplayName = "Ensure Blueprint Functions Return")
-class RULERANGER_API UEnsureFunctionsReturnAction final : public UBlueprintFunctionActionBase
+class UEnsureFunctionsReturnAction final : public UBlueprintFunctionActionBase
 {
     GENERATED_BODY()
 

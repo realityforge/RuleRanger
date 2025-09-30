@@ -36,8 +36,8 @@ using FRuleRangerRuleFn = std::function<
 /**
  * The subsystem responsible for managing callbacks to other subsystems such as ImportSubsystem callbacks.
  */
-UCLASS(BlueprintType, CollapseCategories)
-class RULERANGER_API URuleRangerEditorSubsystem final : public UEditorSubsystem
+UCLASS(CollapseCategories)
+class URuleRangerEditorSubsystem final : public UEditorSubsystem
 {
     GENERATED_BODY()
 

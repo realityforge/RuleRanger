@@ -22,7 +22,7 @@
  * Matcher that returns true if object has and editor property with the specified name is non null object reference.
  */
 UCLASS()
-class RULERANGER_API UEditorPropertyPresentMatcher final : public UEditorPropertyMatcherBase
+class UEditorPropertyPresentMatcher final : public UEditorPropertyMatcherBase
 {
     GENERATED_BODY()
 

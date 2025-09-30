@@ -23,7 +23,7 @@
  * Action to ensure that a function has a maximum number of "non-trivial" nodes.
  */
 UCLASS()
-class RULERANGER_API UEnsureFunctionsMaxNodeCountAction final : public UBlueprintFunctionActionBase
+class UEnsureFunctionsMaxNodeCountAction final : public UBlueprintFunctionActionBase
 {
     GENERATED_BODY()
 

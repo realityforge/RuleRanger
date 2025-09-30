@@ -24,7 +24,7 @@
  * number of variables.
  */
 UCLASS(DisplayName = "Ensure Blueprint Variables Have Categories")
-class RULERANGER_API UEnsureVariablesHaveCategoriesAction final : public UBlueprintVariableActionBase
+class UEnsureVariablesHaveCategoriesAction final : public UBlueprintVariableActionBase
 {
     GENERATED_BODY()
 

@@ -22,7 +22,7 @@
  * Matcher that returns true if object has a path that contains a folder matched by one of the rules.
  */
 UCLASS()
-class RULERANGER_API UPathFolderMatcher final : public URuleRangerMatcher
+class UPathFolderMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

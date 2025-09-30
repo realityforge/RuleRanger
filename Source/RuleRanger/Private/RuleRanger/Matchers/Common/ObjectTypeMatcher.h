@@ -22,7 +22,7 @@
  * Matcher that checks whether object matches specified type.
  */
 UCLASS()
-class RULERANGER_API UObjectTypeMatcher final : public URuleRangerMatcher
+class UObjectTypeMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

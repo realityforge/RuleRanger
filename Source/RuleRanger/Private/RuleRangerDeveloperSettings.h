@@ -24,7 +24,7 @@ class URuleRangerConfig;
  * RuleRanger Project Settings in the Editor category.
  */
 UCLASS(Config = "Editor", DefaultConfig, DisplayName = "Rule Ranger")
-class RULERANGER_API URuleRangerDeveloperSettings final : public UDeveloperSettings
+class URuleRangerDeveloperSettings final : public UDeveloperSettings
 {
     GENERATED_BODY()
 

@@ -23,7 +23,7 @@
  * Action to check that the variables defined in the Blueprint have descriptions.
  */
 UCLASS(DisplayName = "Ensure Blueprint Variables Have Descriptions")
-class RULERANGER_API UEnsureVariablesHaveDescriptionsAction final : public UBlueprintVariableActionBase
+class UEnsureVariablesHaveDescriptionsAction final : public UBlueprintVariableActionBase
 {
     GENERATED_BODY()
 

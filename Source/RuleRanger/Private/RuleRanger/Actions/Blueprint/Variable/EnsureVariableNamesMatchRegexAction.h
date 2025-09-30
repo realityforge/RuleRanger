@@ -23,7 +23,7 @@
  * Action to check that the variable defined in the Blueprint match a pattern.
  */
 UCLASS(DisplayName = "Ensure Blueprint Variable Names Match Regex")
-class RULERANGER_API UEnsureVariableNamesMatchRegexAction final : public UBlueprintVariableActionBase
+class UEnsureVariableNamesMatchRegexAction final : public UBlueprintVariableActionBase
 {
     GENERATED_BODY()
 

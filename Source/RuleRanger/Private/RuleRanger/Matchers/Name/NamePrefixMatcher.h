@@ -22,7 +22,7 @@
  * Matcher that returns true if object has a name with the specified prefix.
  */
 UCLASS()
-class RULERANGER_API UNamePrefixMatcher final : public URuleRangerMatcher
+class UNamePrefixMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

@@ -22,7 +22,7 @@
  * Matcher that returns true if object has a name with the specified suffix.
  */
 UCLASS()
-class RULERANGER_API UNameSuffixMatcher final : public URuleRangerMatcher
+class UNameSuffixMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

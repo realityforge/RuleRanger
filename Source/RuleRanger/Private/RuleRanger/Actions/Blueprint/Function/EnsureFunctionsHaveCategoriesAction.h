@@ -25,7 +25,7 @@
  * number of functions.
  */
 UCLASS(DisplayName = "Ensure Blueprint Functions Have Categories")
-class RULERANGER_API UEnsureFunctionsHaveCategoriesAction final : public UBlueprintFunctionActionBase
+class UEnsureFunctionsHaveCategoriesAction final : public UBlueprintFunctionActionBase
 {
     GENERATED_BODY()
 

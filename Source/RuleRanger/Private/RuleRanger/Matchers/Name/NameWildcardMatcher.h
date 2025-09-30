@@ -22,7 +22,7 @@
  * Matcher that returns true if object has a name with the specified wildcard pattern.
  */
 UCLASS()
-class RULERANGER_API UNameWildcardMatcher final : public URuleRangerMatcher
+class UNameWildcardMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

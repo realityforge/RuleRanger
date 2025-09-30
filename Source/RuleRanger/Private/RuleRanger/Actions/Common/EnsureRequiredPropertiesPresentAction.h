@@ -28,7 +28,7 @@
  * to require the presence of two components WeaponMesh and ShieldMesh with valid values for StaticMesh.
  */
 UCLASS(DisplayName = "Ensure Required Properties Present")
-class RULERANGER_API UEnsureRequiredPropertiesPresentAction final : public URuleRangerAction
+class UEnsureRequiredPropertiesPresentAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

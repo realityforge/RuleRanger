@@ -25,7 +25,7 @@
  * Useful when using matchers to identify scenarios that you do not want in your codebase.
  */
 UCLASS(DisplayName = "Fail")
-class RULERANGER_API UFailAction final : public URuleRangerAction
+class UFailAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

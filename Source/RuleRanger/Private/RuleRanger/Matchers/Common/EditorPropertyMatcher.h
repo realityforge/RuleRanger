@@ -22,7 +22,7 @@
  * Matcher that returns true if object has and editor property with the specified name and value.
  */
 UCLASS()
-class RULERANGER_API UEditorPropertyMatcher final : public UEditorPropertyMatcherBase
+class UEditorPropertyMatcher final : public UEditorPropertyMatcherBase
 {
     GENERATED_BODY()
 

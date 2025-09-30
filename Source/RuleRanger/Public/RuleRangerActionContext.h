@@ -58,8 +58,8 @@ enum class ERuleRangerActionState : uint8
 /**
  * Context object passed to an action so that the action can be provided context.
  */
-UCLASS(BlueprintType, Transient)
-class RULERANGER_API URuleRangerActionContext final : public UObject
+UCLASS(MinimalAPI, Transient)
+class URuleRangerActionContext final : public UObject
 {
     GENERATED_BODY()
     friend class URuleRangerEditorSubsystem;
@@ -71,30 +71,30 @@ public:
      *
      * @param InMessage the message.
      */
-    void Info(const FText& InMessage);
+    RULERANGER_API void Info(const FText& InMessage);
 
     /**
      * Generate a warning message from the action.
      *
      * @param InMessage the message.
      */
-    void Warning(const FText& InMessage);
+    RULERANGER_API void Warning(const FText& InMessage);
 
     /**
      * Generate an error message from the action.
      *
      * @param InMessage the message.
      */
-    void Error(const FText& InMessage);
+    RULERANGER_API void Error(const FText& InMessage);
 
     /**
      * Generate an error message from the action.
      *
      * @param InMessage the message.
      */
-    void Fatal(const FText& InMessage);
+    RULERANGER_API void Fatal(const FText& InMessage);
 
-protected:
+private:
     void ResetContext(URuleRangerConfig* const InConfig,
                       URuleRangerRuleSet* const InRuleSet,
                       URuleRangerRule* InRule,
@@ -102,9 +102,6 @@ protected:
                       ERuleRangerActionTrigger InActionTrigger);
     void ClearContext();
 
-    void EmitMessageLogs();
-
-private:
     /** A reference to the RuleRangerConfig that transitively included this Action. */
     UPROPERTY(Transient)
     TObjectPtr<URuleRangerConfig> Config;

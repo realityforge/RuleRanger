@@ -22,8 +22,8 @@ class URuleRangerRule;
 /**
  * A named set of rules that can be for a project.
  */
-UCLASS(AutoExpandCategories = ("Rule Ranger"), Blueprintable, BlueprintType, CollapseCategories, EditInlineNew)
-class RULERANGER_API URuleRangerRuleSet final : public UDataAsset
+UCLASS(MinimalAPI, AutoExpandCategories = ("Rule Ranger"), CollapseCategories, EditInlineNew)
+class URuleRangerRuleSet final : public UDataAsset
 {
     GENERATED_BODY()
 

@@ -23,8 +23,8 @@ class URuleRangerRuleSet;
 /**
  * A configuration which applies RuleSets to a set of Content Directories.
  */
-UCLASS(AutoExpandCategories = ("Rule Ranger"), Blueprintable, BlueprintType, CollapseCategories, EditInlineNew)
-class RULERANGER_API URuleRangerConfig : public UDataAsset
+UCLASS(MinimalAPI, AutoExpandCategories = ("Rule Ranger"), CollapseCategories, EditInlineNew)
+class URuleRangerConfig : public UDataAsset
 {
     GENERATED_BODY()
 

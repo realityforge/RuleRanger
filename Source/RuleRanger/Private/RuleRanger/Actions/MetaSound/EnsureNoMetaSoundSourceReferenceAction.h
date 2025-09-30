@@ -27,7 +27,7 @@ class UMetaSoundSource;
  * Only adopt this rule if it works for you.
  */
 UCLASS(DisplayName = "Ensure No Direct MetaSoundSource References")
-class RULERANGER_API UEnsureNoMetaSoundSourceReferenceAction final : public URuleRangerAction
+class UEnsureNoMetaSoundSourceReferenceAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

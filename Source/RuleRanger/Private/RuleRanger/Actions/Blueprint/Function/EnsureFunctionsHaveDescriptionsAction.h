@@ -24,7 +24,7 @@
  * Action to check that the functions defined in the Blueprint have descriptions.
  */
 UCLASS(DisplayName = "Ensure Blueprint Functions Have Descriptions")
-class RULERANGER_API UEnsureFunctionsHaveDescriptionsAction final : public UBlueprintFunctionAccessFilteringActionBase
+class UEnsureFunctionsHaveDescriptionsAction final : public UBlueprintFunctionAccessFilteringActionBase
 {
     GENERATED_BODY()
 

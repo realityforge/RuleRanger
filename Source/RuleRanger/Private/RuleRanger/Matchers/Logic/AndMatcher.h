@@ -23,7 +23,7 @@
  * matchers returns true and stops evaluating at that point.
  */
 UCLASS()
-class RULERANGER_API UAndMatcher final : public URuleRangerMatcher
+class UAndMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

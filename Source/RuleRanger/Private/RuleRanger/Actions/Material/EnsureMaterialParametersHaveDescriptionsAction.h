@@ -23,7 +23,7 @@
  * Action to check that the parameters defined in the Material have descriptions.
  */
 UCLASS(DisplayName = "Ensure Material Parameters Have Descriptions")
-class RULERANGER_API UEnsureMaterialParametersHaveDescriptionsAction final : public UMaterialParametersActionBase
+class UEnsureMaterialParametersHaveDescriptionsAction final : public UMaterialParametersActionBase
 {
     GENERATED_BODY()
 

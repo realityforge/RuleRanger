@@ -25,7 +25,7 @@
  * Action to check that a Texture dimensions comply with the specified constraint.
  */
 UCLASS(DisplayName = "Ensure Texture Resolution conforms with Constraint")
-class RULERANGER_API UEnsureTextureResolutionConstraintsAction final : public UTexture2DActionBase
+class UEnsureTextureResolutionConstraintsAction final : public UTexture2DActionBase
 {
     GENERATED_BODY()
 

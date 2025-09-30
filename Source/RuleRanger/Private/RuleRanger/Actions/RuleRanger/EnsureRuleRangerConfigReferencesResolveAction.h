@@ -23,7 +23,7 @@
  * Ensure that RuleRangerConfig references to RuleSets assets resolve.
  */
 UCLASS(DisplayName = "Ensure that RuleRangerConfig references to RuleSets assets resolve")
-class RULERANGER_API UEnsureRuleRangerConfigReferencesResolveAction final : public URuleRangerAction
+class UEnsureRuleRangerConfigReferencesResolveAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

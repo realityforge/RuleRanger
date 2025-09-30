@@ -23,7 +23,7 @@
  * Base class for actions that check Texture2D assets.
  */
 UCLASS(Abstract)
-class RULERANGER_API UTexture2DActionBase : public URuleRangerAction
+class UTexture2DActionBase : public URuleRangerAction
 {
     GENERATED_BODY()
 

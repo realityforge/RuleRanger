@@ -23,7 +23,7 @@ class UK2Node_FunctionEntry;
  * Base class for analyzing the variables in a Blueprint.
  */
 UCLASS(Abstract)
-class RULERANGER_API UBlueprintVariableActionBase : public URuleRangerAction
+class UBlueprintVariableActionBase : public URuleRangerAction
 {
     GENERATED_BODY()
 

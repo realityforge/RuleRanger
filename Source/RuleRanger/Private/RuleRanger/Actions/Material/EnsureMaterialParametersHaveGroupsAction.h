@@ -23,7 +23,7 @@
  * Action to check that the parameters defined in the Material have descriptions.
  */
 UCLASS(DisplayName = "Ensure Material Parameters Have Groups")
-class RULERANGER_API UEnsureMaterialParametersHaveGroupsAction final : public UMaterialParametersActionBase
+class UEnsureMaterialParametersHaveGroupsAction final : public UMaterialParametersActionBase
 {
     GENERATED_BODY()
 

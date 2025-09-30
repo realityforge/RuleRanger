@@ -24,7 +24,7 @@ class UNiagaraScript;
  * Action to check that the niagara system has no disabled emiters.
  */
 UCLASS(DisplayName = "Ensure that the Niagara System has no disabled emitters")
-class RULERANGER_API UEnsureNoDisabledEmittersAction final : public URuleRangerAction
+class UEnsureNoDisabledEmittersAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

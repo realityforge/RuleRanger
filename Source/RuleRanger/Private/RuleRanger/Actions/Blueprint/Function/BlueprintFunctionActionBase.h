@@ -23,7 +23,7 @@
  * Base class for analyzing the functions in a Blueprint Graph.
  */
 UCLASS(Abstract)
-class RULERANGER_API UBlueprintFunctionActionBase : public URuleRangerAction
+class UBlueprintFunctionActionBase : public URuleRangerAction
 {
     GENERATED_BODY()
 

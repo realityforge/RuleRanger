@@ -23,7 +23,7 @@
  * Action to ensure that every StaticMeshComponent contained by an actor references a StaticMesh.
  */
 UCLASS(DisplayName = "Ensure that every StaticMeshComponent references a StaticMesh")
-class RULERANGER_API UEnsureEveryStaticMeshComponentReferencesAStaticMeshAction final : public URuleRangerAction
+class UEnsureEveryStaticMeshComponentReferencesAStaticMeshAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

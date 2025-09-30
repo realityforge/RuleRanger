@@ -23,7 +23,7 @@
  * Action to check that the StaticMesh has LightMap UVs with no problems.
  */
 UCLASS(DisplayName = "Check that the StaticMesh has Valid LightMap UVs")
-class RULERANGER_API UCheckLightMapUVsAction final : public URuleRangerAction
+class UCheckLightMapUVsAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

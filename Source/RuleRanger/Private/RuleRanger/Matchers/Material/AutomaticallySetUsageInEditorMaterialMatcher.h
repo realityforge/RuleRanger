@@ -22,7 +22,7 @@
  * Matcher that matches if the object is a Material with bAutomaticallySetUsageInEditor set to specified value.
  */
 UCLASS()
-class RULERANGER_API UAutomaticallySetUsageInEditorMaterialMatcher final : public URuleRangerMatcher
+class UAutomaticallySetUsageInEditorMaterialMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

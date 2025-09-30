@@ -23,7 +23,7 @@ class UK2Node_Event;
  * Action to check that Blueprints assets have no empty tick nodes.
  */
 UCLASS(DisplayName = "Ensure Blueprints have No Empty Tick Nodes")
-class RULERANGER_API UEnsureNoEmptyTickAction final : public URuleRangerAction
+class UEnsureNoEmptyTickAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

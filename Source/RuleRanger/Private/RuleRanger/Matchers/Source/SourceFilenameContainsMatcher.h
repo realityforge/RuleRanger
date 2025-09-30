@@ -22,7 +22,7 @@
  * Match the filename that the asset was imported from if it contains the specified text.
  */
 UCLASS()
-class RULERANGER_API USourceFilenameContainsMatcher final : public USourcePathMatcherBase
+class USourceFilenameContainsMatcher final : public USourcePathMatcherBase
 {
     GENERATED_BODY()
 

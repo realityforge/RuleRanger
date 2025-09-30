@@ -23,7 +23,7 @@
  * Action to check that the names of the parameters defined in the Material match a regex pattern.
  */
 UCLASS(DisplayName = "Ensure Material Parameter Names Match Regex")
-class RULERANGER_API UEnsureMaterialParameterNamesMatchRegexAction final : public UMaterialParametersActionBase
+class UEnsureMaterialParameterNamesMatchRegexAction final : public UMaterialParametersActionBase
 {
     GENERATED_BODY()
 

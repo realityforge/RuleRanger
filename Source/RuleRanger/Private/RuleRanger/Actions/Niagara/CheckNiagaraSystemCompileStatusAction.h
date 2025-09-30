@@ -24,7 +24,7 @@ class UNiagaraScript;
  * Action to check that the compile status of a Niagara System is valid.
  */
 UCLASS(DisplayName = "Check Niagara System Compile Status")
-class RULERANGER_API UCheckNiagaraSystemCompileStatusAction final : public URuleRangerAction
+class UCheckNiagaraSystemCompileStatusAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

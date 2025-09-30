@@ -21,7 +21,7 @@
 /**
  * Base class used to match against an object to determine whether a rule should be applied to the object.
  */
-UCLASS(Abstract, Blueprintable, BlueprintType, CollapseCategories, DefaultToInstanced, EditInlineNew)
+UCLASS(Abstract, CollapseCategories, DefaultToInstanced, EditInlineNew)
 class RULERANGER_API URuleRangerMatcher : public URuleRangerObjectBase
 {
     GENERATED_BODY()

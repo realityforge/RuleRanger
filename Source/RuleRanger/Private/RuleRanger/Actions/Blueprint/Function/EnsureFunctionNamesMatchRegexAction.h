@@ -23,7 +23,7 @@
  * Action to ensure that the names of functions match specified regex.
  */
 UCLASS(DisplayName = "Ensure Blueprint Function Names Match Regex")
-class RULERANGER_API UEnsureFunctionNamesMatchRegexAction final : public UBlueprintFunctionActionBase
+class UEnsureFunctionNamesMatchRegexAction final : public UBlueprintFunctionActionBase
 {
     GENERATED_BODY()
 

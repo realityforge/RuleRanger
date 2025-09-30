@@ -22,7 +22,7 @@
  * Matcher that matches textures that are in one of the specified TextureGroups.
  */
 UCLASS()
-class RULERANGER_API UTextureGroupMatcher final : public URuleRangerMatcher
+class UTextureGroupMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

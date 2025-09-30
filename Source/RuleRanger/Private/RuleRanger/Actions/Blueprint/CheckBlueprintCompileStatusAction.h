@@ -22,7 +22,7 @@
  * Action to check that the compile status of Blueprints is valid.
  */
 UCLASS(DisplayName = "Check Blueprint Compile Status")
-class RULERANGER_API UCheckBlueprintCompileStatusAction final : public URuleRangerAction
+class UCheckBlueprintCompileStatusAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

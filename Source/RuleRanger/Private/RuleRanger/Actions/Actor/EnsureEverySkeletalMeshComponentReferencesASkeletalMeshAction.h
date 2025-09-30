@@ -23,7 +23,7 @@
  * Action to ensure that every SkeletalMeshComponent contained by an actor references a SkeletalMesh.
  */
 UCLASS(DisplayName = "Ensure that every SkeletalMeshComponent references a SkeletalMesh")
-class RULERANGER_API UEnsureEverySkeletalMeshComponentReferencesASkeletalMeshAction final : public URuleRangerAction
+class UEnsureEverySkeletalMeshComponentReferencesASkeletalMeshAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

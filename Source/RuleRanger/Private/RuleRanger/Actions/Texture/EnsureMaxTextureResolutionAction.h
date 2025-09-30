@@ -23,7 +23,7 @@
  * Action to check that a Texture dimensions comply with the specified constraint.
  */
 UCLASS(DisplayName = "Ensure Max Texture Resolution")
-class RULERANGER_API UEnsureMaxTextureResolutionAction final : public UTexture2DActionBase
+class UEnsureMaxTextureResolutionAction final : public UTexture2DActionBase
 {
     GENERATED_BODY()
 

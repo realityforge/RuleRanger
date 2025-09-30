@@ -24,7 +24,7 @@
  * Action to check that a Texture has a valid TextureCompression setting.
  */
 UCLASS(DisplayName = "Ensure Texture Compression Setting Is Valid")
-class RULERANGER_API UEnsureTextureCompressionValidAction final : public UTexture2DActionBase
+class UEnsureTextureCompressionValidAction final : public UTexture2DActionBase
 {
     GENERATED_BODY()
 

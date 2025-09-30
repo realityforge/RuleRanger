@@ -27,7 +27,7 @@ enum class ETextureResolutionConstraint : uint8;
  * Action to check that a Texture complies with the conventions specified in DataTable.
  */
 UCLASS(DisplayName = "Ensure Texture follows Convention")
-class RULERANGER_API UEnsureTextureFollowsConventionAction final : public UTexture2DActionBase
+class UEnsureTextureFollowsConventionAction final : public UTexture2DActionBase
 {
     GENERATED_BODY()
 

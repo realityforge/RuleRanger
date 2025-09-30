@@ -24,7 +24,7 @@
  * have output data pins used.
  */
 UCLASS(DisplayName = "Ensure Blueprint Contains No Unlinked Nodes")
-class RULERANGER_API UEnsureBlueprintContainsNoUnlinkedNodesAction final : public URuleRangerAction
+class UEnsureBlueprintContainsNoUnlinkedNodesAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

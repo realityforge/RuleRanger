@@ -50,7 +50,7 @@ enum class EFeatureLevel
  * Action to check that the material does not have a compile error.
  */
 UCLASS(DisplayName = "Ensure Material has no compile errors")
-class RULERANGER_API UEnsureMaterialHasNoCompileErrorAction final : public URuleRangerAction
+class UEnsureMaterialHasNoCompileErrorAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

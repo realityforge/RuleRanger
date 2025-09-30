@@ -23,7 +23,7 @@
  * Action to remove a prefix from a name.
  */
 UCLASS(DisplayName = "Remove Name Prefix")
-class RULERANGER_API URemoveNamePrefixAction final : public URuleRangerAction
+class URemoveNamePrefixAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

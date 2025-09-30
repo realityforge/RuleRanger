@@ -24,7 +24,7 @@
  * Action that the specified actions are true.
  */
 UCLASS(DisplayName = "Ensure Matchers Match")
-class RULERANGER_API UEnsureMatchersMatchAction final : public URuleRangerAction
+class UEnsureMatchersMatchAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

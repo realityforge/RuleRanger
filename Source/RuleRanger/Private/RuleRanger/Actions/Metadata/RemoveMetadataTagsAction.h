@@ -23,7 +23,7 @@
  * Action to remove metadata tags with one of the specified keys.
  */
 UCLASS(DisplayName = "Remove Metadata Tags")
-class RULERANGER_API URemoveMetadataTagsAction final : public URuleRangerAction
+class URemoveMetadataTagsAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

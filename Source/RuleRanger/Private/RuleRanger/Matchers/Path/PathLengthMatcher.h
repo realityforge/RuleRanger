@@ -22,7 +22,7 @@
  * Matcher that returns true if object has path that is above maximum length.
  */
 UCLASS()
-class RULERANGER_API UPathLengthMatcher final : public URuleRangerMatcher
+class UPathLengthMatcher final : public URuleRangerMatcher
 {
     GENERATED_BODY()
 

@@ -23,7 +23,7 @@
  * Action to set one or more metadata tags.
  */
 UCLASS(DisplayName = "Set Metadata Tags")
-class RULERANGER_API USetMetadataTagsAction final : public URuleRangerAction
+class USetMetadataTagsAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 

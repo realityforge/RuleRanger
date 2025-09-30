@@ -22,7 +22,7 @@
  * Base class used to apply an action to an object.
  * This is typically used in the body of a rule.
  */
-UCLASS(Abstract, BlueprintType, CollapseCategories, DefaultToInstanced, EditInlineNew)
+UCLASS(Abstract, CollapseCategories, DefaultToInstanced, EditInlineNew)
 class RULERANGER_API URuleRangerAction : public URuleRangerObjectBase
 {
     GENERATED_BODY()

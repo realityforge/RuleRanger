@@ -21,7 +21,7 @@ class URuleRangerRuleSet;
 class URuleRangerConfig;
 class URuleRangerRule;
 
-UENUM(BlueprintType)
+UENUM()
 enum class ERuleRangerActionTrigger : uint8
 {
     /** The action was invoked as a result of an import. */
@@ -40,7 +40,7 @@ enum class ERuleRangerActionTrigger : uint8
     AT_Max UMETA(Hidden)
 };
 
-UENUM(BlueprintType)
+UENUM()
 enum class ERuleRangerActionState : uint8
 {
     /** The action was successful and produced no warnings or errors. */

@@ -101,7 +101,16 @@ void UEnsureNameFollowsConventionAction::Apply_Implementation(URuleRangerActionC
         LogInfo(Object, TEXT("Object is an ObjectRedirector and can not be renamed. No action required."));
         return;
     }
-
+    if (AActor* Actor = Cast<AActor>(Object))
+    {
+        if (Actor->IsPackageExternal())
+        {
+            LogInfo(Object,
+                    TEXT("Object is an Actor stored in an External Package and "
+                         "can not be renamed. No action required."));
+            return;
+        }
+    }
     // Find the naming convention that matches the object closely.
     // i.e. The most specific type, with a matching variant.
     FNameConvention MatchingNameConvention;

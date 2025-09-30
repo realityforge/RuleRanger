@@ -96,23 +96,29 @@ void UEnsureNoMetaSoundSourceReferenceAction::Apply(URuleRangerActionContext* Ac
     else
     {
         TArray<FName> Dependencies;
-        AssetRegistry.GetDependencies(PackageName, Dependencies, UE::AssetRegistry::EDependencyCategory::All);
+        AssetRegistry.GetDependencies(PackageName, Dependencies, UE::AssetRegistry::EDependencyCategory::Package);
 
         for (const auto Referencer : Dependencies)
         {
-            const auto Ref = FSoftObjectPath(Referencer.ToString()).TryLoad();
-            if (Ref && Ref->IsA(UMetaSoundSource::StaticClass()) && !IsReferenceAllowed(Ref, Object))
+            FString AssetPath = Referencer.ToString();
+            if (!AssetPath.StartsWith("/Script/") && !AssetPath.Contains("/__ExternalActors__/")
+                && !AssetPath.Contains("/__ExternalObjects__/"))
             {
-                FFormatNamedArguments Arguments;
-                Arguments.Add(TEXT("Object"), FText::FromString(GetNameSafe(Object)));
-                Arguments.Add(TEXT("MetaSoundSource"), FText::FromString(GetNameSafe(Ref)));
+                FSoftObjectPath SoftObjectPath(AssetPath);
+                const auto Ref = SoftObjectPath.IsAsset() ? SoftObjectPath.TryLoad() : nullptr;
+                if (Ref && Ref->IsA(UMetaSoundSource::StaticClass()) && !IsReferenceAllowed(Ref, Object))
+                {
+                    FFormatNamedArguments Arguments;
+                    Arguments.Add(TEXT("Object"), FText::FromString(GetNameSafe(Object)));
+                    Arguments.Add(TEXT("MetaSoundSource"), FText::FromString(GetNameSafe(Ref)));
 
-                ActionContext->Error(
-                    FText::Format(NSLOCTEXT("RuleRanger",
-                                            "EnsureNoMetaSoundSourceReferenceAction_BadReference",
-                                            "Object {Object} directly references MetaSoundSource {MetaSoundSource}. "
-                                            "Policy indicates that the reference should be to a preset."),
-                                  Arguments));
+                    ActionContext->Error(FText::Format(
+                        NSLOCTEXT("RuleRanger",
+                                  "EnsureNoMetaSoundSourceReferenceAction_BadReference",
+                                  "Object {Object} directly references MetaSoundSource {MetaSoundSource}. "
+                                  "Policy indicates that the reference should be to a preset."),
+                        Arguments));
+                }
             }
         }
     }

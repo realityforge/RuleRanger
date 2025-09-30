@@ -119,8 +119,7 @@ void UEnsureTextureResolutionConstraintsAction::CheckDivisibleConstraint(URuleRa
     }
 }
 
-void UEnsureTextureResolutionConstraintsAction::Apply_Implementation(URuleRangerActionContext* ActionContext,
-                                                                     UObject* Object)
+void UEnsureTextureResolutionConstraintsAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     const auto Texture = CastChecked<UTexture2D>(Object);
     if (ETextureResolutionConstraint::PowerOfTwo == Constraint)

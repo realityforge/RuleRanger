@@ -52,8 +52,7 @@ bool UEnsureBlueprintContainsNoUnlinkedNodesAction::ShouldHaveLinks(const TObjec
     }
 }
 
-void UEnsureBlueprintContainsNoUnlinkedNodesAction::Apply_Implementation(URuleRangerActionContext* ActionContext,
-                                                                         UObject* Object)
+void UEnsureBlueprintContainsNoUnlinkedNodesAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     const auto Blueprint = CastChecked<UBlueprint>(Object);
     TArray<UEdGraph*> Graphs;

@@ -28,7 +28,7 @@ class RULERANGER_API UEnsureRuleRangerConfigReferencesResolveAction final : publ
     GENERATED_BODY()
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 
     virtual UClass* GetExpectedType() override;
 };

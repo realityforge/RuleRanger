@@ -40,7 +40,7 @@ void UBlueprintVariableActionBase::AnalyzeVariable(URuleRangerActionContext* Act
     LogError(Blueprint, TEXT("Action failed to override AnalyzeVariable."));
 }
 
-void UBlueprintVariableActionBase::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void UBlueprintVariableActionBase::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     // ReSharper disable once CppTooWideScopeInitStatement
     const auto Blueprint = CastChecked<UBlueprint>(Object);

@@ -16,8 +16,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureRuleRangerConfigReferencesResolveAction)
 
-void UEnsureRuleRangerConfigReferencesResolveAction::Apply_Implementation(URuleRangerActionContext* ActionContext,
-                                                                          UObject* Object)
+void UEnsureRuleRangerConfigReferencesResolveAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     const auto Config = CastChecked<URuleRangerConfig>(Object);
 

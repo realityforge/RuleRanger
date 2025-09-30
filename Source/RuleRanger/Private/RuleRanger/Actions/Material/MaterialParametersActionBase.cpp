@@ -45,7 +45,7 @@ bool UMaterialParametersActionBase::ShouldAnalyzeParameters(
     return true;
 }
 
-void UMaterialParametersActionBase::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void UMaterialParametersActionBase::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     // ReSharper disable once CppTooWideScopeInitStatement
     const auto Material = CastChecked<UMaterial>(Object);

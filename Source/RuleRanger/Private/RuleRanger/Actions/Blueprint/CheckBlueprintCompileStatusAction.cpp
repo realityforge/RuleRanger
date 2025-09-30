@@ -16,7 +16,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(CheckBlueprintCompileStatusAction)
 
-void UCheckBlueprintCompileStatusAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void UCheckBlueprintCompileStatusAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     // ReSharper disable once CppTooWideScopeInitStatement
     const auto Blueprint = CastChecked<UBlueprint>(Object);

@@ -40,5 +40,5 @@ class RULERANGER_API UEnsureTextureGroupValidAction final : public UTexture2DAct
     bool bApplyFix;
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 };

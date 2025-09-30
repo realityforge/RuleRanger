@@ -17,7 +17,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(SetMetadataTagsAction)
 
-void USetMetadataTagsAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void USetMetadataTagsAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     if (const auto Subsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>())
     {

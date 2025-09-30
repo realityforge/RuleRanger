@@ -108,7 +108,7 @@ class RULERANGER_API UEnsureTextureFollowsConventionAction final : public UTextu
     FName FindVariantBySuffix(const UTexture2D* Texture);
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 
     virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };

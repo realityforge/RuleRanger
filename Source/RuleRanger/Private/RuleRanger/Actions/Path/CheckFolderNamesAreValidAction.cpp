@@ -22,7 +22,7 @@ UCheckFolderNamesAreValidAction::UCheckFolderNamesAreValidAction()
     InvalidNames.Add("Asset");
 }
 
-void UCheckFolderNamesAreValidAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void UCheckFolderNamesAreValidAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     TArray<FString> Folders;
     const FString PathName = Object->GetPackage()->GetPathName();

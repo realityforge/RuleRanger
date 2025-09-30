@@ -15,8 +15,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(CheckTopLevelFolderContentIsValidAction)
 
-void UCheckTopLevelFolderContentIsValidAction::Apply_Implementation(URuleRangerActionContext* ActionContext,
-                                                                    UObject* Object)
+void UCheckTopLevelFolderContentIsValidAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     TArray<FString> Folders;
     Object->GetPathName().ParseIntoArray(Folders, TEXT("/"), true);

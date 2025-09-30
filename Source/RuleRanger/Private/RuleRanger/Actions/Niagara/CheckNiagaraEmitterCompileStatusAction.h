@@ -47,7 +47,7 @@ class RULERANGER_API UCheckNiagaraEmitterCompileStatusAction final : public URul
     bool ValidateScript(URuleRangerActionContext* ActionContext, const UObject* Object, UNiagaraScript* Script) const;
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 
     virtual UClass* GetExpectedType() override;
 };

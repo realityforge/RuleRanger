@@ -47,5 +47,5 @@ class RULERANGER_API UCheckTopLevelFolderContentIsValidAction final : public URu
     bool bCaseSensitive{ true };
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 };

@@ -16,7 +16,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerAction)
 
-void URuleRangerAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) {}
+void URuleRangerAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object) {}
 
 UClass* URuleRangerAction::GetExpectedType()
 {

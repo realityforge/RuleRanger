@@ -15,7 +15,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureMaxTextureResolutionAction)
 
-void UEnsureMaxTextureResolutionAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void UEnsureMaxTextureResolutionAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     const auto Texture = CastChecked<UTexture2D>(Object);
     const int32 TexSizeX = Texture->GetSizeX();

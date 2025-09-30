@@ -29,7 +29,7 @@ class RULERANGER_API UEnsureNoDisabledEmittersAction final : public URuleRangerA
     GENERATED_BODY()
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 
     virtual UClass* GetExpectedType() override;
 };

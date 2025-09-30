@@ -42,5 +42,5 @@ class RULERANGER_API UEnsureMaxTextureResolutionAction final : public UTexture2D
     int32 MaxSizeY{ 4096 };
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 };

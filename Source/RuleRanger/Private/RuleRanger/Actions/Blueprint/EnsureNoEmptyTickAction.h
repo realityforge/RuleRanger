@@ -30,7 +30,7 @@ class RULERANGER_API UEnsureNoEmptyTickAction final : public URuleRangerAction
     bool IsEmptyTick(const UK2Node_Event* Node);
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 
     virtual UClass* GetExpectedType() override;
 };

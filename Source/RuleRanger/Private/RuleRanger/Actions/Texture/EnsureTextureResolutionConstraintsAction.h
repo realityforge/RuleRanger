@@ -37,5 +37,5 @@ class RULERANGER_API UEnsureTextureResolutionConstraintsAction final : public UT
     void CheckDivisibleConstraint(URuleRangerActionContext* ActionContext, const UTexture2D* Texture) const;
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 };

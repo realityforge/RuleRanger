@@ -40,5 +40,5 @@ class RULERANGER_API UEnsureTextureMipGenValidAction final : public UTexture2DAc
     bool bApplyFix{ false };
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 };

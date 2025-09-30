@@ -15,7 +15,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureMatchersMatchAction)
 
-void UEnsureMatchersMatchAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void UEnsureMatchersMatchAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     int Index = 0;
     for (const auto& Matcher : Matchers)

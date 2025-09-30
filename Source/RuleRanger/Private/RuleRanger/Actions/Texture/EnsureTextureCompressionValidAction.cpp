@@ -16,8 +16,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureTextureCompressionValidAction)
 
-void UEnsureTextureCompressionValidAction::Apply_Implementation(URuleRangerActionContext* ActionContext,
-                                                                UObject* Object)
+void UEnsureTextureCompressionValidAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     // ReSharper disable once CppTooWideScopeInitStatement
     UTexture2D* Texture = CastChecked<UTexture2D>(Object);

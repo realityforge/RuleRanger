@@ -15,9 +15,8 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureEveryStaticMeshComponentReferencesAStaticMeshAction)
 
-void UEnsureEveryStaticMeshComponentReferencesAStaticMeshAction::Apply_Implementation(
-    URuleRangerActionContext* ActionContext,
-    UObject* Object)
+void UEnsureEveryStaticMeshComponentReferencesAStaticMeshAction::Apply(URuleRangerActionContext* ActionContext,
+                                                                       UObject* Object)
 {
     // ReSharper disable once CppTooWideScopeInitStatement
     const auto Actor = CastChecked<AActor>(Object);

@@ -607,8 +607,7 @@ void UEnsureTextureFollowsConventionAction::PerformNameSuffixCheck(URuleRangerAc
     }
 }
 
-void UEnsureTextureFollowsConventionAction::Apply_Implementation(URuleRangerActionContext* ActionContext,
-                                                                 UObject* Object)
+void UEnsureTextureFollowsConventionAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     RebuildConfigConventionsTables(ActionContext);
 

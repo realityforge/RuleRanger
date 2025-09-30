@@ -94,8 +94,7 @@ bool UCheckNiagaraEmitterCompileStatusAction::ValidateScript(URuleRangerActionCo
     return true;
 }
 
-void UCheckNiagaraEmitterCompileStatusAction::Apply_Implementation(URuleRangerActionContext* ActionContext,
-                                                                   UObject* Object)
+void UCheckNiagaraEmitterCompileStatusAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     const auto Emitter = CastChecked<UNiagaraEmitter>(Object);
     if (const auto& EmitterData = Emitter->GetLatestEmitterData())

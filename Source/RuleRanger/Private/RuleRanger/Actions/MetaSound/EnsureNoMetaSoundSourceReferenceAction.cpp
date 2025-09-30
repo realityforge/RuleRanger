@@ -64,8 +64,7 @@ bool UEnsureNoMetaSoundSourceReferenceAction::IsReferenceAllowed(const UObject* 
 #endif
 }
 
-void UEnsureNoMetaSoundSourceReferenceAction::Apply_Implementation(URuleRangerActionContext* ActionContext,
-                                                                   UObject* Object)
+void UEnsureNoMetaSoundSourceReferenceAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
 #if WITH_RULERANGER_METASOUND_RULES
     const auto PackageName = FSoftObjectPath(Object).GetAssetPath().GetPackageName();

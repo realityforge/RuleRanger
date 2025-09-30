@@ -52,7 +52,7 @@ class RULERANGER_API UCheckNiagaraSystemCompileStatusAction final : public URule
                         UNiagaraScript* Script) const;
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 
     virtual UClass* GetExpectedType() override;
 };

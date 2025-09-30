@@ -30,7 +30,7 @@ UClass* UEnsureMetaSoundAuthorBlankAction::GetExpectedType()
 #endif
 }
 
-void UEnsureMetaSoundAuthorBlankAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void UEnsureMetaSoundAuthorBlankAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
 #if WITH_RULERANGER_METASOUND_RULES
     if (const auto MetaSound = Cast<UMetaSoundSource>(Object))

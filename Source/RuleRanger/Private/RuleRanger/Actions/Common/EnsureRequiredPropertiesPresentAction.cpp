@@ -255,8 +255,7 @@ void UEnsureRequiredPropertiesPresentAction::PerformChecksForComponentProperties
     }
 }
 
-void UEnsureRequiredPropertiesPresentAction::Apply_Implementation(URuleRangerActionContext* ActionContext,
-                                                                  UObject* Object)
+void UEnsureRequiredPropertiesPresentAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     const UBlueprint* Blueprint = Cast<UBlueprint>(Object);
     UClass* Class;

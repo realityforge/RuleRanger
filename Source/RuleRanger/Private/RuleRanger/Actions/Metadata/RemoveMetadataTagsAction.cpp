@@ -17,7 +17,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RemoveMetadataTagsAction)
 
-void URemoveMetadataTagsAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void URemoveMetadataTagsAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     if (const auto Subsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>())
     {

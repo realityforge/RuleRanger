@@ -16,8 +16,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(CheckNestedEmitterNameMatchesPatternAction)
 
-void UCheckNestedEmitterNameMatchesPatternAction::Apply_Implementation(URuleRangerActionContext* ActionContext,
-                                                                       UObject* Object)
+void UCheckNestedEmitterNameMatchesPatternAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     const UNiagaraSystem* NiagaraSystem = CastChecked<UNiagaraSystem>(Object);
 

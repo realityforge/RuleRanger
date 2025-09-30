@@ -20,8 +20,7 @@ UEnsureSoundWaveSampleRateValidAction::UEnsureSoundWaveSampleRateValidAction()
     ValidSampleRates.Add(48000);
 }
 
-void UEnsureSoundWaveSampleRateValidAction::Apply_Implementation(URuleRangerActionContext* ActionContext,
-                                                                 UObject* Object)
+void UEnsureSoundWaveSampleRateValidAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     const USoundWave* SoundWave = CastChecked<USoundWave>(Object);
 

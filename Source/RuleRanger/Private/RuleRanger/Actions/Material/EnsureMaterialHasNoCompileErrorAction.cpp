@@ -15,8 +15,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureMaterialHasNoCompileErrorAction)
 
-void UEnsureMaterialHasNoCompileErrorAction::Apply_Implementation(URuleRangerActionContext* ActionContext,
-                                                                  UObject* Object)
+void UEnsureMaterialHasNoCompileErrorAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     // ReSharper disable once CppTooWideScopeInitStatement
     const auto Material = CastChecked<UMaterial>(Object);

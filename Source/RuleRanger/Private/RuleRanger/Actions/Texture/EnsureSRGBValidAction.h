@@ -33,5 +33,5 @@ class RULERANGER_API UEnsureSRGBValidAction final : public UTexture2DActionBase
     bool bSRGB{ false };
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 };

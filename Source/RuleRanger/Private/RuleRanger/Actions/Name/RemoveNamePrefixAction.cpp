@@ -17,7 +17,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RemoveNamePrefixAction)
 
-void URemoveNamePrefixAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void URemoveNamePrefixAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     if (Prefix.IsEmpty())
     {

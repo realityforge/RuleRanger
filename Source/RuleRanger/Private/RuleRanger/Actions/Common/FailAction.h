@@ -37,5 +37,5 @@ class RULERANGER_API UFailAction final : public URuleRangerAction
     bool bFatal{ false };
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 };

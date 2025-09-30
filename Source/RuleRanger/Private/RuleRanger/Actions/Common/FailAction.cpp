@@ -15,7 +15,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(FailAction)
 
-void UFailAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void UFailAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     if (bFatal)
     {

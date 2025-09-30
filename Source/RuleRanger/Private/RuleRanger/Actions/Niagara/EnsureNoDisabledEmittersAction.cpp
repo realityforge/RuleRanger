@@ -16,7 +16,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureNoDisabledEmittersAction)
 
-void UEnsureNoDisabledEmittersAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void UEnsureNoDisabledEmittersAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     // ReSharper disable once CppTooWideScopeInitStatement
     const auto System = CastChecked<UNiagaraSystem>(Object);

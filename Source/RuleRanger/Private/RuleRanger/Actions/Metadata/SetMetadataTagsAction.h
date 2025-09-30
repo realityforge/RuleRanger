@@ -32,5 +32,5 @@ class RULERANGER_API USetMetadataTagsAction final : public URuleRangerAction
     TMap<FName, FString> MetadataTags;
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 };

@@ -37,5 +37,5 @@ class RULERANGER_API UEnsureMatchersMatchAction final : public URuleRangerAction
     TArray<URuleRangerMatcher*> Matchers;
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 };

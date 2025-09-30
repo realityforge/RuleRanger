@@ -99,7 +99,6 @@ public:
      * @param ActionContext the context in which the actions are invoked.
      * @param Object the object to apply the actions to.
      */
-    UFUNCTION(BlueprintNativeEvent, Category = "Rule Ranger")
     void Apply(URuleRangerActionContext* ActionContext, UObject* Object);
 
     /**

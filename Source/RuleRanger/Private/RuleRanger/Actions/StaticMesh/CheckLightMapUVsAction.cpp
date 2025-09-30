@@ -15,7 +15,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(CheckLightMapUVsAction)
 
-void UCheckLightMapUVsAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void UCheckLightMapUVsAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     UStaticMesh* StaticMesh = CastChecked<UStaticMesh>(Object);
 

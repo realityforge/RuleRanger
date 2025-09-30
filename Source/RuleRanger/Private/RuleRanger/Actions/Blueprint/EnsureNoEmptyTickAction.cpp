@@ -30,7 +30,7 @@ bool UEnsureNoEmptyTickAction::IsEmptyTick(const UK2Node_Event* Node)
     }
 }
 
-void UEnsureNoEmptyTickAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void UEnsureNoEmptyTickAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     static const FName EventTickName(TEXT("ReceiveTick"));
 

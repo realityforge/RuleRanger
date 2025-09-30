@@ -34,7 +34,7 @@ class RULERANGER_API UCheckNestedEmitterNameMatchesPatternAction final : public 
     bool bCaseSensitive{ true };
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 
     virtual UClass* GetExpectedType() override;
 };

@@ -15,7 +15,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureSkeletalMeshHasBones)
 
-void UEnsureSkeletalMeshHasBones::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void UEnsureSkeletalMeshHasBones::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     // ReSharper disable once CppTooWideScopeInitStatement
     const auto SkeletalMesh = CastChecked<USkeletalMesh>(Object);

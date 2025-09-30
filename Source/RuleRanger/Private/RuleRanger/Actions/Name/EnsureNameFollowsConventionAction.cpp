@@ -79,7 +79,7 @@ void UEnsureNameFollowsConventionAction::RebuildCachesIfNecessary()
     }
 }
 
-void UEnsureNameFollowsConventionAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void UEnsureNameFollowsConventionAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     static FName NAME_RuleRanger_Variant("RuleRanger.Variant");
 

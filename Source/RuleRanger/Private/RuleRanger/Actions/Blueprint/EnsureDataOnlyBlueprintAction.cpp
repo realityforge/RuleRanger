@@ -123,7 +123,7 @@ void UEnsureDataOnlyBlueprintAction::RebuildCachesIfNecessary()
     }
 }
 
-void UEnsureDataOnlyBlueprintAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void UEnsureDataOnlyBlueprintAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     RebuildConfigConventionsTables(ActionContext);
     RebuildCachesIfNecessary();

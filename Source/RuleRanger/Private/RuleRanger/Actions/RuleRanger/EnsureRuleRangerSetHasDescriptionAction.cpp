@@ -16,8 +16,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureRuleRangerSetHasDescriptionAction)
 
-void UEnsureRuleRangerSetHasDescriptionAction::Apply_Implementation(URuleRangerActionContext* ActionContext,
-                                                                    UObject* Object)
+void UEnsureRuleRangerSetHasDescriptionAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     if (const auto RuleRangerRuleSet = Cast<URuleRangerRuleSet>(Object))
     {

@@ -35,5 +35,5 @@ class RULERANGER_API URemoveNamePrefixAction final : public URuleRangerAction
     bool bCaseSensitive{ true };
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 };

@@ -15,7 +15,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureNeverStreamValidAction)
 
-void UEnsureNeverStreamValidAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void UEnsureNeverStreamValidAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     // ReSharper disable once CppTooWideScopeInitStatement
     UTexture2D* Texture = CastChecked<UTexture2D>(Object);

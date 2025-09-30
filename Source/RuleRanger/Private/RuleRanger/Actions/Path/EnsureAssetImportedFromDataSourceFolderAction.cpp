@@ -113,8 +113,7 @@ void UEnsureAssetImportedFromDataSourceFolderAction::ValidateAssetImportData(
     }
 }
 
-void UEnsureAssetImportedFromDataSourceFolderAction::Apply_Implementation(URuleRangerActionContext* ActionContext,
-                                                                          UObject* Object)
+void UEnsureAssetImportedFromDataSourceFolderAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     static const FName PropertyName = FName("AssetImportData");
     const UEditorPerProjectUserSettings* EditorSettings = GetDefault<UEditorPerProjectUserSettings>();

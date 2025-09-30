@@ -16,8 +16,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureRuleRangerRuleSetReferencesResolveAction)
 
-void UEnsureRuleRangerRuleSetReferencesResolveAction::Apply_Implementation(URuleRangerActionContext* ActionContext,
-                                                                           UObject* Object)
+void UEnsureRuleRangerRuleSetReferencesResolveAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     const auto RuleSet = CastChecked<URuleRangerRuleSet>(Object);
 

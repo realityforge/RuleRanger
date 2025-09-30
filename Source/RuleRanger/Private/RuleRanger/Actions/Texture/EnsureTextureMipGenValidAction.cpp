@@ -16,7 +16,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureTextureMipGenValidAction)
 
-void UEnsureTextureMipGenValidAction::Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object)
+void UEnsureTextureMipGenValidAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     // ReSharper disable once CppTooWideScopeInitStatement
     UTexture2D* Texture = CastChecked<UTexture2D>(Object);

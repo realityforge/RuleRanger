@@ -43,5 +43,5 @@ class RULERANGER_API UCheckFolderNamesAreValidAction final : public URuleRangerA
 public:
     UCheckFolderNamesAreValidAction();
 
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 };

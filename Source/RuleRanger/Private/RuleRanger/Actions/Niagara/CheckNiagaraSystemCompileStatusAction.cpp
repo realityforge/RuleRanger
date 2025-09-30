@@ -107,8 +107,7 @@ bool UCheckNiagaraSystemCompileStatusAction::ValidateScript(URuleRangerActionCon
     return true;
 }
 
-void UCheckNiagaraSystemCompileStatusAction::Apply_Implementation(URuleRangerActionContext* ActionContext,
-                                                                  UObject* Object)
+void UCheckNiagaraSystemCompileStatusAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
     const auto System = CastChecked<UNiagaraSystem>(Object);
 

@@ -28,5 +28,5 @@ class RULERANGER_API UEnsureMetaSoundAuthorBlankAction final : public URuleRange
 protected:
     virtual UClass* GetExpectedType() override;
 
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 };

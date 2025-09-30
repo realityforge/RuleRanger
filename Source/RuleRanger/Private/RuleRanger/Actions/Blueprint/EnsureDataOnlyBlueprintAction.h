@@ -74,7 +74,7 @@ class RULERANGER_API UEnsureDataOnlyBlueprintAction final : public URuleRangerAc
     void RebuildCachesIfNecessary();
 
 public:
-    virtual void Apply_Implementation(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 
     virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 

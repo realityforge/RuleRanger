@@ -13,18 +13,20 @@
  */
 #pragma once
 
-class RULERANGER_API FRuleRangerUtilities
+#define UE_API RULERANGER_API
+
+class FRuleRangerUtilities
 {
 public:
     /** Method to perform the rename of an asset. */
-    static bool RenameAsset(UObject* Object, const FString& NewName);
+    UE_API static bool RenameAsset(UObject* Object, const FString& NewName);
 
     /**
      * Add the types of an object into a classes array, starting with the most specific and moving to least specific at
      * the end of the list. "Alternative" type hierarchies such as via Blueprint type system are also incorporated into
      * the list.
      */
-    static void CollectTypeHierarchy(const UObject* Object, TArray<UClass*>& Classes);
+    UE_API static void CollectTypeHierarchy(const UObject* Object, TArray<UClass*>& Classes);
 
     /**
      * Return true if the specified Object is an instance of the specified Class. This also traverses alternate
@@ -34,14 +36,14 @@ public:
      * @param Class The Class To Test For
      * @return true if the specified object is instance of the specified class.
      */
-    static bool IsA(const UObject* Object, const UClass* Class);
+    UE_API static bool IsA(const UObject* Object, const UClass* Class);
 
     /**
      * Collect the "parent" instances of an object into an objects array, starting with the passed in class and moving
      * to parent objects at the end of the list. This is to support the scenario where a MaterialInstance may have a
      * chain of parent Material instances before being parented by a Material.
      */
-    static void CollectInstanceHierarchy(UObject* Object, TArray<UObject*>& Instances);
+    UE_API static void CollectInstanceHierarchy(UObject* Object, TArray<UObject*>& Instances);
 
     /**
      * Attempt to return a C++ object of type <code>T</code> from InObject.
@@ -81,3 +83,5 @@ public:
         return ToObject<T>(InObject, T::StaticClass());
     }
 };
+
+#undef UE_API

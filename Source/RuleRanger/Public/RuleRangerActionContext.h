@@ -104,19 +104,19 @@ private:
 
     /** A reference to the RuleRangerConfig that transitively included this Action. */
     UPROPERTY(Transient)
-    TObjectPtr<URuleRangerConfig> Config;
+    TObjectPtr<URuleRangerConfig> Config{ nullptr };
 
     /** A reference to the RuleRangerRuleSet that directly included this Action. */
     UPROPERTY(Transient)
-    TObjectPtr<URuleRangerRuleSet> RuleSet;
+    TObjectPtr<URuleRangerRuleSet> RuleSet{ nullptr };
 
     /** The rule that contains the associated action that is using the context. */
     UPROPERTY(Transient)
-    TObjectPtr<URuleRangerRule> Rule;
+    TObjectPtr<URuleRangerRule> Rule{ nullptr };
 
     /** The object that the associated action is acting upon. */
     UPROPERTY(VisibleAnywhere)
-    TObjectPtr<UObject> Object;
+    TObjectPtr<UObject> Object{ nullptr };
 
     /** The reason that the associated action was triggered. */
     UPROPERTY(VisibleAnywhere)

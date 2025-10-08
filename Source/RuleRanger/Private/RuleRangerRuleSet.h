@@ -22,7 +22,7 @@ class URuleRangerRule;
 /**
  * A named set of rules that can be for a project.
  */
-UCLASS(MinimalAPI, AutoExpandCategories = ("Rule Ranger"), CollapseCategories, EditInlineNew)
+UCLASS(AutoExpandCategories = ("Rule Ranger"), CollapseCategories, EditInlineNew)
 class URuleRangerRuleSet final : public UDataAsset
 {
     GENERATED_BODY()

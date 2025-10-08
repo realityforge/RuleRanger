@@ -2,7 +2,7 @@
 
 Shorthand notes of where to go next with this experiment:
 
-* Change the way that Texture conventions are driven so that suffix is driven by variant in NameConventions. Also change `DT_DefaultTextureConventions` so that ehy are driven by variants
+* Change the way that Texture conventions are driven so that suffix is driven by variant in NameConventions. Also change `DT_DefaultTextureConventions` so that they are driven by variants
 * Change naming convention so that if a variant is not specified but the type has variants and the name has a suffix that matches a variant then auto-set variant (i.e. importing a texture named `T_Blah_BC` will automatically set `BaseTexture`). Maybe add a flag per NameConvention row that allows auto-setting variant?
 
 * RuleRanger should ALSO invoke validation on each object ... otherwise problems highlighted via IsDataValid will be missed. Note that by default validation also invokes RuleRanger so we will need to guard this scenario and avoid duplicate invocations
@@ -27,8 +27,6 @@ Shorthand notes of where to go next with this experiment:
     `Characters/[CharacterName]/Rigs`
     `Characters/[CharacterName]/Textures`
 
-* Experiment rolling back treating rules/matchers/actions as assets and instead allow them as Blueprint classes
-* Support writing rules as blueprints and thus inlining matcher/action functionality into a single call?
 * Retargeters should be named as RTG_\[Source\]_To_\[Target\]
 * Add the ability to add other validators that are invoked on Scan (i.e. no directories without assets)
 * Add tool to record licenses for assets in MetaData
@@ -38,10 +36,6 @@ Shorthand notes of where to go next with this experiment:
     * Add action to apply license to entire folder or individual assets or selected assets/folders
     * Add RuleRanger validation to ensure license is set
 * Re-enable `RRR_Texture_AlertOnMissingVariant` when exclusion rules in places
-* Common checks:
-  * Support RuleRangerRequiredIf="SomeProperty" to meta which will require that the property is non-null if the referenced property is non-null.
-* Possibly extract "Config Overrides" to allow us to configure all the settings in a central place?
-  * Is this possible? or do we continue to configure on a rule-by-rule basis. Perhaps we could introspect rule sets and automagically build a config panel.
 * BlackBoard:
   * Add check to ensure keys follow naming convention
   * Add check to ensure entries are categorized if threshold count reached
@@ -50,9 +44,6 @@ Shorthand notes of where to go next with this experiment:
   * Add regex per-type for nested names? or global regex for internal names?
   * Ensure that classes (C++ and Blueprint) have a "basename" that ends with Base rather than starts with Base. i.e. Prefer FooBase over BaseFoo
   * Ensure some name patterns (i.e. *Base) require (Abstract) UCLASS specifier
-* Blueprint checks:
-  * Add flag to skip description and categorization requirements for private variables/functions
-  * Blueprint Macros also have function rules applied. Should we restrict these rules as Macros are mostly internal? or maybe not as used by child classes?
 * InputMappingContext:
   * Ensure Description is specified
 * InputAction:
@@ -96,7 +87,6 @@ TextureFilter FGLTFTextureUtilities::GetDefaultFilter(TextureGroup LODGroup)
 	}
 }
 ```
-* Can we make an asset validator that makes sure that certain assets are not baked/packaged?
 * Native Class checks:
   * Add naming convention check for native classes/structs
   * Add naming convention check for native classes/structs properties and functions

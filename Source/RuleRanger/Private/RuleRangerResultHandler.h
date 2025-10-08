@@ -28,7 +28,7 @@ class URuleRangerResultHandler : public UInterface
 /**
  * The interface to receive results from RuleRanger analysis.
  */
-class RULERANGER_API IRuleRangerResultHandler
+class IRuleRangerResultHandler
 {
     GENERATED_BODY()
 

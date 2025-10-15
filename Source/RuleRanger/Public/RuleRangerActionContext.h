@@ -17,8 +17,6 @@
 #include "UObject/Interface.h"
 #include "RuleRangerActionContext.generated.h"
 
-#define UE_API RULERANGER_API
-
 class URuleRangerRuleSet;
 class URuleRangerConfig;
 class URuleRangerRule;
@@ -73,28 +71,28 @@ public:
      *
      * @param InMessage the message.
      */
-    UE_API void Info(const FText& InMessage);
+    RULERANGER_API void Info(const FText& InMessage);
 
     /**
      * Generate a warning message from the action.
      *
      * @param InMessage the message.
      */
-    UE_API void Warning(const FText& InMessage);
+    RULERANGER_API void Warning(const FText& InMessage);
 
     /**
      * Generate an error message from the action.
      *
      * @param InMessage the message.
      */
-    UE_API void Error(const FText& InMessage);
+    RULERANGER_API void Error(const FText& InMessage);
 
     /**
      * Generate an error message from the action.
      *
      * @param InMessage the message.
      */
-    UE_API void Fatal(const FText& InMessage);
+    RULERANGER_API void Fatal(const FText& InMessage);
 
 private:
     void ResetContext(URuleRangerConfig* const InConfig,
@@ -185,5 +183,3 @@ public:
     FORCEINLINE const TArray<FText>& GetErrorMessages() { return ErrorMessages; }
     FORCEINLINE const TArray<FText>& GetFatalMessages() { return FatalMessages; }
 };
-
-#undef UE_API

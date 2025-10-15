@@ -18,13 +18,11 @@
 #include "UObject/Object.h"
 #include "RuleRangerMatcher.generated.h"
 
-#define UE_API RULERANGER_API
-
 /**
  * Base class used to match against an object to determine whether a rule should be applied to the object.
  */
 UCLASS(Abstract, CollapseCategories, DefaultToInstanced, EditInlineNew)
-class UE_API URuleRangerMatcher : public URuleRangerObjectBase
+class RULERANGER_API URuleRangerMatcher : public URuleRangerObjectBase
 {
     GENERATED_BODY()
 
@@ -37,5 +35,3 @@ public:
      */
     virtual bool Test(UObject* Object) const;
 };
-
-#undef UE_API

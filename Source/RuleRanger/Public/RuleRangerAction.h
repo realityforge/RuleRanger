@@ -18,14 +18,12 @@
 #include "RuleRangerObjectBase.h"
 #include "RuleRangerAction.generated.h"
 
-#define UE_API RULERANGER_API
-
 /**
  * Base class used to apply an action to an object.
  * This is typically used in the body of a rule.
  */
 UCLASS(Abstract, CollapseCategories, DefaultToInstanced, EditInlineNew)
-class UE_API URuleRangerAction : public URuleRangerObjectBase
+class RULERANGER_API URuleRangerAction : public URuleRangerObjectBase
 {
     GENERATED_BODY()
 
@@ -49,5 +47,3 @@ public:
      */
     virtual UClass* GetExpectedType();
 };
-
-#undef UE_API

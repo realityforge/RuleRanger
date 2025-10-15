@@ -16,13 +16,11 @@
 #include "CoreMinimal.h"
 #include "RuleRangerObjectBase.generated.h"
 
-#define UE_API RULERANGER_API
-
 /**
  * Base class used for actions and matchers.
  */
 UCLASS(Abstract, AutoExpandCategories = ("Rule Ranger"))
-class UE_API URuleRangerObjectBase : public UObject
+class RULERANGER_API URuleRangerObjectBase : public UObject
 {
     GENERATED_BODY()
 
@@ -46,5 +44,3 @@ protected:
      */
     void LogError(const UObject* const Object, const FString& Message) const;
 };
-
-#undef UE_API

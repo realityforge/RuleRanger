@@ -20,7 +20,7 @@
 
 void URuleRangerDefaultResultHandler::OnRuleApplied(URuleRangerActionContext* ActionContext)
 {
-    auto InfoMessages = ActionContext->GetInfoMessages();
+    const auto& InfoMessages = ActionContext->GetInfoMessages();
     for (auto i = 0; i < InfoMessages.Num(); i++)
     {
         FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
@@ -28,7 +28,7 @@ void URuleRangerDefaultResultHandler::OnRuleApplied(URuleRangerActionContext* Ac
             ->AddToken(FUObjectToken::Create(ActionContext->GetObject()))
             ->AddToken(FTextToken::Create(InfoMessages[i]));
     }
-    auto WarningMessages = ActionContext->GetWarningMessages();
+    const auto& WarningMessages = ActionContext->GetWarningMessages();
     for (auto i = 0; i < WarningMessages.Num(); i++)
     {
         FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
@@ -36,7 +36,7 @@ void URuleRangerDefaultResultHandler::OnRuleApplied(URuleRangerActionContext* Ac
             ->AddToken(FUObjectToken::Create(ActionContext->GetObject()))
             ->AddToken(FTextToken::Create(WarningMessages[i]));
     }
-    auto ErrorMessages = ActionContext->GetErrorMessages();
+    const auto& ErrorMessages = ActionContext->GetErrorMessages();
     for (auto i = 0; i < ErrorMessages.Num(); i++)
     {
         FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
@@ -44,7 +44,7 @@ void URuleRangerDefaultResultHandler::OnRuleApplied(URuleRangerActionContext* Ac
             ->AddToken(FUObjectToken::Create(ActionContext->GetObject()))
             ->AddToken(FTextToken::Create(ErrorMessages[i]));
     }
-    auto FatalMessages = ActionContext->GetFatalMessages();
+    const auto& FatalMessages = ActionContext->GetFatalMessages();
     for (auto i = 0; i < FatalMessages.Num(); i++)
     {
         FMessageLog(FRuleRangerMessageLog::GetMessageLogName())

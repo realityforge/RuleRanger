@@ -64,17 +64,17 @@ void URuleRangerEditorValidator::OnRuleApplied(URuleRangerActionContext* InActio
     }
 
     const auto InObject = InActionContext->GetObject();
-    const auto WarningMessages = InActionContext->GetWarningMessages();
+    const auto& WarningMessages = InActionContext->GetWarningMessages();
     for (int i = 0; i < WarningMessages.Num(); i++)
     {
         AssetWarning(InObject, WarningMessages[i]);
     }
-    const auto ErrorMessages = InActionContext->GetErrorMessages();
+    const auto& ErrorMessages = InActionContext->GetErrorMessages();
     for (int i = 0; i < ErrorMessages.Num(); i++)
     {
         AssetFails(InObject, ErrorMessages[i]);
     }
-    const auto FatalMessages = InActionContext->GetFatalMessages();
+    const auto& FatalMessages = InActionContext->GetFatalMessages();
     for (int i = 0; i < FatalMessages.Num(); i++)
     {
         AssetFails(InObject, FatalMessages[i]);

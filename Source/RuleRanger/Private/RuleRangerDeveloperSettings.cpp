@@ -21,7 +21,7 @@ void URuleRangerDeveloperSettings::PostEditChangeProperty(FPropertyChangedEvent&
     {
         if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
         {
-            Subsystem->MarkdRuleSetConfigCacheDirty();
+            Subsystem->MarkRuleSetConfigCacheDirty();
         }
     }
 }

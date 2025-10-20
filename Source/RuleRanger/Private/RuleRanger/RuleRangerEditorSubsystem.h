@@ -58,7 +58,7 @@ public:
 
     bool CanValidateObject(UObject* InObject, bool bIsSave);
 
-    void MarkdRuleSetConfigCacheDirty();
+    void MarkRuleSetConfigCacheDirty();
 
     IRuleRangerResultHandler* GetDefaultResultHandler() const;
 

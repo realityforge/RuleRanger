@@ -155,7 +155,7 @@ TConstArrayView<TWeakObjectPtr<URuleRangerConfig>> URuleRangerEditorSubsystem::G
     return CachedRuleSetConfigs;
 }
 
-void URuleRangerEditorSubsystem::MarkdRuleSetConfigCacheDirty()
+void URuleRangerEditorSubsystem::MarkRuleSetConfigCacheDirty()
 {
     if (!bRuleSetConfigCacheDirty)
     {
@@ -175,7 +175,7 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
 {
     if (Object->IsA<URuleRangerConfig>())
     {
-        MarkdRuleSetConfigCacheDirty();
+        MarkRuleSetConfigCacheDirty();
     }
 
     const auto Subsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>();
@@ -199,7 +199,7 @@ void URuleRangerEditorSubsystem::OnAssetReimport(UObject* Object)
 {
     if (Object->IsA<URuleRangerConfig>())
     {
-        MarkdRuleSetConfigCacheDirty();
+        MarkRuleSetConfigCacheDirty();
     }
 
     ProcessRule(Object, [this](auto Config, auto RuleSet, auto Rule, auto InObject) {

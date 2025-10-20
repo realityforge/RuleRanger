@@ -49,7 +49,7 @@ FString FRuleRangerRuleExclusion::DeriveSuffix() const
     {
         Suffixes.Add(FString::Printf(TEXT("Matched Objects=%d"), Objects.Num()));
     }
-    if (Objects.Num() > 0)
+    if (Dirs.Num() > 0)
     {
         Suffixes.Add(FString::Printf(TEXT("Matched Dirs=%d"), Dirs.Num()));
     }

@@ -27,7 +27,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerEditorSubsystem)
 
-static FString ImportMarkerValue = FString(TEXT("True"));
+const static FString ImportMarkerValue = FString(TEXT("True"));
 
 void URuleRangerEditorSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -193,6 +193,12 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
                                             InObject,
                                             DefaultResultHandler.GetInterface());
     });
+
+    // Mark asset as having been processed by RuleRanger during import so we can detect reimports later
+    if (Subsystem && !bIsReimport)
+    {
+        Subsystem->SetMetadataTag(Object, NAME_ImportMarkerKey, ImportMarkerValue);
+    }
 }
 
 void URuleRangerEditorSubsystem::OnAssetReimport(UObject* Object)

@@ -27,6 +27,7 @@ Shorthand notes of where to go next with this experiment:
     `Characters/[CharacterName]/Rigs`
     `Characters/[CharacterName]/Textures`
 
+* Name `GameplayCues` assets with a name based on the tag with optional prefix. i.e. GCN_GameplayCue.Fire.Burst`. See `UAbilitySystemGlobals::DeriveGameplayCueTagFromAssetName` to understand the motivation for this naming convention.
 * Retargeters should be named as RTG_\[Source\]_To_\[Target\]
 * Add the ability to add other validators that are invoked on Scan (i.e. no directories without assets)
 * Add tool to record licenses for assets in MetaData

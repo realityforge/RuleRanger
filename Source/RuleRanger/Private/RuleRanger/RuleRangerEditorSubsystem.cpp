@@ -35,7 +35,6 @@ void URuleRangerEditorSubsystem::Initialize(FSubsystemCollectionBase& Collection
     if (const auto Subsystem = GEditor->GetEditorSubsystem<UImportSubsystem>())
     {
         OnAssetPostImportDelegateHandle = Subsystem->OnAssetPostImport.AddUObject(this, &ThisClass::OnAssetPostImport);
-        OnAssetReimportDelegateHandle = Subsystem->OnAssetReimport.AddUObject(this, &ThisClass::OnAssetReimport);
     }
     DefaultResultHandler =
         NewObject<URuleRangerDefaultResultHandler>(this, URuleRangerDefaultResultHandler::StaticClass());
@@ -199,18 +198,7 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
     {
         Subsystem->SetMetadataTag(Object, NAME_ImportMarkerKey, ImportMarkerValue);
     }
-}
-
-void URuleRangerEditorSubsystem::OnAssetReimport(UObject* Object)
-{
-    if (Object->IsA<URuleRangerConfig>())
-    {
-        MarkRuleSetConfigCacheDirty();
-    }
-
-    ProcessRule(Object, [this](auto Config, auto RuleSet, auto Rule, auto InObject) {
-        return ProcessOnAssetPostImportRule(Config, RuleSet, Rule, true, InObject, DefaultResultHandler.GetInterface());
-    });
+    UE_LOG(LogRuleRanger, Error, TEXT("OnAssetPostImport: Handling reimport for object %s"), *Object->GetName());
 }
 
 bool URuleRangerEditorSubsystem::ProcessRuleSetForObject(URuleRangerConfig* const Config,

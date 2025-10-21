@@ -83,8 +83,6 @@ private:
 
     void OnAssetPostImport(UFactory* Factory, UObject* Object);
 
-    void OnAssetReimport(UObject* Object);
-
     bool ProcessRuleSetForObject(URuleRangerConfig* const Config,
                                  URuleRangerRuleSet* const RuleSet,
                                  const TArray<FRuleRangerRuleExclusion>& Exclusions,

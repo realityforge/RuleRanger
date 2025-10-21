@@ -359,18 +359,19 @@ void FRuleRangerContentBrowserExtensions::Shutdown()
         {
             UE_LOGFMT(LogRuleRanger,
                       VeryVerbose,
-                      "FRuleRangerContentBrowserExtensions::Shutdown(): Deregistering ContentBrowser Extensions.");
+                      "FRuleRangerContentBrowserExtensions::Shutdown(): "
+                      "Deregistering Path ContextMenu ContentBrowser Extensions.");
             auto Target = SelectedPathsDelegateHandle;
-            Module.GetAllPathViewContextMenuExtenders().RemoveAll(
-                [&Target](const auto& Delegate) { return Delegate.GetHandle() == Target; });
+            auto& Extenders = Module.GetAllPathViewContextMenuExtenders();
+            Extenders.RemoveAll([&Target](const auto& Delegate) { return Delegate.GetHandle() == Target; });
             Target.Reset();
         }
         else
         {
             UE_LOGFMT(LogRuleRanger,
                       Verbose,
-                      "FRuleRangerContentBrowserExtensions::Shutdown(): Skipping deregister of "
-                      "ContentBrowserExtensions as handle is Invalid.");
+                      "FRuleRangerContentBrowserExtensions::Shutdown(): "
+                      "Skipping deregister of Path ContextMenu ContentBrowser Extensions as handle is Invalid.");
         }
     }
 }

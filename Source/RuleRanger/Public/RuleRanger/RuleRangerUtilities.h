@@ -13,6 +13,10 @@
  */
 #pragma once
 
+#include "CoreMinimal.h"
+
+class UBlueprint;
+
 class FRuleRangerUtilities
 {
 public:

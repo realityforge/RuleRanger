@@ -52,18 +52,18 @@ static void OnScanSelectedAssets(const TArray<FAssetData>& Assets)
 
         if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
         {
-            if (SlowTask.ShouldCancel())
-            {
-                MessageLog.Info()->AddToken(FTextToken::Create(FText::Format(
-                    NSLOCTEXT("RuleRanger",
-                              "CancelScanSelectedAssets",
-                              "User requested that Rule Ranger cancel the scanning of the selected assets at {0}"),
-                    FText::AsDateTime(FDateTime::UtcNow()))));
-                MaybeOpenMessageLog(MessageLog);
-                return;
-            }
             for (const auto& Asset : Assets)
             {
+                if (SlowTask.ShouldCancel())
+                {
+                    MessageLog.Info()->AddToken(FTextToken::Create(FText::Format(
+                        NSLOCTEXT("RuleRanger",
+                                  "CancelScanSelectedAssets",
+                                  "User requested that Rule Ranger cancel the scanning of the selected assets at {0}"),
+                        FText::AsDateTime(FDateTime::UtcNow()))));
+                    MaybeOpenMessageLog(MessageLog);
+                    return;
+                }
                 // Object can be null if it is a redirect
                 if (const auto Object = Asset.GetAsset())
                 {
@@ -98,19 +98,19 @@ static void OnFixSelectedAssets(const TArray<FAssetData>& Assets)
 
         if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
         {
-            if (SlowTask.ShouldCancel())
-            {
-                MessageLog.Info()->AddToken(FTextToken::Create(FText::Format(
-                    NSLOCTEXT(
-                        "RuleRanger",
-                        "CancelScanAndFixSelectedAssets",
-                        "User requested that Rule Ranger cancel the scanning and fixing of the selected assets at {0}"),
-                    FText::AsDateTime(FDateTime::UtcNow()))));
-                MaybeOpenMessageLog(MessageLog);
-                return;
-            }
             for (const auto& Asset : Assets)
             {
+                if (SlowTask.ShouldCancel())
+                {
+                    MessageLog.Info()->AddToken(FTextToken::Create(FText::Format(
+                        NSLOCTEXT(
+                            "RuleRanger",
+                            "CancelScanAndFixSelectedAssets",
+                            "User requested that Rule Ranger cancel the scanning and fixing of the selected assets at {0}"),
+                        FText::AsDateTime(FDateTime::UtcNow()))));
+                    MaybeOpenMessageLog(MessageLog);
+                    return;
+                }
                 // Object can be null if it is a redirect
                 if (const auto Object = Asset.GetAsset())
                 {

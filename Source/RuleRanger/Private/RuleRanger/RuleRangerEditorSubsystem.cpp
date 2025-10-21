@@ -198,7 +198,6 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
     {
         Subsystem->SetMetadataTag(Object, NAME_ImportMarkerKey, ImportMarkerValue);
     }
-    UE_LOG(LogRuleRanger, Error, TEXT("OnAssetPostImport: Handling reimport for object %s"), *Object->GetName());
 }
 
 bool URuleRangerEditorSubsystem::ProcessRuleSetForObject(URuleRangerConfig* const Config,

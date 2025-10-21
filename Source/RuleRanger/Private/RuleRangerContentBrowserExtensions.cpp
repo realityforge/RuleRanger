@@ -149,7 +149,7 @@ static void CollectAssetsFromPaths(const TArray<FString>& AssetPaths, TArray<FAs
             AssetRegistry.GetAssetsByPath(*AssetPath, OutAssets, true);
             for (auto& OutAsset : OutAssets)
             {
-                if (AssetData.IsTopLevelAsset())
+                if (OutAsset.IsTopLevelAsset())
                 {
                     Assets.Add(OutAsset);
                 }

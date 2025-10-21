@@ -373,5 +373,24 @@ void FRuleRangerContentBrowserExtensions::Shutdown()
                       "FRuleRangerContentBrowserExtensions::Shutdown(): "
                       "Skipping deregister of Path ContextMenu ContentBrowser Extensions as handle is Invalid.");
         }
+
+        if (SelectedAssetsDelegateHandle.IsValid())
+        {
+            UE_LOGFMT(LogRuleRanger,
+                      VeryVerbose,
+                      "FRuleRangerContentBrowserExtensions::Shutdown(): "
+                      "Deregistering Asset ContextMenu ContentBrowser Extensions.");
+            auto Target = SelectedAssetsDelegateHandle;
+            auto& Extenders = Module.GetAllAssetViewContextMenuExtenders();
+            Extenders.RemoveAll([&Target](auto& Delegate) { return Delegate.GetHandle() == Target; });
+            SelectedAssetsDelegateHandle.Reset();
+        }
+        else
+        {
+            UE_LOGFMT(LogRuleRanger,
+                      Verbose,
+                      "FRuleRangerContentBrowserExtensions::Shutdown(): "
+                      "Skipping deregister of Asset Asset ContextMenu ContentBrowser Extensions as handle is Invalid.");
+        }
     }
 }

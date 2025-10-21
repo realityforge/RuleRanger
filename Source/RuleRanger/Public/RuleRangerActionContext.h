@@ -178,8 +178,8 @@ public:
      */
     FORCEINLINE ERuleRangerActionState GetState() const { return ActionState; }
 
-    FORCEINLINE const TArray<FText>& GetInfoMessages() { return InfoMessages; }
-    FORCEINLINE const TArray<FText>& GetWarningMessages() { return WarningMessages; }
-    FORCEINLINE const TArray<FText>& GetErrorMessages() { return ErrorMessages; }
-    FORCEINLINE const TArray<FText>& GetFatalMessages() { return FatalMessages; }
+    FORCEINLINE const TArray<FText>& GetInfoMessages() const { return InfoMessages; }
+    FORCEINLINE const TArray<FText>& GetWarningMessages() const { return WarningMessages; }
+    FORCEINLINE const TArray<FText>& GetErrorMessages() const { return ErrorMessages; }
+    FORCEINLINE const TArray<FText>& GetFatalMessages() const { return FatalMessages; }
 };

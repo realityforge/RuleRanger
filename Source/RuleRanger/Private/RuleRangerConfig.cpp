@@ -19,9 +19,9 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerConfig)
 
-bool URuleRangerConfig::ConfigMatches(const FString& Path)
+bool URuleRangerConfig::ConfigMatches(const FString& Path) const
 {
-    for (auto Dir = Dirs.CreateIterator(); Dir; ++Dir)
+    for (auto Dir = Dirs.CreateConstIterator(); Dir; ++Dir)
     {
         const auto& DirPath = Dir->Path;
         if (!DirPath.IsEmpty())

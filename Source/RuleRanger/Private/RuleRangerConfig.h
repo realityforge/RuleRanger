@@ -55,7 +55,7 @@ public:
                       TitleProperty = "EditorFriendlyTitle"))
     TArray<FRuleRangerRuleExclusion> Exclusions;
 
-    bool ConfigMatches(const FString& Path);
+    bool ConfigMatches(const FString& Path) const;
 
     /**
      * Collect the DataTables that are transitively defined in the RuleRangerConfig that have the specified

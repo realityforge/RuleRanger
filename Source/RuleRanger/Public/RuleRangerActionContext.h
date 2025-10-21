@@ -30,7 +30,7 @@ enum class ERuleRangerActionTrigger : uint8
     AT_Reimport UMETA(DisplayName = "ReImport"),
     /** The action was invoked as a result of a validate. */
     AT_Validate UMETA(DisplayName = "Validate"),
-    /** The action was invoked as a result of a validate. */
+    /** The action was invoked as a result of a save. */
     AT_Save UMETA(DisplayName = "Save"),
     /** The action was invoked as an explicit "report" action from a user. */
     AT_Report UMETA(DisplayName = "Report"),

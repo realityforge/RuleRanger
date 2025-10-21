@@ -335,7 +335,7 @@ void FRuleRangerContentBrowserExtensions::Initialize()
 
     UE_LOGFMT(LogRuleRanger,
               VeryVerbose,
-              "FRuleRangerContentBrowserExtensions::Shutdown(): Registering ContentBrowser Extensions.");
+              "FRuleRangerContentBrowserExtensions::Initialize(): Registering ContentBrowser Extensions.");
     SelectedPathsDelegate = FContentBrowserMenuExtender_SelectedPaths::CreateStatic(&OnExtendSelectedPathsMenu);
     Module.GetAllPathViewContextMenuExtenders().Add(SelectedPathsDelegate);
     SelectedPathsDelegateHandle = SelectedPathsDelegate.GetHandle();

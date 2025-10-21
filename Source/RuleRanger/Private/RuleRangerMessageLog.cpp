@@ -31,7 +31,7 @@ void FRuleRangerMessageLog::Initialize()
     MessageLogModule.RegisterLogListing(GetMessageLogName(),
                                         NSLOCTEXT("RuleRanger", "RuleRangerLogLabel", "Rule Ranger"),
                                         InitOptions);
-    UE_LOGFMT(LogRuleRanger, VeryVerbose, "FRuleRangerMessageLog::Shutdown(): Registered MessageLog.");
+    UE_LOGFMT(LogRuleRanger, VeryVerbose, "FRuleRangerMessageLog::Initialize(): Registered MessageLog.");
 }
 
 void FRuleRangerMessageLog::Shutdown()

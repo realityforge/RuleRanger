@@ -427,7 +427,31 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetValidateRule(URuleRangerConfig* c
 
         const auto State = ActionContext->GetState();
         ActionContext->ClearContext();
-        return ERuleRangerActionState::AS_Fatal != State;
+
+        if (ERuleRangerActionState::AS_Fatal == State)
+        {
+            UE_LOGFMT(LogRuleRanger,
+                      VeryVerbose,
+                      "OnAssetValidate({Object}) applied rule {Rule} which resulted in fatal error. "
+                      "Processing rules will not continue.",
+                      InObject->GetName(),
+                      Rule->GetName());
+            return false;
+        }
+        else if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
+        {
+            UE_LOGFMT(LogRuleRanger,
+                      VeryVerbose,
+                      "OnAssetValidate({Object}) applied rule {Rule} which resulted in error. "
+                      "Processing rules will not continue as ContinueOnError=False.",
+                      InObject->GetName(),
+                      Rule->GetName());
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
     else
     {

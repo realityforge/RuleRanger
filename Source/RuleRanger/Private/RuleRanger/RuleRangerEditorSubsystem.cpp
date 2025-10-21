@@ -539,7 +539,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScan(URuleRangerConfig* const Conf
                   "ProcessDemandScan({Object}) applying rule {Rule}.",
                   InObject->GetName(),
                   Rule->GetName());
-        ActionContext->ResetContext(Config, RuleSet, Rule, InObject, ERuleRangerActionTrigger::AT_Validate);
+        ActionContext->ResetContext(Config, RuleSet, Rule, InObject, ERuleRangerActionTrigger::AT_Report);
 
         Rule->Apply(ActionContext, InObject);
 

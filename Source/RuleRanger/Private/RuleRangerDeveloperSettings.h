@@ -36,7 +36,7 @@ public:
 
     /** Should we always show the message log after a request to scan assets or only when warnings or errors occur? */
     UPROPERTY(Config, EditAnywhere, Category = "Rule Ranger", meta = (DisplayThumbnail = "false"))
-    bool bAlwaysShowMessageLog;
+    bool bAlwaysShowMessageLog{ false };
 
     UPROPERTY(Config, EditAnywhere, Category = "Rule Ranger", meta = (DisplayThumbnail = "false"))
     TArray<TSoftObjectPtr<URuleRangerConfig>> Configs;

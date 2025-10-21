@@ -205,7 +205,8 @@ bool URuleRangerEditorSubsystem::ProcessRuleSetForObject(URuleRangerConfig* cons
                                                          URuleRangerRuleSet* const RuleSet,
                                                          const TArray<FRuleRangerRuleExclusion>& Exclusions,
                                                          UObject* Object,
-                                                         const FRuleRangerRuleFn& ProcessRuleFunction)
+                                                         const FRuleRangerRuleFn& ProcessRuleFunction,
+                                                         TSet<const URuleRangerRuleSet*>& Visited)
 {
     UE_LOGFMT(LogRuleRanger,
               VeryVerbose,
@@ -213,102 +214,115 @@ bool URuleRangerEditorSubsystem::ProcessRuleSetForObject(URuleRangerConfig* cons
               RuleSet->GetName(),
               Object->GetName());
 
-    for (const auto& Exclusion : Exclusions)
+    if (Visited.Contains(RuleSet))
     {
-        if (Exclusion.RuleSets.Contains(RuleSet))
-        {
-            UE_LOGFMT(LogRuleRanger,
-                      VeryVerbose,
-                      "ProcessRule: Rule Set {RuleSet} excluded for object "
-                      "{Object} due to exclusion rule. Reason: {Reason}",
-                      RuleSet->GetName(),
-                      Object->GetName(),
-                      Exclusion.Description.ToString());
-            return true;
-        }
+        UE_LOGFMT(LogRuleRanger,
+                  Error,
+                  "ProcessRule: Detected cyclic reference involving Rule Set {RuleSet}. Skipping nested traversal.",
+                  RuleSet->GetName());
+        return true;
     }
-
-    for (auto RuleSetIt = RuleSet->RuleSets.CreateIterator(); RuleSetIt; ++RuleSetIt)
+    else
     {
-        if (const auto NestedRuleSet = RuleSetIt->Get())
-        {
-            UE_LOGFMT(LogRuleRanger,
-                      VeryVerbose,
-                      "ProcessRule: Processing Nested Rule Set {RuleSet} for object {Object}",
-                      NestedRuleSet->GetName(),
-                      Object->GetName());
-            if (!ProcessRuleSetForObject(Config, NestedRuleSet, Exclusions, Object, ProcessRuleFunction))
-            {
-                return false;
-            }
-            UE_LOGFMT(LogRuleRanger,
-                      VeryVerbose,
-                      "ProcessRule: Completed processing of Nested Rule Set {RuleSet} for object {Object}",
-                      NestedRuleSet->GetName(),
-                      Object->GetName());
-        }
-        else
-        {
-            UE_LOGFMT(LogRuleRanger,
-                      Error,
-                      "ProcessRule: Invalid RuleSet skipped when processing rules for {Object} in config {Config}",
-                      Object->GetName(),
-                      Config->GetName());
-        }
-    }
+        Visited.Add(RuleSet);
 
-    int RuleIndex = 0;
-    for (const auto RulePtr : RuleSet->Rules)
-    {
-        // ReSharper disable once CppTooWideScopeInitStatement
-        if (const auto Rule = RulePtr.Get(); IsValid(Rule))
+        for (const auto& Exclusion : Exclusions)
         {
-            bool bSkipRule = false;
-
-            for (const auto& Exclusion : Exclusions)
-            {
-                if (Exclusion.Rules.Contains(Rule))
-                {
-                    UE_LOGFMT(LogRuleRanger,
-                              VeryVerbose,
-                              "ProcessRule: Rule {Rule} from RuleSet {RuleSet} was excluded for "
-                              "object {Object} due to exclusion rule. Reason: {Reason}",
-                              Rule->GetName(),
-                              RuleSet->GetName(),
-                              Object->GetName(),
-                              Exclusion.Description.ToString());
-                    bSkipRule = true;
-                }
-            }
-
-            if (!bSkipRule && !ProcessRuleFunction(Config, RuleSet, Rule, Object))
+            if (Exclusion.RuleSets.Contains(RuleSet))
             {
                 UE_LOGFMT(LogRuleRanger,
                           VeryVerbose,
-                          "ProcessRule: Rule {Rule} from RuleSet {RuleSet} indicated that following "
-                          "rules should be skipped for {Object}",
-                          Rule->GetName(),
+                          "ProcessRule: Rule Set {RuleSet} excluded for object "
+                          "{Object} due to exclusion rule. Reason: {Reason}",
                           RuleSet->GetName(),
-                          Object->GetName());
-                ActionContext->ClearContext();
-                return false;
+                          Object->GetName(),
+                          Exclusion.Description.ToString());
+                return true;
             }
         }
-        else
+
+        for (auto RuleSetIt = RuleSet->RuleSets.CreateIterator(); RuleSetIt; ++RuleSetIt)
         {
-            UE_LOGFMT(LogRuleRanger,
-                      Error,
-                      "ProcessRule: Invalid Rule skipped at index {RuleIndex} "
-                      "in rule set '{RuleSet}' from config '{Config}' when analyzing "
-                      "object '{Object}'",
-                      RuleIndex,
-                      RuleSet->GetName(),
-                      Config->GetName(),
-                      Object->GetName());
+            if (const auto NestedRuleSet = RuleSetIt->Get())
+            {
+                UE_LOGFMT(LogRuleRanger,
+                          VeryVerbose,
+                          "ProcessRule: Processing Nested Rule Set {RuleSet} for object {Object}",
+                          NestedRuleSet->GetName(),
+                          Object->GetName());
+                if (!ProcessRuleSetForObject(Config, NestedRuleSet, Exclusions, Object, ProcessRuleFunction, Visited))
+                {
+                    return false;
+                }
+                UE_LOGFMT(LogRuleRanger,
+                          VeryVerbose,
+                          "ProcessRule: Completed processing of Nested Rule Set {RuleSet} for object {Object}",
+                          NestedRuleSet->GetName(),
+                          Object->GetName());
+            }
+            else
+            {
+                UE_LOGFMT(LogRuleRanger,
+                          Error,
+                          "ProcessRule: Invalid RuleSet skipped when processing rules for {Object} in config {Config}",
+                          Object->GetName(),
+                          Config->GetName());
+            }
         }
-        RuleIndex++;
+
+        int RuleIndex = 0;
+        for (const auto RulePtr : RuleSet->Rules)
+        {
+            // ReSharper disable once CppTooWideScopeInitStatement
+            if (const auto Rule = RulePtr.Get(); IsValid(Rule))
+            {
+                bool bSkipRule = false;
+
+                for (const auto& Exclusion : Exclusions)
+                {
+                    if (Exclusion.Rules.Contains(Rule))
+                    {
+                        UE_LOGFMT(LogRuleRanger,
+                                  VeryVerbose,
+                                  "ProcessRule: Rule {Rule} from RuleSet {RuleSet} was excluded for "
+                                  "object {Object} due to exclusion rule. Reason: {Reason}",
+                                  Rule->GetName(),
+                                  RuleSet->GetName(),
+                                  Object->GetName(),
+                                  Exclusion.Description.ToString());
+                        bSkipRule = true;
+                    }
+                }
+
+                if (!bSkipRule && !ProcessRuleFunction(Config, RuleSet, Rule, Object))
+                {
+                    UE_LOGFMT(LogRuleRanger,
+                              VeryVerbose,
+                              "ProcessRule: Rule {Rule} from RuleSet {RuleSet} indicated that following "
+                              "rules should be skipped for {Object}",
+                              Rule->GetName(),
+                              RuleSet->GetName(),
+                              Object->GetName());
+                    ActionContext->ClearContext();
+                    return false;
+                }
+            }
+            else
+            {
+                UE_LOGFMT(LogRuleRanger,
+                          Error,
+                          "ProcessRule: Invalid Rule skipped at index {RuleIndex} "
+                          "in rule set '{RuleSet}' from config '{Config}' when analyzing "
+                          "object '{Object}'",
+                          RuleIndex,
+                          RuleSet->GetName(),
+                          Config->GetName(),
+                          Object->GetName());
+            }
+            RuleIndex++;
+        }
+        return true;
     }
-    return true;
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
@@ -331,6 +345,7 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
                   Configs.Num(),
                   Object->GetName(),
                   Path);
+        TSet<const URuleRangerRuleSet*> Visited;
         for (const auto ConfigPtr : Configs)
         {
             if (const auto Config = ConfigPtr.Get())
@@ -351,7 +366,12 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
                     {
                         if (const auto RuleSet = RuleSetIt->Get())
                         {
-                            if (!ProcessRuleSetForObject(Config, RuleSet, Exclusions, Object, ProcessRuleFunction))
+                            if (!ProcessRuleSetForObject(Config,
+                                                         RuleSet,
+                                                         Exclusions,
+                                                         Object,
+                                                         ProcessRuleFunction,
+                                                         Visited))
                             {
                                 return;
                             }

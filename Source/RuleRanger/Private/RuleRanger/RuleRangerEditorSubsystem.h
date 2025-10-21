@@ -87,7 +87,8 @@ private:
                                  URuleRangerRuleSet* const RuleSet,
                                  const TArray<FRuleRangerRuleExclusion>& Exclusions,
                                  UObject* Object,
-                                 const FRuleRangerRuleFn& ProcessRuleFunction);
+                                 const FRuleRangerRuleFn& ProcessRuleFunction,
+                                 TSet<const URuleRangerRuleSet*>& Visited);
 
     bool CanValidateObject(const URuleRangerRule* Rule, const UObject* InObject, const bool bIsSave) const;
 

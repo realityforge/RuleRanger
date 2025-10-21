@@ -58,4 +58,9 @@ public:
      * @param OutDataTables The variable in which to place matching DataTables.
      */
     void CollectDataTables(const UScriptStruct* RowStructure, TArray<TObjectPtr<UDataTable>>& OutDataTables) const;
+
+private:
+    void CollectDataTablesInternal(const UScriptStruct* RowStructure,
+                                   TArray<TObjectPtr<UDataTable>>& OutDataTables,
+                                   TSet<const URuleRangerRuleSet*>& Visited) const;
 };

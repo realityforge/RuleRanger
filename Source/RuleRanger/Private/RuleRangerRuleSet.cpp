@@ -12,24 +12,47 @@
  * limitations under the License.
  */
 #include "RuleRangerRuleSet.h"
+#include "Logging/StructuredLog.h"
+#include "RuleRangerLogging.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerRuleSet)
 
 void URuleRangerRuleSet::CollectDataTables(const UScriptStruct* RowStructure,
                                            TArray<TObjectPtr<UDataTable>>& OutDataTables) const
 {
-    for (const auto DataTable : DataTables)
+    TSet<const URuleRangerRuleSet*> Visited;
+    CollectDataTablesInternal(RowStructure, OutDataTables, Visited);
+}
+
+void URuleRangerRuleSet::CollectDataTablesInternal(const UScriptStruct* RowStructure,
+                                                   TArray<TObjectPtr<UDataTable>>& OutDataTables,
+                                                   TSet<const URuleRangerRuleSet*>& Visited) const
+{
+    if (Visited.Contains(this))
     {
-        if (IsValid(DataTable) && RowStructure == DataTable->RowStruct)
-        {
-            OutDataTables.Add(DataTable);
-        }
+        UE_LOGFMT(LogRuleRanger,
+                  Error,
+                  "CollectDataTables: Detected cyclic reference involving "
+                  "Rule Set {RuleSet}. Skipping nested traversal.",
+                  GetName());
     }
-    for (const auto RuleSet : RuleSets)
+    else
     {
-        if (IsValid(RuleSet))
+        Visited.Add(this);
+
+        for (const auto DataTable : DataTables)
         {
-            RuleSet->CollectDataTables(RowStructure, OutDataTables);
+            if (IsValid(DataTable) && RowStructure == DataTable->RowStruct)
+            {
+                OutDataTables.Add(DataTable);
+            }
+        }
+        for (const auto RuleSet : RuleSets)
+        {
+            if (IsValid(RuleSet))
+            {
+                RuleSet->CollectDataTablesInternal(RowStructure, OutDataTables, Visited);
+            }
         }
     }
 }

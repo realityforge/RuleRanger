@@ -73,12 +73,6 @@ public:
     UPROPERTY(EditAnywhere, Category = "Default")
     bool bContinueOnError{ false };
 
-    /**
-     * Priority used to order rules when multiple apply to the same ObjectType.
-     */
-    UPROPERTY(EditAnywhere, Category = "Default")
-    int32 Priority{ 1000 };
-
     /** The matchers that an object MUST match before this rule is applied. */
     UPROPERTY(Instanced,
               EditAnywhere,

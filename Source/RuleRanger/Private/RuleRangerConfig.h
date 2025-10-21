@@ -19,6 +19,7 @@
 
 struct FRuleRangerRuleExclusion;
 class URuleRangerRuleSet;
+class FObjectPreSaveContext;
 
 /**
  * A configuration which applies RuleSets to a set of Content Directories.
@@ -80,6 +81,9 @@ public:
      * Updates the editor only titles for subobjects after the asset is initially loaded.
      */
     virtual void PostLoad() override;
+
+    // Sort certain properties before saving
+    virtual void PreSave(FObjectPreSaveContext SaveContext) override;
 
 private:
     void UpdateExclusionsEditorFriendlyTitles();

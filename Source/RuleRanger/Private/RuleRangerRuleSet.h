@@ -17,6 +17,8 @@
 #include "Engine/DataAsset.h"
 #include "RuleRangerRuleSet.generated.h"
 
+class FObjectPreSaveContext;
+
 class URuleRangerRule;
 
 /**
@@ -58,6 +60,9 @@ public:
      * @param OutDataTables The variable in which to place matching DataTables.
      */
     void CollectDataTables(const UScriptStruct* RowStructure, TArray<TObjectPtr<UDataTable>>& OutDataTables) const;
+
+    // Sort certain properties before saving
+    virtual void PreSave(FObjectPreSaveContext SaveContext) override;
 
 private:
     void CollectDataTablesInternal(const UScriptStruct* RowStructure,

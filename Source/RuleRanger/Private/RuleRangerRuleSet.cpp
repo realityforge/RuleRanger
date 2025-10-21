@@ -13,7 +13,9 @@
  */
 #include "RuleRangerRuleSet.h"
 #include "Logging/StructuredLog.h"
+#include "RuleRanger/RuleRangerSortUtils.h"
 #include "RuleRangerLogging.h"
+#include "UObject/ObjectSaveContext.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerRuleSet)
 
@@ -55,4 +57,14 @@ void URuleRangerRuleSet::CollectDataTablesInternal(const UScriptStruct* RowStruc
             }
         }
     }
+}
+
+void URuleRangerRuleSet::PreSave(const FObjectPreSaveContext SaveContext)
+{
+    using namespace RuleRanger::SortUtils;
+
+    // Keep DataTables ordered and clean of nulls
+    RemoveNullsAndSortByName(DataTables);
+
+    Super::PreSave(SaveContext);
 }

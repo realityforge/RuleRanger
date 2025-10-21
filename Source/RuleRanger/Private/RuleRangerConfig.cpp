@@ -12,8 +12,10 @@
  * limitations under the License.
  */
 #include "RuleRangerConfig.h"
+#include "RuleRanger/RuleRangerSortUtils.h"
 #include "RuleRangerRuleExclusion.h"
 #include "RuleRangerRuleSet.h"
+#include "UObject/ObjectSaveContext.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerConfig)
 
@@ -98,4 +100,26 @@ void URuleRangerConfig::UpdateExclusionsEditorFriendlyTitles()
     {
         Exclusion.InitEditorFriendlyTitleProperty();
     }
+}
+
+void URuleRangerConfig::PreSave(FObjectPreSaveContext SaveContext)
+{
+    using namespace RuleRanger::SortUtils;
+
+    // Sort config-level directories
+    SortDirsByPath(Dirs);
+
+    // Clean and sort data tables
+    RemoveNullsAndSortByName(DataTables);
+
+    // Clean and sort exclusions' arrays
+    for (auto& Exclusion : Exclusions)
+    {
+        RemoveNullsAndSortByName(Exclusion.RuleSets);
+        RemoveNullsAndSortByName(Exclusion.Rules);
+        RemoveNullsAndSortByName(Exclusion.Objects);
+        SortDirsByPath(Exclusion.Dirs);
+    }
+
+    Super::PreSave(SaveContext);
 }

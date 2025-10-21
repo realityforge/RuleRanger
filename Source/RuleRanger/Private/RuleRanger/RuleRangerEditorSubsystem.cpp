@@ -49,13 +49,8 @@ void URuleRangerEditorSubsystem::Deinitialize()
         {
             Subsystem->OnAssetPostImport.Remove(OnAssetPostImportDelegateHandle);
         }
-        if (OnAssetReimportDelegateHandle.IsValid())
-        {
-            Subsystem->OnAssetReimport.Remove(OnAssetReimportDelegateHandle);
-        }
     }
     OnAssetPostImportDelegateHandle.Reset();
-    OnAssetReimportDelegateHandle.Reset();
 }
 
 void URuleRangerEditorSubsystem::ScanObject(UObject* InObject, IRuleRangerResultHandler* InResultHandler)

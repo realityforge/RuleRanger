@@ -77,7 +77,6 @@ private:
     URuleRangerActionContext* ActionContext{ nullptr };
 
     FDelegateHandle OnAssetPostImportDelegateHandle;
-    FDelegateHandle OnAssetReimportDelegateHandle;
 
     void ProcessRule(UObject* Object, const FRuleRangerRuleFn& ProcessRuleFunction);
 

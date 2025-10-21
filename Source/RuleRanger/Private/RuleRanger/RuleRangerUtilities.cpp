@@ -30,12 +30,15 @@ bool FRuleRangerUtilities::RenameAsset(UObject* Object, const FString& NewName)
     const bool bSuccess =
         FModuleManager::LoadModuleChecked<FAssetToolsModule>(AssetToolsModuleName).Get().RenameAssets(AssetsAndNames);
 
-    // Notify asset registry of rename .. if required
-    FAssetRegistryModule::AssetRenamed(Object, PathName);
+    if (bSuccess)
+    {
+        // Notify asset registry of rename
+        FAssetRegistryModule::AssetRenamed(Object, PathName);
 
-    // This should not be called during loads of object so neither of these functions should return false
-    ensure(Object->MarkPackageDirty());
-    ensure(Object->GetOuter()->MarkPackageDirty());
+        // This should not be called during loads of object so neither of these functions should return false
+        ensure(Object->MarkPackageDirty());
+        ensure(Object->GetPackage()->MarkPackageDirty());
+    }
     return bSuccess;
 }
 

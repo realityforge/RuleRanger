@@ -21,9 +21,18 @@ bool URuleRangerConfig::ConfigMatches(const FString& Path)
 {
     for (auto Dir = Dirs.CreateIterator(); Dir; ++Dir)
     {
-        if (Path.StartsWith(Dir->Path))
+        const auto& DirPath = Dir->Path;
+        if (!DirPath.IsEmpty())
         {
-            return true;
+            auto Prefix = DirPath;
+            if (!Prefix.EndsWith(TEXT("/")))
+            {
+                Prefix.Append(TEXT("/"));
+            }
+            if (Path.StartsWith(Prefix, ESearchCase::CaseSensitive) || Path.Equals(DirPath, ESearchCase::CaseSensitive))
+            {
+                return true;
+            }
         }
     }
     return false;

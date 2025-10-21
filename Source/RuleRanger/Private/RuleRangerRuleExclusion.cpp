@@ -26,9 +26,18 @@ bool FRuleRangerRuleExclusion::ExclusionMatches(const UObject& Object, const FSt
     }
     for (auto DirIt = Dirs.CreateConstIterator(); DirIt; ++DirIt)
     {
-        if (Path.StartsWith(DirIt->Path))
+        const auto& DirPath = DirIt->Path;
+        if (!DirPath.IsEmpty())
         {
-            return true;
+            auto Prefix = DirPath;
+            if (!Prefix.EndsWith(TEXT("/")))
+            {
+                Prefix.Append(TEXT("/"));
+            }
+            if (Path.StartsWith(Prefix, ESearchCase::CaseSensitive) || Path.Equals(DirPath, ESearchCase::CaseSensitive))
+            {
+                return true;
+            }
         }
     }
     return false;

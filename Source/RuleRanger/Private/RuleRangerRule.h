@@ -20,6 +20,7 @@
 class URuleRangerActionContext;
 class URuleRangerAction;
 class URuleRangerMatcher;
+class FObjectPreSaveContext;
 
 /**
  * The object that binds one or more matchers with one or more actions.
@@ -104,4 +105,7 @@ public:
      * @return true if the rule matches, false otherwise.
      */
     bool Match(URuleRangerActionContext* ActionContext, UObject* Object) const;
+
+    // Clean up invalid entries before saving
+    virtual void PreSave(FObjectPreSaveContext SaveContext) override;
 };

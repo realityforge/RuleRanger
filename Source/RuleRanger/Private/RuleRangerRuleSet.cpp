@@ -66,5 +66,9 @@ void URuleRangerRuleSet::PreSave(const FObjectPreSaveContext SaveContext)
     // Keep DataTables ordered and clean of nulls
     RemoveNullsAndSortByName(DataTables);
 
+    // Clean invalid references but preserve execution order
+    RuleSets.RemoveAll([](const TObjectPtr<URuleRangerRuleSet>& Value) { return Value == nullptr; });
+    Rules.RemoveAll([](const TObjectPtr<URuleRangerRule>& Value) { return Value == nullptr; });
+
     Super::PreSave(SaveContext);
 }

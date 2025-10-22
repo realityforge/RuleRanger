@@ -18,6 +18,7 @@
 #include "RuleRangerActionContext.h"
 #include "RuleRangerLogging.h"
 #include "RuleRangerMatcher.h"
+#include "UObject/ObjectSaveContext.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerRule)
 
@@ -135,4 +136,13 @@ bool URuleRangerRule::Match(URuleRangerActionContext* ActionContext, UObject* Ob
         MatcherIndex++;
     }
     return true;
+}
+
+void URuleRangerRule::PreSave(const FObjectPreSaveContext SaveContext)
+{
+    // Remove invalid entries but preserve author-specified order
+    Matchers.RemoveAll([](const TObjectPtr<URuleRangerMatcher>& Value) { return Value == nullptr; });
+    Actions.RemoveAll([](const TObjectPtr<URuleRangerAction>& Value) { return Value == nullptr; });
+
+    Super::PreSave(SaveContext);
 }

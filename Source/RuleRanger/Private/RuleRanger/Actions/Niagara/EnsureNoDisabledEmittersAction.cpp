@@ -25,12 +25,14 @@ void UEnsureNoDisabledEmittersAction::Apply(URuleRangerActionContext* ActionCont
         if (!Handle.GetIsEnabled())
         {
             ActionContext->Error(
-                FText::FromString(FString::Printf(TEXT("NiagaraSystem has a disabled emitter named %s. "
-                                                       "Disabled emitters are loaded at runtime and should "
-                                                       "be removed unless they are dynamically enabled at "
-                                                       "runtime. Either remove the disabled emitter or exclude "
-                                                       "this NiagaraSystem from the RuleRanger rule."),
-                                                  *Handle.GetName().ToString())));
+                FText::Format(NSLOCTEXT("RuleRanger",
+                                        "NiagaraDisabledEmitter",
+                                        "NiagaraSystem has a disabled emitter named {0}. "
+                                        "Disabled emitters are loaded at runtime and should "
+                                        "be removed unless they are dynamically enabled at runtime. "
+                                        "Either remove the disabled emitter or exclude this NiagaraSystem "
+                                        "from the RuleRanger rule."),
+                              FText::FromName(Handle.GetName())));
         }
     }
 }

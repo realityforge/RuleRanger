@@ -22,10 +22,11 @@ void UEnsureMaterialParametersHaveDescriptionsAction::AnalyzeParameter(URuleRang
 {
     if (Metadata.Description.TrimStartAndEnd().IsEmpty())
     {
-        ActionContext->Error(
-            FText::FromString(FString::Printf(TEXT("Material contains a parameter named '%s' that is expected "
-                                                   "to have a description but does not."),
-                                              *Info.Name.ToString())));
+        ActionContext->Error(FText::Format(NSLOCTEXT("RuleRanger",
+                                                     "MaterialParamMissingDescription",
+                                                     "Material contains a parameter named '{0}' that is "
+                                                     "expected to have a description but does not."),
+                                           FText::FromName(Info.Name)));
     }
     else
     {

@@ -22,10 +22,11 @@ void UEnsureMaterialParametersHaveGroupsAction::AnalyzeParameter(URuleRangerActi
 {
     if (Metadata.Group == EName::None)
     {
-        ActionContext->Error(
-            FText::FromString(FString::Printf(TEXT("Material contains a parameter named '%s' that is expected "
-                                                   "to have a group but does not."),
-                                              *Info.Name.ToString())));
+        ActionContext->Error(FText::Format(NSLOCTEXT("RuleRanger",
+                                                     "MaterialParamMissingGroup",
+                                                     "Material contains a parameter named '{0}' that "
+                                                     "is expected to have a group but does not."),
+                                           FText::FromName(Info.Name)));
     }
     else
     {

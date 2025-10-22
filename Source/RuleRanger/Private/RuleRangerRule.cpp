@@ -31,10 +31,11 @@ void URuleRangerRule::Apply(URuleRangerActionContext* ActionContext, UObject* Ob
         {
             if (!IsValid(Action))
             {
-                ActionContext->Error(FText::FromString(FString::Printf(TEXT("Invalid Action detected at "
-                                                                            "index %d in rule '%s'"),
-                                                                       ActionIndex,
-                                                                       *GetName())));
+                ActionContext->Error(FText::Format(NSLOCTEXT("RuleRanger",
+                                                             "InvalidActionAtIndex",
+                                                             "Invalid Action detected at index {0} in rule '{1}'"),
+                                                   FText::AsNumber(ActionIndex),
+                                                   FText::FromString(GetName())));
             }
             else
             {
@@ -113,7 +114,8 @@ bool URuleRangerRule::Match(URuleRangerActionContext* ActionContext, UObject* Ob
         if (!IsValid(Matcher))
         {
             ActionContext->Error(
-                FText::FromString(FString::Printf(TEXT("Invalid Matcher detected at index %d"), MatcherIndex)));
+                FText::Format(NSLOCTEXT("RuleRanger", "InvalidMatcherAtIndex", "Invalid Matcher detected at index {0}"),
+                              FText::AsNumber(MatcherIndex)));
             return false;
         }
         else if (!Matcher->Test(Object))

@@ -118,20 +118,24 @@ void UEnsureBlueprintContainsNoUnlinkedNodesAction::Apply(URuleRangerActionConte
 
                     if (Node->IsAutomaticallyPlacedGhostNode())
                     {
-                        ActionContext->Error(FText::FromString(FString::Printf(
-                            TEXT("Blueprint has a default event node named "
-                                 "'%s' in '%s' with no outgoing links and bErrorOnLooseDefaultEvents=true. "
-                                 "Remove event node or change bErrorOnLooseDefaultEvents to false."),
-                            *NodeTitle,
-                            *GraphName)));
+                        ActionContext->Error(
+                            FText::Format(NSLOCTEXT("RuleRanger",
+                                                    "BlueprintLooseDefaultEvent",
+                                                    "Blueprint has a default event node named '{0}' in '{1}' "
+                                                    "with no outgoing links and bErrorOnLooseDefaultEvents=true. "
+                                                    "Remove event node or change bErrorOnLooseDefaultEvents to false."),
+                                          FText::FromString(NodeTitle),
+                                          FText::FromString(GraphName)));
                     }
                     else if (bHasInputExecNotLinked && 0 == InputExecLinkCount)
                     {
-                        ActionContext->Error(FText::FromString(
-                            FString::Printf(TEXT("Blueprint has a node named '%s' in '%s' missing an exec input pin. "
-                                                 "Remove node or connect pin."),
-                                            *NodeTitle,
-                                            *GraphName)));
+                        ActionContext->Error(
+                            FText::Format(NSLOCTEXT("RuleRanger",
+                                                    "BlueprintMissingExecInput",
+                                                    "Blueprint has a node named '{0}' in '{1}' "
+                                                    "missing an exec input pin. Remove node or connect pin."),
+                                          FText::FromString(NodeTitle),
+                                          FText::FromString(GraphName)));
                     }
                 }
             }

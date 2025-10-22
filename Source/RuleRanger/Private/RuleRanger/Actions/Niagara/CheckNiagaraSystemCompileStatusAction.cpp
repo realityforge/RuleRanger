@@ -39,10 +39,12 @@ bool UCheckNiagaraSystemCompileStatusAction::ValidateScript(URuleRangerActionCon
             break;
 
         case ENiagaraScriptCompileStatus::NCS_Dirty:
-            ActionContext->Error(FText::FromString(FString::Printf(TEXT("NiagaraSystem status is dirty for "
-                                                                        "script %s in %s and needs to be recompiled"),
-                                                                   *Name,
-                                                                   *ContainerContext)));
+            ActionContext->Error(FText::Format(
+                NSLOCTEXT("RuleRanger",
+                          "NiagaraSystemDirty",
+                          "NiagaraSystem status is dirty for script {0} in {1} and needs to be recompiled"),
+                FText::FromString(Name),
+                FText::FromString(ContainerContext)));
             return false;
 
         case ENiagaraScriptCompileStatus::NCS_UpToDate:
@@ -53,24 +55,25 @@ bool UCheckNiagaraSystemCompileStatusAction::ValidateScript(URuleRangerActionCon
                                     *ContainerContext));
             break;
         case ENiagaraScriptCompileStatus::NCS_Error:
-            ActionContext->Error(
-                FText::FromString(FString::Printf(TEXT("NiagaraSystem has an error status for "
-                                                       "script %s in %s. Fix errors and recompile NiagaraSystem."),
-                                                  *Name,
-                                                  *ContainerContext)));
+            ActionContext->Error(FText::Format(NSLOCTEXT("RuleRanger",
+                                                         "NiagaraSystemError",
+                                                         "NiagaraSystem has an error status for script {0} in {1}. "
+                                                         "Fix errors and recompile NiagaraSystem."),
+                                               FText::FromString(Name),
+                                               FText::FromString(ContainerContext)));
             return false;
 
         case ENiagaraScriptCompileStatus::NCS_UpToDateWithWarnings:
         case ENiagaraScriptCompileStatus::NCS_ComputeUpToDateWithWarnings:
             if (bErrorOnUpToDateWithWarnings)
             {
-                ActionContext->Error(
-                    FText::FromString(FString::Printf(TEXT("NiagaraSystem is UpToDate but has "
-                                                           "warnings for script %s in %s. Fix warnings and "
-                                                           "recompile NiagaraSystem or set "
-                                                           "bErrorOnUpToDateWithWarnings=false"),
-                                                      *Name,
-                                                      *ContainerContext)));
+                ActionContext->Error(FText::Format(
+                    NSLOCTEXT("RuleRanger",
+                              "NiagaraSystemWarnings",
+                              "NiagaraSystem is UpToDate but has warnings for script {0} in {1}. "
+                              "Fix warnings and recompile NiagaraSystem or set bErrorOnUpToDateWithWarnings=false"),
+                    FText::FromString(Name),
+                    FText::FromString(ContainerContext)));
                 return false;
             }
             else
@@ -89,10 +92,12 @@ bool UCheckNiagaraSystemCompileStatusAction::ValidateScript(URuleRangerActionCon
             if (bErrorOnUnknown)
             {
                 ActionContext->Error(
-                    FText::FromString(FString::Printf(TEXT("NiagaraSystem has an Unknown status for script %s in %s. "
-                                                           "Recompile NiagaraSystem or set bErrorOnUnknown to true"),
-                                                      *Name,
-                                                      *ContainerContext)));
+                    FText::Format(NSLOCTEXT("RuleRanger",
+                                            "NiagaraSystemUnknown",
+                                            "NiagaraSystem has an Unknown status for script {0} in {1}. "
+                                            "Recompile NiagaraSystem or set bErrorOnUnknown to true"),
+                                  FText::FromString(Name),
+                                  FText::FromString(ContainerContext)));
                 return false;
             }
             else

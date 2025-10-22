@@ -179,7 +179,7 @@ void URuleRangerEditorSubsystem::MarkRuleSetConfigCacheDirty()
     {
         CachedRuleSetConfigs.Reset();
         bRuleSetConfigCacheDirty = true;
-        UE_LOGFMT(LogRuleRanger, Log, "Clearing the RuleSetConfig cache");
+        UE_LOGFMT(LogRuleRanger, Verbose, "Clearing the RuleSetConfig cache");
     }
 }
 

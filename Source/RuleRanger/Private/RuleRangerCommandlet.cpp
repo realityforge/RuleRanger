@@ -16,6 +16,7 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Dom/JsonObject.h"
 #include "Editor.h"
+#include "Logging/StructuredLog.h"
 #include "Misc/FileHelper.h"
 #include "RuleRanger/RuleRangerEditorSubsystem.h"
 #include "RuleRangerActionContext.h"
@@ -145,7 +146,7 @@ int32 URuleRangerCommandlet::Main(const FString& Params)
 
             if (!bQuiet)
             {
-                UE_LOG(LogRuleRanger, Display, TEXT("RuleRanger report written to %s"), *ReportPath);
+                UE_LOGFMT(LogRuleRanger, Display, "RuleRanger report written to {Path}", ReportPath);
             }
         }
 
@@ -155,7 +156,7 @@ int32 URuleRangerCommandlet::Main(const FString& Params)
     }
     else
     {
-        UE_LOG(LogRuleRanger, Error, TEXT("RuleRangerCommandlet: Unable to get URuleRangerEditorSubsystem"));
+        UE_LOGFMT(LogRuleRanger, Error, "RuleRangerCommandlet: Unable to get URuleRangerEditorSubsystem");
         return 1;
     }
 }

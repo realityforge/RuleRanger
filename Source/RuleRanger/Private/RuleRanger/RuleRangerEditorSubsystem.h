@@ -25,6 +25,7 @@
 struct FRuleRangerRuleExclusion;
 class URuleRangerRule;
 class URuleRangerActionContext;
+class URuleRangerEditorValidator;
 class URuleRangerConfig;
 class URuleRangerContentBrowserExtensions;
 
@@ -42,6 +43,7 @@ class URuleRangerEditorSubsystem final : public UEditorSubsystem
     GENERATED_BODY()
 
     friend URuleRangerContentBrowserExtensions;
+    friend URuleRangerEditorValidator;
 
 public:
     /** Implement this for initialization of instances of the system */
@@ -76,7 +78,16 @@ private:
     UPROPERTY(Transient)
     URuleRangerActionContext* ActionContext{ nullptr };
 
+    // Cached results of Rule->Match(Object) calculated during CanValidate stage
+    UPROPERTY(Transient)
+    TWeakObjectPtr<UObject> ValidationMatchCacheObject{ nullptr };
+    TMap<TWeakObjectPtr<URuleRangerRule>, bool> ValidationMatchCache;
+
     FDelegateHandle OnAssetPostImportDelegateHandle;
+
+    void ClearValidationMatchCache();
+
+    void ResetValidationMatchCache(UObject* InObject);
 
     void ProcessRule(UObject* Object, const FRuleRangerRuleFn& ProcessRuleFunction);
 

@@ -82,10 +82,34 @@ void URuleRangerEditorSubsystem::ValidateObject(UObject* InObject,
 bool URuleRangerEditorSubsystem::CanValidateObject(UObject* InObject, bool bIsSave)
 {
     bool Result = false;
+    // Begin caching matches for this object across CanValidate and Validate
+    ResetValidationMatchCache(InObject);
     ProcessRule(InObject, [this, &Result, bIsSave](auto, auto, auto Rule, auto InnerObject) {
-        if (CanValidateObject(Rule, InnerObject, bIsSave) && Rule->Match(ActionContext, InnerObject))
+        if (CanValidateObject(Rule, InnerObject, bIsSave))
         {
-            Result = true;
+            bool bMatches;
+            if (ValidationMatchCacheObject == InnerObject)
+            {
+                const TWeakObjectPtr Key(Rule);
+                if (const auto Cached = ValidationMatchCache.Find(Key))
+                {
+                    bMatches = *Cached;
+                }
+                else
+                {
+                    bMatches = Rule->Match(ActionContext, InnerObject);
+                    ValidationMatchCache.Add(Key, bMatches);
+                }
+            }
+            else
+            {
+                bMatches = Rule->Match(ActionContext, InnerObject);
+            }
+
+            if (bMatches)
+            {
+                Result = true;
+            }
         }
         return true;
     });
@@ -410,6 +434,25 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetValidateRule(URuleRangerConfig* c
 {
     if ((!bIsSave && Rule->bApplyOnValidate) || (bIsSave && Rule->bApplyOnSave))
     {
+        // If we previously determined during CanValidate that this rule does not match this object,
+        // skip invoking Apply/Match a second time.
+        if (ValidationMatchCacheObject == InObject)
+        {
+            const TWeakObjectPtr Key(Rule);
+            if (const auto Cached = ValidationMatchCache.Find(Key))
+            {
+                if (!*Cached)
+                {
+                    UE_LOGFMT(LogRuleRanger,
+                              VeryVerbose,
+                              "OnAssetValidate({Object}) skipped rule {Rule} due to cached non-match.",
+                              InObject->GetName(),
+                              Rule->GetName());
+
+                    return true;
+                }
+            }
+        }
         UE_LOGFMT(LogRuleRanger,
                   VeryVerbose,
                   "OnAssetValidate({Object}) detected applicable rule {Rule}.",
@@ -459,6 +502,18 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetValidateRule(URuleRangerConfig* c
     {
         return true;
     }
+}
+
+void URuleRangerEditorSubsystem::ResetValidationMatchCache(UObject* InObject)
+{
+    ValidationMatchCacheObject = InObject;
+    ValidationMatchCache.Reset();
+}
+
+void URuleRangerEditorSubsystem::ClearValidationMatchCache()
+{
+    ValidationMatchCacheObject.Reset();
+    ValidationMatchCache.Reset();
 }
 
 bool URuleRangerEditorSubsystem::ProcessOnAssetPostImportRule(URuleRangerConfig* const Config,

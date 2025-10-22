@@ -17,16 +17,16 @@
 
 bool FRuleRangerRuleExclusion::ExclusionMatches(const UObject& Object, const FString& Path) const
 {
-    for (auto ObjectIt = Objects.CreateConstIterator(); ObjectIt; ++ObjectIt)
+    for (const auto& ObjPtr : Objects)
     {
-        if (ObjectIt->Get() == &Object)
+        if (ObjPtr.Get() == &Object)
         {
             return true;
         }
     }
-    for (auto DirIt = Dirs.CreateConstIterator(); DirIt; ++DirIt)
+    for (const auto& Dir : Dirs)
     {
-        const auto& DirPath = DirIt->Path;
+        const auto& DirPath = Dir.Path;
         if (!DirPath.IsEmpty())
         {
             auto Prefix = DirPath;

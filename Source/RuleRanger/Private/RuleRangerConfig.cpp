@@ -21,9 +21,9 @@
 
 bool URuleRangerConfig::ConfigMatches(const FString& Path) const
 {
-    for (auto Dir = Dirs.CreateConstIterator(); Dir; ++Dir)
+    for (const auto& Dir : Dirs)
     {
-        const auto& DirPath = Dir->Path;
+        const auto& DirPath = Dir.Path;
         if (!DirPath.IsEmpty())
         {
             auto Prefix = DirPath;

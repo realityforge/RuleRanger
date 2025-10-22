@@ -30,9 +30,9 @@ void UMaterialParametersActionBase::AnalyzeParameters(
 {
     if (ShouldAnalyzeParameters(ActionContext, Material, Parameters))
     {
-        for (auto ParameterIt = Parameters.CreateConstIterator(); ParameterIt; ++ParameterIt)
+        for (const auto& Pair : Parameters)
         {
-            AnalyzeParameter(ActionContext, Material, ParameterIt->Key, ParameterIt->Value);
+            AnalyzeParameter(ActionContext, Material, Pair.Key, Pair.Value);
         }
     }
 }

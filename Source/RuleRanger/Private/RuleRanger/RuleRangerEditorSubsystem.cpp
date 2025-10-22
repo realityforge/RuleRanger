@@ -259,9 +259,9 @@ bool URuleRangerEditorSubsystem::ProcessRuleSetForObject(URuleRangerConfig* cons
             }
         }
 
-        for (auto RuleSetIt = RuleSet->RuleSets.CreateIterator(); RuleSetIt; ++RuleSetIt)
+        for (const auto& NestedRuleSetPtr : RuleSet->RuleSets)
         {
-            if (const auto NestedRuleSet = RuleSetIt->Get())
+            if (const auto NestedRuleSet = NestedRuleSetPtr.Get())
             {
                 UE_LOGFMT(LogRuleRanger,
                           VeryVerbose,
@@ -380,9 +380,9 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
                         }
                     }
 
-                    for (auto RuleSetIt = Config->RuleSets.CreateIterator(); RuleSetIt; ++RuleSetIt)
+                    for (const auto& RuleSetPtr : Config->RuleSets)
                     {
-                        if (const auto RuleSet = RuleSetIt->Get())
+                        if (const auto RuleSet = RuleSetPtr.Get())
                         {
                             if (!ProcessRuleSetForObject(Config,
                                                          RuleSet,

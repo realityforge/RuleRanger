@@ -81,9 +81,8 @@ void UEnsureRequiredPropertiesPresentAction::DeriveRequiredComponentProperties(
         {
             TArray<FString> Rules;
             Value->ParseIntoArray(Rules, TEXT(","));
-            for (auto RuleIt = Rules.CreateConstIterator(); RuleIt; ++RuleIt)
+            for (const auto& Rule : Rules)
             {
-                const auto Rule = *RuleIt;
                 FString ComponentName;
                 FString PropertyName;
                 if (Rule.Split(TEXT("."), &ComponentName, &PropertyName))
@@ -113,9 +112,8 @@ void UEnsureRequiredPropertiesPresentAction::PerformChecksForComponentProperties
     const UObject* Component,
     const TArray<FString>& PropertyNames)
 {
-    for (auto PropertyNameIt = PropertyNames.CreateConstIterator(); PropertyNameIt; ++PropertyNameIt)
+    for (const auto& PropertyName : PropertyNames)
     {
-        const auto PropertyName = *PropertyNameIt;
         if (const FProperty* Property = Component->GetClass()->FindPropertyByName(FName(PropertyName)))
         {
             if (const auto ObjectProperty = CastField<FObjectPropertyBase>(Property))
@@ -186,10 +184,10 @@ void UEnsureRequiredPropertiesPresentAction::PerformChecksForComponentProperties
     const TMap<FString, TArray<FString>>& RequiredComponentProperties)
 {
     const UClass* Class = Object->GetClass();
-    for (auto EntryIt = RequiredComponentProperties.CreateConstIterator(); EntryIt; ++EntryIt)
+    for (const auto& Entry : RequiredComponentProperties)
     {
-        const auto ComponentName = EntryIt->Key;
-        const auto PropertyNames = EntryIt->Value;
+        const auto& ComponentName = Entry.Key;
+        const auto& PropertyNames = Entry.Value;
         if (const FProperty* Property = Class->FindPropertyByName(FName(ComponentName)))
         {
             if (const auto ComponentProperty = CastField<FObjectPropertyBase>(Property))

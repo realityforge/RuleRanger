@@ -81,6 +81,20 @@ bool FRuleRangerUtilities::IsA(const UObject* Object, const UClass* Class)
     }
 }
 
+bool FRuleRangerUtilities::IsAbstract(const UObject* Object)
+{
+    check(Object);
+    const auto Blueprint = Cast<UBlueprint>(Object);
+    return Blueprint && (Blueprint->bGenerateAbstractClass || IsAbstract(Blueprint->GeneratedClass))
+        || IsAbstract(Object->GetClass());
+}
+
+bool FRuleRangerUtilities::IsAbstract(const UClass* const Class)
+{
+    check(Class);
+    return Class->HasAnyClassFlags(CLASS_Abstract);
+}
+
 void FRuleRangerUtilities::CollectInstanceHierarchy(UObject* Object, TArray<UObject*>& Instances)
 {
     Instances.Add(Object);

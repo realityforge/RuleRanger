@@ -41,6 +41,24 @@ public:
     RULERANGER_API static bool IsA(const UObject* Object, const UClass* Class);
 
     /**
+     * Determines whether the specified UObject is an abstract type.
+     * This includes checks for both Blueprint-generated and native C++ classes.
+     *
+     * @param Object The UObject to check.
+     * @return true if the specified UObject is abstract, either as a Blueprint-generated type
+     *         or a native C++ class; false otherwise.
+     */
+    RULERANGER_API static bool IsAbstract(const UObject* Object);
+
+    /**
+     * Checks if the given UClass is abstract.
+     *
+     * @param Class The UClass to check.
+     * @return true if the class is abstract, false otherwise.
+     */
+    RULERANGER_API static bool IsAbstract(const UClass* Class);
+
+    /**
      * Collect the "parent" instances of an object into an objects array, starting with the passed in class and moving
      * to parent objects at the end of the list. This is to support the scenario where a MaterialInstance may have a
      * chain of parent Material instances before being parented by a Material.

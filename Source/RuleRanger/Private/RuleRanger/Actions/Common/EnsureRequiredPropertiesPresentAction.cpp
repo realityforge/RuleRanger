@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 #include "EnsureRequiredPropertiesPresentAction.h"
+#include "RuleRanger/RuleRangerUtilities.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureRequiredPropertiesPresentAction)
 
@@ -268,7 +269,7 @@ void UEnsureRequiredPropertiesPresentAction::Apply(URuleRangerActionContext* Act
         Class = Object->GetClass();
     }
 
-    if (Class->HasAnyClassFlags(CLASS_Abstract) && bSkipCheckOnAbstractTypes)
+    if (bSkipCheckOnAbstractTypes && FRuleRangerUtilities::IsAbstract(Object))
     {
         return;
     }

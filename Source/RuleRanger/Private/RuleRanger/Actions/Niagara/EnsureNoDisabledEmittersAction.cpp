@@ -29,7 +29,7 @@ void UEnsureNoDisabledEmittersAction::Apply(URuleRangerActionContext* ActionCont
                                                        "Disabled emitters are loaded at runtime and should "
                                                        "be removed unless they are dynamically enabled at "
                                                        "runtime. Either remove the disabled emitter or exclude "
-                                                       "this NiagaraSystem from the RulrRanger rule."),
+                                                       "this NiagaraSystem from the RuleRanger rule."),
                                                   *Handle.GetName().ToString())));
         }
     }

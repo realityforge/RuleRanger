@@ -65,15 +65,49 @@ void FRuleRangerUtilities::CollectTypeHierarchy(const UObject* Object, TArray<UC
 
 bool FRuleRangerUtilities::IsA(const UObject* Object, const UClass* Class)
 {
-    // Direct inheritance path
-    if (Object->IsA(Class))
+    if (!Object || !Class)
     {
+        return false;
+    }
+    else if (Object->IsA(Class))
+    {
+        // Native/classic inheritance path
         return true;
     }
-    else if (const UBlueprint* Blueprint = Cast<UBlueprint>(Object))
+    else if (const auto Blueprint = Cast<UBlueprint>(Object))
     {
-        // Alternate Blueprint hierarchy via ParentClass
-        return Blueprint->ParentClass && Blueprint->ParentClass->IsChildOf(Class);
+        // Blueprint assets: support both class inheritance and interfaces via GeneratedClass/ParentClass
+        const auto GeneratedClass = Blueprint->GeneratedClass;
+        const auto ParentClass = Blueprint->ParentClass;
+
+        // Interface support
+        if (Class->HasAnyClassFlags(CLASS_Interface))
+        {
+            if (GeneratedClass && GeneratedClass->ImplementsInterface(Class))
+            {
+                return true;
+            }
+            else if (ParentClass && ParentClass->ImplementsInterface(Class))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else if (GeneratedClass && GeneratedClass->IsChildOf(Class))
+        {
+            return true;
+        }
+        else if (ParentClass && ParentClass->IsChildOf(Class))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     else
     {

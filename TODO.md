@@ -31,7 +31,9 @@ If a rule has a single action and no description. Add the description from the A
 
 * Name `GameplayCues` assets with a name based on the tag with optional prefix. i.e. GCN_GameplayCue.Fire.Burst`. See `UAbilitySystemGlobals::DeriveGameplayCueTagFromAssetName` to understand the motivation for this naming convention.
 * Retargeters should be named as RTG_\[Source\]_To_\[Target\]
-* Add the ability to add other validators that are invoked on Scan (i.e. no directories without assets)
+* Add the ability to add other validators that are invoked on Scan. These can run checks on anything in the project. i.e.
+  - no directories without assets
+  - Ensure configuration in .ini files matches expected shape (i.e. See `FAeonTagCategoryValidator`)
 * Add tool to record licenses for assets in MetaData
     * A DataTable that indicates the source (Marketplace project name? Some other project tag), description and license
     * Add metadata to assets to link to this table

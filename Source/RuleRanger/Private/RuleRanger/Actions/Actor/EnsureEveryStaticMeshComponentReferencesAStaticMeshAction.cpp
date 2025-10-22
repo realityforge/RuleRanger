@@ -12,24 +12,28 @@
  * limitations under the License.
  */
 #include "EnsureEveryStaticMeshComponentReferencesAStaticMeshAction.h"
+#include "RuleRanger/RuleRangerUtilities.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureEveryStaticMeshComponentReferencesAStaticMeshAction)
 
 void UEnsureEveryStaticMeshComponentReferencesAStaticMeshAction::Apply(URuleRangerActionContext* ActionContext,
                                                                        UObject* Object)
 {
-    // ReSharper disable once CppTooWideScopeInitStatement
-    const auto Actor = CastChecked<AActor>(Object);
-    TArray<UStaticMeshComponent*> Components;
-    Actor->GetComponents<UStaticMeshComponent>(Components);
-    for (const auto Component : Components)
+    if (!FRuleRangerUtilities::IsAbstract(Object))
     {
-        if (!Component->GetStaticMesh())
+        // ReSharper disable once CppTooWideScopeInitStatement
+        const auto Actor = FRuleRangerUtilities::ToObject<AActor>(Object, GetExpectedType());
+        TArray<UStaticMeshComponent*> Components;
+        Actor->GetComponents<UStaticMeshComponent>(Components);
+        for (const auto Component : Components)
         {
-            const auto OutMessage =
-                FString::Printf(TEXT("StaticMeshComponent named '%s' does not reference a valid StaticMesh"),
-                                *Component->GetName());
-            ActionContext->Error(FText::FromString(OutMessage));
+            if (!Component->GetStaticMesh())
+            {
+                const auto OutMessage =
+                    FString::Printf(TEXT("StaticMeshComponent named '%s' does not reference a valid StaticMesh"),
+                                    *Component->GetName());
+                ActionContext->Error(FText::FromString(OutMessage));
+            }
         }
     }
 }

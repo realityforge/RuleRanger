@@ -27,12 +27,7 @@ bool URuleRangerConfig::ConfigMatches(const FString& Path) const
         const auto& DirPath = Dir.Path;
         if (!DirPath.IsEmpty())
         {
-            auto Prefix = DirPath;
-            if (!Prefix.EndsWith(TEXT("/")))
-            {
-                Prefix.Append(TEXT("/"));
-            }
-            if (Path.StartsWith(Prefix, ESearchCase::CaseSensitive) || Path.Equals(DirPath, ESearchCase::CaseSensitive))
+            if (Path.StartsWith(DirPath, ESearchCase::CaseSensitive))
             {
                 return true;
             }
@@ -110,6 +105,15 @@ void URuleRangerConfig::PreSave(FObjectPreSaveContext SaveContext)
     // Sort config-level directories
     SortDirsByPath(Dirs);
 
+    // Ensure config-level directory paths end with '/'
+    for (auto& Dir : Dirs)
+    {
+        if (!Dir.Path.IsEmpty() && !Dir.Path.EndsWith(TEXT("/")))
+        {
+            Dir.Path.Append(TEXT("/"));
+        }
+    }
+
     // Clean and sort data tables
     RemoveNullsAndSortByName(DataTables);
 
@@ -120,6 +124,15 @@ void URuleRangerConfig::PreSave(FObjectPreSaveContext SaveContext)
         RemoveNullsAndSortByName<URuleRangerRule>(Exclusion.Rules);
         RemoveNullsAndSortByName<UObject>(Exclusion.Objects);
         SortDirsByPath(Exclusion.Dirs);
+
+        // Ensure exclusion directory paths end with '/'
+        for (auto& Dir : Exclusion.Dirs)
+        {
+            if (!Dir.Path.IsEmpty() && !Dir.Path.EndsWith(TEXT("/")))
+            {
+                Dir.Path.Append(TEXT("/"));
+            }
+        }
     }
 
     Super::PreSave(SaveContext);

@@ -22,14 +22,24 @@ UEnsureSoundWaveSampleRateValidAction::UEnsureSoundWaveSampleRateValidAction()
 
 void UEnsureSoundWaveSampleRateValidAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
-    const USoundWave* SoundWave = CastChecked<USoundWave>(Object);
+    const auto SoundWave = CastChecked<USoundWave>(Object);
 
     // ReSharper disable once CppTooWideScopeInitStatement
-    const float SampleRate = SoundWave->GetSampleRateForCurrentPlatform();
-    if (!ValidSampleRates.Contains(static_cast<int32>(SampleRate)))
+    const auto SampleRate = SoundWave->GetSampleRateForCurrentPlatform();
+    // Allow small float deviations around expected integer sample rates
+    auto bIsValidRate{ false };
+    for (const auto ValidRate : ValidSampleRates)
+    {
+        if (FMath::IsNearlyEqual(SampleRate, static_cast<float>(ValidRate), 0.5f))
+        {
+            bIsValidRate = true;
+            break;
+        }
+    }
+    if (!bIsValidRate)
     {
         FString ValidValues{ "" };
-        for (const int32 ValidSampleRate : ValidSampleRates)
+        for (const auto ValidSampleRate : ValidSampleRates)
         {
             if (0 != ValidValues.Len())
             {

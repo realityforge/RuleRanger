@@ -13,6 +13,7 @@
  */
 #include "RuleRangerConfig.h"
 #include "RuleRanger/RuleRangerSortUtils.h"
+#include "RuleRangerRule.h"
 #include "RuleRangerRuleExclusion.h"
 #include "RuleRangerRuleSet.h"
 #include "UObject/ObjectSaveContext.h"
@@ -115,9 +116,9 @@ void URuleRangerConfig::PreSave(FObjectPreSaveContext SaveContext)
     // Clean and sort exclusions' arrays
     for (auto& Exclusion : Exclusions)
     {
-        RemoveNullsAndSortByName(Exclusion.RuleSets);
-        RemoveNullsAndSortByName(Exclusion.Rules);
-        RemoveNullsAndSortByName(Exclusion.Objects);
+        RemoveNullsAndSortByName<URuleRangerRuleSet>(Exclusion.RuleSets);
+        RemoveNullsAndSortByName<URuleRangerRule>(Exclusion.Rules);
+        RemoveNullsAndSortByName<UObject>(Exclusion.Objects);
         SortDirsByPath(Exclusion.Dirs);
     }
 

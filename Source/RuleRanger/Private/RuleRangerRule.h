@@ -108,4 +108,8 @@ public:
 
     // Clean up invalid entries before saving
     virtual void PreSave(FObjectPreSaveContext SaveContext) override;
+
+#if WITH_EDITOR
+    virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
+#endif
 };

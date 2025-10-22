@@ -19,6 +19,9 @@
 #include "RuleRangerLogging.h"
 #include "RuleRangerMatcher.h"
 #include "UObject/ObjectSaveContext.h"
+#if WITH_EDITOR
+    #include "Misc/DataValidation.h"
+#endif
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerRule)
 
@@ -141,3 +144,30 @@ void URuleRangerRule::PreSave(const FObjectPreSaveContext SaveContext)
 
     Super::PreSave(SaveContext);
 }
+
+#if WITH_EDITOR
+EDataValidationResult URuleRangerRule::IsDataValid(FDataValidationContext& Context) const
+{
+    auto Result = CombineDataValidationResults(Super::IsDataValid(Context), EDataValidationResult::Valid);
+
+    // Count valid actions only
+    int32 ValidActionCount{ 0 };
+    for (const auto& Action : Actions)
+    {
+        if (IsValid(Action))
+        {
+            ++ValidActionCount;
+        }
+    }
+
+    if (0 == ValidActionCount)
+    {
+        Context.AddError(NSLOCTEXT("RuleRanger",
+                                   "RuleHasNoActions",
+                                   "RuleRangerRule has no actions. Please add at least one action to the rule."));
+        Result = EDataValidationResult::Invalid;
+    }
+
+    return Result;
+}
+#endif

@@ -32,12 +32,14 @@ void UEnsureRequiredPropertiesPresentAction::PerformChecksOnObject(URuleRangerAc
                 {
                     if (!ObjectProperty->LoadObjectPropertyValue_InContainer(Object))
                     {
-                        const auto& ErrorMessage = FString::Printf(
-                            TEXT("Object contains property named '%s' that is not set but the property is "
-                                 "annotated with the %s meta property which indicates it MUST be set."),
-                            *Property->GetDisplayNameText().ToString(),
-                            *RequiredPropertyName.ToString());
-                        ActionContext->Error(FText::FromString(ErrorMessage));
+                        ActionContext->Error(
+                            FText::Format(NSLOCTEXT("RuleRanger",
+                                                    "ReqPropMissingSingle",
+                                                    "Object contains property named '{0}' that is not set but "
+                                                    "the property is annotated with the {1} meta property "
+                                                    "which indicates it MUST be set."),
+                                          Property->GetDisplayNameText(),
+                                          FText::FromName(RequiredPropertyName)));
                     }
                 }
                 else
@@ -46,14 +48,16 @@ void UEnsureRequiredPropertiesPresentAction::PerformChecksOnObject(URuleRangerAc
                     {
                         if (!ObjectProperty->LoadObjectPropertyValue_InContainer(Object, i))
                         {
-                            const auto& ErrorMessage = FString::Printf(
-                                TEXT("Object contains property named '%s' that has index %d that is not set "
-                                     "but the property is annotated with the %s meta property which indicates "
-                                     "it MUST be set."),
-                                *Property->GetDisplayNameText().ToString(),
-                                i,
-                                *RequiredPropertyName.ToString());
-                            ActionContext->Error(FText::FromString(ErrorMessage));
+                            ActionContext->Error(
+                                FText::Format(NSLOCTEXT("RuleRanger",
+                                                        "ReqPropMissingArray",
+                                                        "Object contains property named '{0}' that has "
+                                                        "index {1} that is not set but the property is "
+                                                        "annotated with the {2} meta property which indicates "
+                                                        "it MUST be set."),
+                                              Property->GetDisplayNameText(),
+                                              FText::AsNumber(i),
+                                              FText::FromName(RequiredPropertyName)));
                         }
                     }
                 }
@@ -122,14 +126,15 @@ void UEnsureRequiredPropertiesPresentAction::PerformChecksForComponentProperties
                 {
                     if (!ObjectProperty->LoadObjectPropertyValue_InContainer(Component))
                     {
-                        const auto& ErrorMessage =
-                            FString::Printf(TEXT("The %s class (or a parent class) declared that the "
-                                                 "property %s must be present on the sub-object named %s "
-                                                 "and the property is present but value is not set."),
-                                            *Class->GetAuthoredName(),
-                                            *PropertyName,
-                                            *ComponentName);
-                        ActionContext->Error(FText::FromString(ErrorMessage));
+                        ActionContext->Error(
+                            FText::Format(NSLOCTEXT("RuleRanger",
+                                                    "ReqCompPropUnset",
+                                                    "The {0} class (or a parent class) declared that the property {1} "
+                                                    "must be present on the sub-object named {2} and the property "
+                                                    "is present but value is not set."),
+                                          FText::FromString(Class->GetAuthoredName()),
+                                          FText::FromString(PropertyName),
+                                          FText::FromString(ComponentName)));
                     }
                 }
                 else
@@ -138,42 +143,45 @@ void UEnsureRequiredPropertiesPresentAction::PerformChecksForComponentProperties
                     {
                         if (!ObjectProperty->LoadObjectPropertyValue_InContainer(Component, i))
                         {
-                            const auto& ErrorMessage =
-                                FString::Printf(TEXT("The %s class (or a parent class) declared that the "
-                                                     "property %s must be present on the sub-object named %s "
-                                                     "and the property is present but value is not set at index %d."),
-                                                *Class->GetAuthoredName(),
-                                                *PropertyName,
-                                                *ComponentName,
-                                                i);
-                            ActionContext->Error(FText::FromString(ErrorMessage));
+                            ActionContext->Error(FText::Format(
+                                NSLOCTEXT("RuleRanger",
+                                          "ReqCompPropUnsetIndexed",
+                                          "The {0} class (or a parent class) declared that the property {1} "
+                                          "must be present on the sub-object named {2} and the property is "
+                                          "present but value is not set at index {3}."),
+                                FText::FromString(Class->GetAuthoredName()),
+                                FText::FromString(PropertyName),
+                                FText::FromString(ComponentName),
+                                FText::AsNumber(i)));
                         }
                     }
                 }
             }
             else
             {
-                const auto& ErrorMessage =
-                    FString::Printf(TEXT("The %s class (or a parent class) declared that the "
-                                         "property %s must be present on the sub-object named %s "
-                                         "and the property is present on the sub-object but the "
-                                         "property is not a valid object reference."),
-                                    *Class->GetAuthoredName(),
-                                    *PropertyName,
-                                    *ComponentName);
-                ActionContext->Error(FText::FromString(ErrorMessage));
+                ActionContext->Error(
+                    FText::Format(NSLOCTEXT("RuleRanger",
+                                            "ReqCompPropInvalidRef",
+                                            "The {0} class (or a parent class) declared that the property {1} "
+                                            "must be present on the sub-object named {2} and the property is "
+                                            "present on the sub-object but the property is not a valid "
+                                            "object reference."),
+                                  FText::FromString(Class->GetAuthoredName()),
+                                  FText::FromString(PropertyName),
+                                  FText::FromString(ComponentName)));
             }
         }
         else
         {
-            const auto& ErrorMessage =
-                FString::Printf(TEXT("The %s class (or a parent class) declared that the property %s must "
-                                     "be present on the sub-object named %s "
-                                     "and the property is not present on the sub-object."),
-                                *Class->GetAuthoredName(),
-                                *PropertyName,
-                                *ComponentName);
-            ActionContext->Error(FText::FromString(ErrorMessage));
+            ActionContext->Error(
+                FText::Format(NSLOCTEXT("RuleRanger",
+                                        "ReqCompPropMissing",
+                                        "The {0} class (or a parent class) declared that the property {1} "
+                                        "must be present on the sub-object named {2} and the property is "
+                                        "not present on the sub-object."),
+                              FText::FromString(Class->GetAuthoredName()),
+                              FText::FromString(PropertyName),
+                              FText::FromString(ComponentName)));
         }
     }
 }
@@ -205,51 +213,55 @@ void UEnsureRequiredPropertiesPresentAction::PerformChecksForComponentProperties
                     else
                     {
                         // TODO: We could add configuration, that optionally ignored null sub-object references
-                        const auto& ErrorMessage =
-                            FString::Printf(TEXT("The %s class (or a parent class) declared that the "
-                                                 "properties [%s] must be present on the sub-object named %s "
-                                                 "but the sub-object property is null."),
-                                            *Class->GetAuthoredName(),
-                                            *FString::Join(PropertyNames, TEXT(",")),
-                                            *ComponentName);
-                        ActionContext->Error(FText::FromString(ErrorMessage));
+                        ActionContext->Error(FText::Format(
+                            NSLOCTEXT("RuleRanger",
+                                      "ReqCompPropsNull",
+                                      "The {0} class (or a parent class) declared that the properties [{1}] "
+                                      "must be present on the sub-object named {2} but the sub-object "
+                                      "property is null."),
+                            FText::FromString(Class->GetAuthoredName()),
+                            FText::FromString(FString::Join(PropertyNames, TEXT(","))),
+                            FText::FromString(ComponentName)));
                     }
                 }
                 else
                 {
                     // TODO: We could support this in the future but will not bother until there is a need
-                    const auto& ErrorMessage =
-                        FString::Printf(TEXT("The %s class (or a parent class) declared that the "
-                                             "properties [%s] must be present on the sub-object named %s "
-                                             "but the sub-object property is an array which is not supported."),
-                                        *Class->GetAuthoredName(),
-                                        *FString::Join(PropertyNames, TEXT(",")),
-                                        *ComponentName);
-                    ActionContext->Error(FText::FromString(ErrorMessage));
+                    ActionContext->Error(
+                        FText::Format(NSLOCTEXT("RuleRanger",
+                                                "ReqCompPropsArrayUnsupported",
+                                                "The {0} class (or a parent class) declared that the properties "
+                                                "[{1}] must be present on the sub-object named {2} but the "
+                                                "sub-object property is an array which is not supported."),
+                                      FText::FromString(Class->GetAuthoredName()),
+                                      FText::FromString(FString::Join(PropertyNames, TEXT(","))),
+                                      FText::FromString(ComponentName)));
                 }
             }
             else
             {
-                const auto& ErrorMessage =
-                    FString::Printf(TEXT("The %s class (or a parent class) declared that the "
-                                         "properties [%s] must be present on the sub-object named %s "
-                                         "but the sub-object property is not a valid object reference."),
-                                    *Class->GetAuthoredName(),
-                                    *FString::Join(PropertyNames, TEXT(",")),
-                                    *ComponentName);
-                ActionContext->Error(FText::FromString(ErrorMessage));
+                ActionContext->Error(
+                    FText::Format(NSLOCTEXT("RuleRanger",
+                                            "ReqCompPropsInvalidRef",
+                                            "The {0} class (or a parent class) declared that the properties "
+                                            "[{1}] must be present on the sub-object named {2} but the "
+                                            "sub-object property is not a valid object reference."),
+                                  FText::FromString(Class->GetAuthoredName()),
+                                  FText::FromString(FString::Join(PropertyNames, TEXT(","))),
+                                  FText::FromString(ComponentName)));
             }
         }
         else
         {
-            const auto& ErrorMessage =
-                FString::Printf(TEXT("The %s class (or a parent class) declared that the properties [%s] must "
-                                     "be present on the sub-object named %s but no such sub-object property "
-                                     "was defined for the class."),
-                                *Class->GetAuthoredName(),
-                                *FString::Join(PropertyNames, TEXT(",")),
-                                *ComponentName);
-            ActionContext->Error(FText::FromString(ErrorMessage));
+            ActionContext->Error(
+                FText::Format(NSLOCTEXT("RuleRanger",
+                                        "ReqCompPropsMissingSubobject",
+                                        "The {0} class (or a parent class) declared that the properties "
+                                        "[{1}] must be present on the sub-object named {2} but no such "
+                                        "sub-object property was defined for the class."),
+                              FText::FromString(Class->GetAuthoredName()),
+                              FText::FromString(FString::Join(PropertyNames, TEXT(","))),
+                              FText::FromString(ComponentName)));
         }
     }
 }

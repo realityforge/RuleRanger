@@ -83,6 +83,30 @@ void URuleRangerRule::Apply(URuleRangerActionContext* ActionContext, UObject* Ob
 
 bool URuleRangerRule::Match(URuleRangerActionContext* ActionContext, UObject* Object) const
 {
+    // Fast prefilter: if there are valid actions but none accept this object's type,
+    // skip running matchers as the rule can never apply meaningful actions.
+    auto bAnyActionTypeMatches{ false };
+    for (const auto& Action : Actions)
+    {
+        if (IsValid(Action))
+        {
+            if (FRuleRangerUtilities::IsA(Object, Action->GetExpectedType()))
+            {
+                bAnyActionTypeMatches = true;
+                break;
+            }
+        }
+    }
+    if (!bAnyActionTypeMatches)
+    {
+        UE_LOGFMT(LogRuleRanger,
+                  VeryVerbose,
+                  "Match({Object}) on rule {Rule} skipped as no actions accept the object type.",
+                  GetNameSafe(Object),
+                  GetName());
+        return false;
+    }
+
     int32 MatcherIndex = 0;
     for (const TObjectPtr Matcher : Matchers)
     {

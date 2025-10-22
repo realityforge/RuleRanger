@@ -24,57 +24,53 @@
 
 void URuleRangerRule::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
-    if (Match(ActionContext, Object))
+    if (IsValid(Object) && Match(ActionContext, Object))
     {
         int32 ActionIndex = 0;
         for (const auto Action : Actions)
         {
-            if (IsValid(Object))
+            if (!IsValid(Action))
             {
-                if (!IsValid(Action))
+                ActionContext->Error(FText::FromString(FString::Printf(TEXT("Invalid Action detected at "
+                                                                            "index %d in rule '%s'"),
+                                                                       ActionIndex,
+                                                                       *GetName())));
+            }
+            else
+            {
+                if (const auto _ = FRuleRangerUtilities::ToObject<UObject>(Object, Action->GetExpectedType()))
                 {
-                    ActionContext->Error(
-                        FText::FromString(FString::Printf(TEXT("Invalid Action detected at index %d in rule '%s'"),
-                                                          ActionIndex,
-                                                          *GetName())));
+                    Action->Apply(ActionContext, Object);
                 }
                 else
                 {
-                    if (const auto _ = FRuleRangerUtilities::ToObject<UObject>(Object, Action->GetExpectedType()))
-                    {
-                        Action->Apply(ActionContext, Object);
-                    }
-                    else
-                    {
-                        Action->LogError(Object,
-                                         FString::Printf(TEXT("Attempt to run on Object that is not an "
-                                                              "instance of the type %s."),
-                                                         *Action->GetExpectedType()->GetName()));
-                    }
-                    const auto State = ActionContext->GetState();
-                    if (ERuleRangerActionState::AS_Fatal == State)
-                    {
-                        UE_LOGFMT(LogRuleRanger,
-                                  Verbose,
-                                  "ApplyRule({Object}) on rule {Rule} applied action {Action} "
-                                  "which resulted in fatal error. Processing rules will not continue.",
-                                  Object->GetName(),
-                                  GetName(),
-                                  Action->GetName());
-                        return;
-                    }
-                    else if (!bContinueOnError && ERuleRangerActionState::AS_Error == State)
-                    {
-                        UE_LOGFMT(
-                            LogRuleRanger,
-                            Verbose,
-                            "ApplyRule({Object}) on rule {Rule} applied action {Action} "
-                            "which resulted in error. Processing rules will not continue as ContinueOnError=False.",
-                            Object->GetName(),
-                            GetName(),
-                            Action->GetName());
-                        return;
-                    }
+                    Action->LogError(Object,
+                                     FString::Printf(TEXT("Attempt to run on Object "
+                                                          "that is not an instance of the type %s."),
+                                                     *Action->GetExpectedType()->GetName()));
+                }
+                const auto State = ActionContext->GetState();
+                if (ERuleRangerActionState::AS_Fatal == State)
+                {
+                    UE_LOGFMT(LogRuleRanger,
+                              Verbose,
+                              "ApplyRule({Object}) on rule {Rule} applied action {Action} which "
+                              "resulted in fatal error. Processing rules will not continue.",
+                              Object->GetName(),
+                              GetName(),
+                              Action->GetName());
+                    return;
+                }
+                else if (!bContinueOnError && ERuleRangerActionState::AS_Error == State)
+                {
+                    UE_LOGFMT(LogRuleRanger,
+                              Verbose,
+                              "ApplyRule({Object}) on rule {Rule} applied action {Action} which "
+                              "resulted in error. Processing rules will not continue as ContinueOnError=False.",
+                              Object->GetName(),
+                              GetName(),
+                              Action->GetName());
+                    return;
                 }
             }
             ActionIndex++;
@@ -89,13 +85,10 @@ bool URuleRangerRule::Match(URuleRangerActionContext* ActionContext, UObject* Ob
     auto bAnyActionTypeMatches{ false };
     for (const auto& Action : Actions)
     {
-        if (IsValid(Action))
+        if (IsValid(Action) && FRuleRangerUtilities::IsA(Object, Action->GetExpectedType()))
         {
-            if (FRuleRangerUtilities::IsA(Object, Action->GetExpectedType()))
-            {
-                bAnyActionTypeMatches = true;
-                break;
-            }
+            bAnyActionTypeMatches = true;
+            break;
         }
     }
     if (!bAnyActionTypeMatches)
@@ -108,30 +101,30 @@ bool URuleRangerRule::Match(URuleRangerActionContext* ActionContext, UObject* Ob
         return false;
     }
 
-    int32 MatcherIndex = 0;
-    for (const TObjectPtr Matcher : Matchers)
+    // If object is invalid, do not attempt to match
+    if (!IsValid(Object))
     {
-        if (IsValid(Object))
+        return false;
+    }
+
+    int32 MatcherIndex = 0;
+    for (const auto Matcher : Matchers)
+    {
+        if (!IsValid(Matcher))
         {
-            if (!IsValid(Matcher))
-            {
-                ActionContext->Error(
-                    FText::FromString(FString::Printf(TEXT("Invalid Matcher detected at index %d"), MatcherIndex)));
-                return false;
-            }
-            else
-            {
-                if (!Matcher->Test(Object))
-                {
-                    UE_LOGFMT(LogRuleRanger,
-                              Verbose,
-                              "Match({Object}) on rule {Rule} exited early as matcher {Matcher} did not match",
-                              Object->GetName(),
-                              GetName(),
-                              Matcher->GetName());
-                    return false;
-                }
-            }
+            ActionContext->Error(
+                FText::FromString(FString::Printf(TEXT("Invalid Matcher detected at index %d"), MatcherIndex)));
+            return false;
+        }
+        else if (!Matcher->Test(Object))
+        {
+            UE_LOGFMT(LogRuleRanger,
+                      Verbose,
+                      "Match({Object}) on rule {Rule} exited early as matcher {Matcher} did not match",
+                      Object->GetName(),
+                      GetName(),
+                      Matcher->GetName());
+            return false;
         }
         MatcherIndex++;
     }

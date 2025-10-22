@@ -56,9 +56,11 @@ void URuleRangerActionContext::ClearContext()
 
 FText URuleRangerActionContext::ToMessage(const FText& InMessage) const
 {
-    return FText::FromString(FString::Printf(TEXT("%s (Emitted from rule %s)"),
-                                             *InMessage.ToString(),
-                                             Rule ? *Rule->GetOutermost()->GetPathName() : TEXT("?")));
+    const auto RulePathText =
+        Rule ? FText::FromString(Rule->GetOutermost()->GetPathName()) : FText::FromString(TEXT("?"));
+    return FText::Format(NSLOCTEXT("RuleRanger", "ActionContext_Message_WithRule", "{0} (Emitted from rule {1})"),
+                         InMessage,
+                         RulePathText);
 }
 
 void URuleRangerActionContext::Info(const FText& InMessage)

@@ -37,8 +37,6 @@ EDataValidationResult URuleRangerEditorValidator::ValidateLoadedAsset_Implementa
     {
         const bool bIsSave = EDataValidationUsecase::Save == Context.GetValidationUsecase();
         SubSystem->ValidateObject(InAsset, bIsSave, this);
-        // Clear validation match cache after full validation run for this asset
-        SubSystem->ClearValidationMatchCache();
     }
     else
     {

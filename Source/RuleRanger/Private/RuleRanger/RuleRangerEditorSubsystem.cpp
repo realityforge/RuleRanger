@@ -77,6 +77,8 @@ void URuleRangerEditorSubsystem::ValidateObject(UObject* InObject,
     ProcessRule(InObject, [this, bIsSave, Handler](auto Config, auto RuleSet, auto Rule, auto InnerInObject) mutable {
         return ProcessOnAssetValidateRule(Config, RuleSet, Rule, InnerInObject, bIsSave, Handler);
     });
+    // Ensure any per-object validation caches are cleared even if validator is not in play
+    ClearValidationMatchCache();
 }
 
 bool URuleRangerEditorSubsystem::CanValidateObject(UObject* InObject, bool bIsSave)

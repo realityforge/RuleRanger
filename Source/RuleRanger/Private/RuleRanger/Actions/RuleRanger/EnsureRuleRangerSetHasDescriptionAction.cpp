@@ -28,7 +28,7 @@ void UEnsureRuleRangerSetHasDescriptionAction::Apply(URuleRangerActionContext* A
     }
 }
 
-UClass* UEnsureRuleRangerSetHasDescriptionAction::GetExpectedType()
+UClass* UEnsureRuleRangerSetHasDescriptionAction::GetExpectedType() const
 {
     return URuleRangerRuleSet::StaticClass();
 }

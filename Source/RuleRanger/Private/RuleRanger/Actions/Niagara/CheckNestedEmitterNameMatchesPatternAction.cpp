@@ -38,7 +38,7 @@ void UCheckNestedEmitterNameMatchesPatternAction::Apply(URuleRangerActionContext
     }
 }
 
-UClass* UCheckNestedEmitterNameMatchesPatternAction::GetExpectedType()
+UClass* UCheckNestedEmitterNameMatchesPatternAction::GetExpectedType() const
 {
     return UNiagaraSystem::StaticClass();
 }

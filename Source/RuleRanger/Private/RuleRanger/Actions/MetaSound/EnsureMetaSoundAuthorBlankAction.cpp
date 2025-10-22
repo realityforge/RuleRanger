@@ -21,7 +21,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureMetaSoundAuthorBlankAction)
 
-UClass* UEnsureMetaSoundAuthorBlankAction::GetExpectedType()
+UClass* UEnsureMetaSoundAuthorBlankAction::GetExpectedType() const
 {
 #if WITH_RULERANGER_METASOUND_RULES
     return UMetaSoundSource::StaticClass();

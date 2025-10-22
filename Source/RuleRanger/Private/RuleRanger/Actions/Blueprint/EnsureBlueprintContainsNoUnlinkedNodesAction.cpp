@@ -144,7 +144,7 @@ void UEnsureBlueprintContainsNoUnlinkedNodesAction::Apply(URuleRangerActionConte
     }
 }
 
-UClass* UEnsureBlueprintContainsNoUnlinkedNodesAction::GetExpectedType()
+UClass* UEnsureBlueprintContainsNoUnlinkedNodesAction::GetExpectedType() const
 {
     return UBlueprint::StaticClass();
 }

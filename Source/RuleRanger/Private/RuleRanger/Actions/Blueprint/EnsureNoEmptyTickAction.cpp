@@ -52,7 +52,7 @@ void UEnsureNoEmptyTickAction::Apply(URuleRangerActionContext* ActionContext, UO
     }
 }
 
-UClass* UEnsureNoEmptyTickAction::GetExpectedType()
+UClass* UEnsureNoEmptyTickAction::GetExpectedType() const
 {
     return UBlueprint::StaticClass();
 }

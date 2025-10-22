@@ -18,7 +18,7 @@
 
 void URuleRangerAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object) {}
 
-UClass* URuleRangerAction::GetExpectedType()
+UClass* URuleRangerAction::GetExpectedType() const
 {
     return UObject::StaticClass();
 }

@@ -34,7 +34,7 @@ void UEnsureEverySkeletalMeshComponentReferencesASkeletalMeshAction::Apply(URule
     }
 }
 
-UClass* UEnsureEverySkeletalMeshComponentReferencesASkeletalMeshAction::GetExpectedType()
+UClass* UEnsureEverySkeletalMeshComponentReferencesASkeletalMeshAction::GetExpectedType() const
 {
     return AActor::StaticClass();
 }

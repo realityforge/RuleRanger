@@ -65,7 +65,7 @@ void UEnsureMaterialHasNoCompileErrorAction::Apply(URuleRangerActionContext* Act
     }
 }
 
-UClass* UEnsureMaterialHasNoCompileErrorAction::GetExpectedType()
+UClass* UEnsureMaterialHasNoCompileErrorAction::GetExpectedType() const
 {
     return UMaterial::StaticClass();
 }

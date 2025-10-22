@@ -95,7 +95,7 @@ void UBlueprintFunctionActionBase::Apply(URuleRangerActionContext* ActionContext
     }
 }
 
-UClass* UBlueprintFunctionActionBase::GetExpectedType()
+UClass* UBlueprintFunctionActionBase::GetExpectedType() const
 {
     return UBlueprint::StaticClass();
 }

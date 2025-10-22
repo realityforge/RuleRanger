@@ -45,7 +45,7 @@ void UEnsureSoundWaveSampleRateValidAction::Apply(URuleRangerActionContext* Acti
     }
 }
 
-UClass* UEnsureSoundWaveSampleRateValidAction::GetExpectedType()
+UClass* UEnsureSoundWaveSampleRateValidAction::GetExpectedType() const
 {
     return USoundWave::StaticClass();
 }

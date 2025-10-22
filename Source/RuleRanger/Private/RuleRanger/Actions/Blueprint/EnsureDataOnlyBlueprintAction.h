@@ -78,5 +78,5 @@ public:
 
     virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
-    virtual UClass* GetExpectedType() override;
+    virtual UClass* GetExpectedType() const override;
 };

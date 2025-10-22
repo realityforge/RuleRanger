@@ -26,7 +26,7 @@ class UEnsureMetaSoundAuthorBlankAction final : public URuleRangerAction
     GENERATED_BODY()
 
 protected:
-    virtual UClass* GetExpectedType() override;
+    virtual UClass* GetExpectedType() const override;
 
     virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
 };

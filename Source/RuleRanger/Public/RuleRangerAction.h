@@ -45,5 +45,5 @@ public:
      *
      * @return The Class that the Object must be an instance of.
      */
-    virtual UClass* GetExpectedType();
+    virtual UClass* GetExpectedType() const;
 };

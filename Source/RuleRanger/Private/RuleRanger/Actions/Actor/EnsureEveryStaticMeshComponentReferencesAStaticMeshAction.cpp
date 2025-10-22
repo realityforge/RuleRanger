@@ -34,7 +34,7 @@ void UEnsureEveryStaticMeshComponentReferencesAStaticMeshAction::Apply(URuleRang
     }
 }
 
-UClass* UEnsureEveryStaticMeshComponentReferencesAStaticMeshAction::GetExpectedType()
+UClass* UEnsureEveryStaticMeshComponentReferencesAStaticMeshAction::GetExpectedType() const
 {
     return AActor::StaticClass();
 }

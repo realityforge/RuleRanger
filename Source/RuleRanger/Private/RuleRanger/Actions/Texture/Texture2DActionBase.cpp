@@ -16,7 +16,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(Texture2DActionBase)
 
-UClass* UTexture2DActionBase::GetExpectedType()
+UClass* UTexture2DActionBase::GetExpectedType() const
 {
     return UTexture2D::StaticClass();
 }

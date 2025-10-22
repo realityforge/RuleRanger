@@ -112,7 +112,7 @@ void UCheckNiagaraEmitterCompileStatusAction::Apply(URuleRangerActionContext* Ac
     }
 }
 
-UClass* UCheckNiagaraEmitterCompileStatusAction::GetExpectedType()
+UClass* UCheckNiagaraEmitterCompileStatusAction::GetExpectedType() const
 {
     return UNiagaraEmitter::StaticClass();
 }

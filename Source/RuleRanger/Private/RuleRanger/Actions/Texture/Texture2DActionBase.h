@@ -28,5 +28,5 @@ class UTexture2DActionBase : public URuleRangerAction
     GENERATED_BODY()
 
 public:
-    virtual UClass* GetExpectedType() override;
+    virtual UClass* GetExpectedType() const override;
 };

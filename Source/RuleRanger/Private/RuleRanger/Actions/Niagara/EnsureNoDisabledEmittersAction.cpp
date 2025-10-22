@@ -35,7 +35,7 @@ void UEnsureNoDisabledEmittersAction::Apply(URuleRangerActionContext* ActionCont
     }
 }
 
-UClass* UEnsureNoDisabledEmittersAction::GetExpectedType()
+UClass* UEnsureNoDisabledEmittersAction::GetExpectedType() const
 {
     return UNiagaraSystem::StaticClass();
 }

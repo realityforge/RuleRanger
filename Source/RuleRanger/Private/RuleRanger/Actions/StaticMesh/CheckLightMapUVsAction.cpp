@@ -39,7 +39,7 @@ void UCheckLightMapUVsAction::Apply(URuleRangerActionContext* ActionContext, UOb
     }
 }
 
-UClass* UCheckLightMapUVsAction::GetExpectedType()
+UClass* UCheckLightMapUVsAction::GetExpectedType() const
 {
     return UStaticMesh::StaticClass();
 }

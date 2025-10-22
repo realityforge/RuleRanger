@@ -83,7 +83,7 @@ void UCheckBlueprintCompileStatusAction::Apply(URuleRangerActionContext* ActionC
     }
 }
 
-UClass* UCheckBlueprintCompileStatusAction::GetExpectedType()
+UClass* UCheckBlueprintCompileStatusAction::GetExpectedType() const
 {
     return UBlueprint::StaticClass();
 }

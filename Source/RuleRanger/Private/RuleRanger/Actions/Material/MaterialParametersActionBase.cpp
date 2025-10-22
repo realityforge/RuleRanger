@@ -85,7 +85,7 @@ void UMaterialParametersActionBase::Apply(URuleRangerActionContext* ActionContex
     AnalyzeParameters(ActionContext, Material, AllParameters);
 }
 
-UClass* UMaterialParametersActionBase::GetExpectedType()
+UClass* UMaterialParametersActionBase::GetExpectedType() const
 {
     return UMaterial::StaticClass();
 }

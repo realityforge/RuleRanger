@@ -80,7 +80,7 @@ void UBlueprintVariableActionBase::Apply(URuleRangerActionContext* ActionContext
     }
 }
 
-UClass* UBlueprintVariableActionBase::GetExpectedType()
+UClass* UBlueprintVariableActionBase::GetExpectedType() const
 {
     return UBlueprint::StaticClass();
 }

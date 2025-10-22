@@ -168,7 +168,7 @@ void UCheckNiagaraSystemCompileStatusAction::Apply(URuleRangerActionContext* Act
     }
 }
 
-UClass* UCheckNiagaraSystemCompileStatusAction::GetExpectedType()
+UClass* UCheckNiagaraSystemCompileStatusAction::GetExpectedType() const
 {
     return UNiagaraSystem::StaticClass();
 }

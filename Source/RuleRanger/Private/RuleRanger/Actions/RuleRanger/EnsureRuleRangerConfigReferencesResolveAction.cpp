@@ -31,7 +31,7 @@ void UEnsureRuleRangerConfigReferencesResolveAction::Apply(URuleRangerActionCont
     }
 }
 
-UClass* UEnsureRuleRangerConfigReferencesResolveAction::GetExpectedType()
+UClass* UEnsureRuleRangerConfigReferencesResolveAction::GetExpectedType() const
 {
     return URuleRangerConfig::StaticClass();
 }

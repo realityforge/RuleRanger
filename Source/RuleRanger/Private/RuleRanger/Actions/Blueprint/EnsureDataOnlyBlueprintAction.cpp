@@ -219,7 +219,7 @@ void UEnsureDataOnlyBlueprintAction::PostEditChangeProperty(FPropertyChangedEven
     Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 
-UClass* UEnsureDataOnlyBlueprintAction::GetExpectedType()
+UClass* UEnsureDataOnlyBlueprintAction::GetExpectedType() const
 {
     return UBlueprint::StaticClass();
 }

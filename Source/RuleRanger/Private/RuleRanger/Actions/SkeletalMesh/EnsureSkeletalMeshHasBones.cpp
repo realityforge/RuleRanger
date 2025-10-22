@@ -39,7 +39,7 @@ void UEnsureSkeletalMeshHasBones::Apply(URuleRangerActionContext* ActionContext,
     }
 }
 
-UClass* UEnsureSkeletalMeshHasBones::GetExpectedType()
+UClass* UEnsureSkeletalMeshHasBones::GetExpectedType() const
 {
     return USkeletalMesh::StaticClass();
 }

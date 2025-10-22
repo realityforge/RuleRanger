@@ -142,8 +142,6 @@ private:
     UPROPERTY(VisibleAnywhere)
     TArray<FText> FatalMessages;
 
-    FText ToMessage(const FText& InMessage) const;
-
 public:
     FORCEINLINE const URuleRangerConfig* GetConfig() const { return Config; }
     FORCEINLINE const URuleRangerRuleSet* GetRuleSet() const { return RuleSet; }

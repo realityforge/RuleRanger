@@ -25,6 +25,10 @@ class URuleRangerDefaultResultHandler final : public UObject, public IRuleRanger
 {
     GENERATED_BODY()
 
+    static void EmitMessage(const URuleRangerActionContext* ActionContext,
+                            const TSharedRef<FTokenizedMessage>& Message,
+                            const FText& InMessage);
+
 public:
     virtual void OnRuleApplied(URuleRangerActionContext* ActionContext) override;
 };

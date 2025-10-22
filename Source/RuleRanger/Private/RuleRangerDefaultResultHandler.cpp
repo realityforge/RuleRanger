@@ -15,41 +15,50 @@
 #include "Misc/UObjectToken.h"
 #include "RuleRangerActionContext.h"
 #include "RuleRangerMessageLog.h"
+#include "RuleRangerRule.h"
+#include "RuleRangerRuleSet.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerDefaultResultHandler)
 
+void URuleRangerDefaultResultHandler::EmitMessage(const URuleRangerActionContext* ActionContext,
+                                                  const TSharedRef<FTokenizedMessage>& Message,
+                                                  const FText& InMessage)
+{
+    Message->AddToken(FUObjectToken::Create(ActionContext->GetObject()));
+    Message->AddToken(FTextToken::Create(InMessage));
+    if (const auto RuleSet = ActionContext->GetRuleSet())
+    {
+        Message->AddToken(FTextToken::Create(NSLOCTEXT("RuleRanger", "RuleSetPrefix", "  RuleSet: ")));
+        Message->AddToken(FUObjectToken::Create(RuleSet));
+    }
+    if (const auto Rule = ActionContext->GetRule())
+    {
+        Message->AddToken(FTextToken::Create(NSLOCTEXT("RuleRanger", "RulePrefix", "  Rule: ")));
+        Message->AddToken(FUObjectToken::Create(Rule));
+    }
+}
+
 void URuleRangerDefaultResultHandler::OnRuleApplied(URuleRangerActionContext* ActionContext)
 {
+    auto Log = FMessageLog(FRuleRangerMessageLog::GetMessageLogName());
     const auto& InfoMessages = ActionContext->GetInfoMessages();
     for (auto i = 0; i < InfoMessages.Num(); i++)
     {
-        FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
-            .Info()
-            ->AddToken(FUObjectToken::Create(ActionContext->GetObject()))
-            ->AddToken(FTextToken::Create(InfoMessages[i]));
+        EmitMessage(ActionContext, Log.Info(), InfoMessages[i]);
     }
     const auto& WarningMessages = ActionContext->GetWarningMessages();
     for (auto i = 0; i < WarningMessages.Num(); i++)
     {
-        FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
-            .Warning()
-            ->AddToken(FUObjectToken::Create(ActionContext->GetObject()))
-            ->AddToken(FTextToken::Create(WarningMessages[i]));
+        EmitMessage(ActionContext, Log.Warning(), WarningMessages[i]);
     }
     const auto& ErrorMessages = ActionContext->GetErrorMessages();
     for (auto i = 0; i < ErrorMessages.Num(); i++)
     {
-        FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
-            .Error()
-            ->AddToken(FUObjectToken::Create(ActionContext->GetObject()))
-            ->AddToken(FTextToken::Create(ErrorMessages[i]));
+        EmitMessage(ActionContext, Log.Error(), ErrorMessages[i]);
     }
     const auto& FatalMessages = ActionContext->GetFatalMessages();
     for (auto i = 0; i < FatalMessages.Num(); i++)
     {
-        FMessageLog(FRuleRangerMessageLog::GetMessageLogName())
-            .Error()
-            ->AddToken(FUObjectToken::Create(ActionContext->GetObject()))
-            ->AddToken(FTextToken::Create(FatalMessages[i]));
+        EmitMessage(ActionContext, Log.Error(), FatalMessages[i]);
     }
 }

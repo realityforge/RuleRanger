@@ -52,34 +52,25 @@ void URuleRangerActionContext::ClearContext()
     FatalMessages.Reset();
 }
 
-FText URuleRangerActionContext::ToMessage(const FText& InMessage) const
-{
-    const auto RulePathText =
-        Rule ? FText::FromString(Rule->GetOutermost()->GetPathName()) : FText::FromString(TEXT("?"));
-    return FText::Format(NSLOCTEXT("RuleRanger", "ActionContext_Message_WithRule", "{0} (Emitted from rule {1})"),
-                         InMessage,
-                         RulePathText);
-}
-
 void URuleRangerActionContext::Info(const FText& InMessage)
 {
-    InfoMessages.Add(ToMessage(InMessage));
+    InfoMessages.Add(InMessage);
 }
 
 void URuleRangerActionContext::Warning(const FText& InMessage)
 {
-    WarningMessages.Add(ToMessage(InMessage));
+    WarningMessages.Add(InMessage);
     ActionState = ActionState < ERuleRangerActionState::AS_Warning ? ERuleRangerActionState::AS_Warning : ActionState;
 }
 
 void URuleRangerActionContext::Error(const FText& InMessage)
 {
-    ErrorMessages.Add(ToMessage(InMessage));
+    ErrorMessages.Add(InMessage);
     ActionState = ActionState < ERuleRangerActionState::AS_Error ? ERuleRangerActionState::AS_Error : ActionState;
 }
 
 void URuleRangerActionContext::Fatal(const FText& InMessage)
 {
-    FatalMessages.Add(ToMessage(InMessage));
+    FatalMessages.Add(InMessage);
     ActionState = ActionState < ERuleRangerActionState::AS_Fatal ? ERuleRangerActionState::AS_Fatal : ActionState;
 }

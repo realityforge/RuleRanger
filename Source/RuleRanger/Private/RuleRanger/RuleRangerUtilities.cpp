@@ -27,9 +27,8 @@ bool FRuleRangerUtilities::RenameAsset(UObject* Object, const FString& NewName)
     TArray<FAssetRenameData> AssetsAndNames;
     AssetsAndNames.Add(FAssetRenameData(Object, PackagePath, NewName));
 
-    const bool bSuccess =
+    const auto bSuccess =
         FModuleManager::LoadModuleChecked<FAssetToolsModule>(AssetToolsModuleName).Get().RenameAssets(AssetsAndNames);
-
     if (bSuccess)
     {
         // Notify asset registry of rename
@@ -45,14 +44,14 @@ bool FRuleRangerUtilities::RenameAsset(UObject* Object, const FString& NewName)
 void FRuleRangerUtilities::CollectTypeHierarchy(const UObject* Object, TArray<UClass*>& Classes)
 {
     bool bProcessedBlueprintHierarchy{ false };
-    UClass* Class = Object->GetClass();
+    auto Class = Object->GetClass();
     while (Class)
     {
         if (!bProcessedBlueprintHierarchy && Object->IsA<UBlueprint>())
         {
             bProcessedBlueprintHierarchy = true;
             // If Object is a Blueprint then we have an alternate hierarchy accessible via the ParentClass property.
-            UClass* BlueprintClass{ Cast<UBlueprint>(Object)->ParentClass };
+            auto BlueprintClass{ Cast<UBlueprint>(Object)->ParentClass };
             while (BlueprintClass)
             {
                 Classes.Add(BlueprintClass);

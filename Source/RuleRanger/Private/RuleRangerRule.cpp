@@ -142,6 +142,17 @@ void URuleRangerRule::PreSave(const FObjectPreSaveContext SaveContext)
     Matchers.RemoveAll([](const TObjectPtr<URuleRangerMatcher>& Value) { return Value == nullptr; });
     Actions.RemoveAll([](const TObjectPtr<URuleRangerAction>& Value) { return Value == nullptr; });
 
+    // If there is exactly one action and the rule has no description,
+    // derive the description from the single action's display name.
+    if (Description.TrimStartAndEnd().IsEmpty() && 1 == Actions.Num())
+    {
+        const auto& Action = Actions[0];
+        if (IsValid(Action))
+        {
+            Description = Action->GetClass()->GetDisplayNameText().ToString().TrimStartAndEnd();
+        }
+    }
+
     Super::PreSave(SaveContext);
 }
 

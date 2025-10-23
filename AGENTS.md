@@ -9,6 +9,12 @@ This plugin is sometimes integrated into other repositories via git subtree merg
 unzip into `Plugins/RuleRanger/`). Those copies are mirrors for consumption; treat them as downstream integrations and
 avoid filing issues/PRs there.
 
+## User Interaction
+
+When asked to perform a task, ask the user questions one at a time until you have enough context. Feel free to make
+reasonable assumptions based on patterns present in the code and ask the user to confirm the assumptions if there are
+reasonable alternatives.
+
 ## Project Structure & Module Organization
 
 - `RuleRanger.uplugin` declares modules; each module sits under `Source/<Module>/Public` and `Source/<Module>/Private`

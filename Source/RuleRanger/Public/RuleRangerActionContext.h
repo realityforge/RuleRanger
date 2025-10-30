@@ -14,6 +14,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RuleRangerCommonContext.h"
 #include "UObject/Interface.h"
 #include "RuleRangerActionContext.generated.h"
 
@@ -40,76 +41,25 @@ enum class ERuleRangerActionTrigger : uint8
     AT_Max UMETA(Hidden)
 };
 
-UENUM()
-enum class ERuleRangerActionState : uint8
-{
-    /** The action was successful and produced no warnings or errors. */
-    AS_Success UMETA(DisplayName = "Success"),
-    /** The action produced one or more warnings but no errors. */
-    AS_Warning UMETA(DisplayName = "Warning"),
-    /** The action produced one or more errors but the errors are not fatal. */
-    AS_Error UMETA(DisplayName = "Error"),
-    /** The action produced one or more fatal errors and further rule processing should not occur for object. */
-    AS_Fatal UMETA(DisplayName = "Fatal"),
-
-    AS_Max UMETA(Hidden)
-};
-
 /**
  * Context object passed to an action so that the action can be provided context.
  */
 UCLASS(MinimalAPI, Transient)
-class URuleRangerActionContext final : public UObject
+class URuleRangerActionContext final : public URuleRangerCommonContext
 {
     GENERATED_BODY()
     friend class URuleRangerEditorSubsystem;
     friend class URuleRangerEditorValidator;
 
-public:
-    /**
-     * Generate an informational message from action.
-     *
-     * @param InMessage the message.
-     */
-    RULERANGER_API void Info(const FText& InMessage);
-
-    /**
-     * Generate a warning message from the action.
-     *
-     * @param InMessage the message.
-     */
-    RULERANGER_API void Warning(const FText& InMessage);
-
-    /**
-     * Generate an error message from the action.
-     *
-     * @param InMessage the message.
-     */
-    RULERANGER_API void Error(const FText& InMessage);
-
-    /**
-     * Generate an error message from the action.
-     *
-     * @param InMessage the message.
-     */
-    RULERANGER_API void Fatal(const FText& InMessage);
-
-private:
+protected:
     void ResetContext(URuleRangerConfig* const InConfig,
                       URuleRangerRuleSet* const InRuleSet,
                       URuleRangerRule* InRule,
                       UObject* InObject,
                       ERuleRangerActionTrigger InActionTrigger);
-    void ClearContext();
+    virtual void ClearContext() override;
 
-    /** A reference to the RuleRangerConfig that transitively included this Action. */
-    UPROPERTY(Transient)
-    TObjectPtr<URuleRangerConfig> Config{ nullptr };
-
-    /** A reference to the RuleRangerRuleSet that directly included this Action. */
-    UPROPERTY(Transient)
-    TObjectPtr<URuleRangerRuleSet> RuleSet{ nullptr };
-
+private:
     /** The rule that contains the associated action that is using the context. */
     UPROPERTY(Transient)
     TObjectPtr<URuleRangerRule> Rule{ nullptr };
@@ -122,29 +72,7 @@ private:
     UPROPERTY(VisibleAnywhere)
     ERuleRangerActionTrigger ActionTrigger{ ERuleRangerActionTrigger::AT_Max };
 
-    /** Current state of the action. */
-    UPROPERTY(VisibleAnywhere)
-    ERuleRangerActionState ActionState{ ERuleRangerActionState::AS_Max };
-
-    /** The array of info messages. */
-    UPROPERTY(VisibleAnywhere)
-    TArray<FText> InfoMessages;
-
-    /** The array of warning messages. */
-    UPROPERTY(VisibleAnywhere)
-    TArray<FText> WarningMessages;
-
-    /** The array of error messages. */
-    UPROPERTY(VisibleAnywhere)
-    TArray<FText> ErrorMessages;
-
-    /** The array of fatal messages. */
-    UPROPERTY(VisibleAnywhere)
-    TArray<FText> FatalMessages;
-
 public:
-    FORCEINLINE const URuleRangerConfig* GetConfig() const { return Config; }
-    FORCEINLINE const URuleRangerRuleSet* GetRuleSet() const { return RuleSet; }
     FORCEINLINE const URuleRangerRule* GetRule() const { return Rule; }
     FORCEINLINE const UObject* GetObject() const { return Object; }
 
@@ -168,16 +96,4 @@ public:
      * @return the trigger for the current action
      */
     FORCEINLINE ERuleRangerActionTrigger GetActionTrigger() const { return ActionTrigger; }
-
-    /**
-     * Return the current state of the action.
-     *
-     * @return the current state of the action.
-     */
-    FORCEINLINE ERuleRangerActionState GetState() const { return ActionState; }
-
-    FORCEINLINE const TArray<FText>& GetInfoMessages() const { return InfoMessages; }
-    FORCEINLINE const TArray<FText>& GetWarningMessages() const { return WarningMessages; }
-    FORCEINLINE const TArray<FText>& GetErrorMessages() const { return ErrorMessages; }
-    FORCEINLINE const TArray<FText>& GetFatalMessages() const { return FatalMessages; }
 };

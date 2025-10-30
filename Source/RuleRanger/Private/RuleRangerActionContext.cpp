@@ -26,51 +26,16 @@ void URuleRangerActionContext::ResetContext(URuleRangerConfig* const InConfig,
     check(InRuleSet);
     check(InRule);
     check(InObject);
-    Config = InConfig;
-    RuleSet = InRuleSet;
+    Super::ResetContext(InConfig, InRuleSet);
     Rule = InRule;
     Object = InObject;
     ActionTrigger = InActionTrigger;
-    ActionState = ERuleRangerActionState::AS_Success;
-    InfoMessages.Reset();
-    WarningMessages.Reset();
-    ErrorMessages.Reset();
-    FatalMessages.Reset();
 }
 
 void URuleRangerActionContext::ClearContext()
 {
-    Config = nullptr;
-    RuleSet = nullptr;
+    Super::ClearContext();
     Rule = nullptr;
     Object = nullptr;
     ActionTrigger = ERuleRangerActionTrigger::AT_Report;
-    ActionState = ERuleRangerActionState::AS_Success;
-    InfoMessages.Reset();
-    WarningMessages.Reset();
-    ErrorMessages.Reset();
-    FatalMessages.Reset();
-}
-
-void URuleRangerActionContext::Info(const FText& InMessage)
-{
-    InfoMessages.Add(InMessage);
-}
-
-void URuleRangerActionContext::Warning(const FText& InMessage)
-{
-    WarningMessages.Add(InMessage);
-    ActionState = ActionState < ERuleRangerActionState::AS_Warning ? ERuleRangerActionState::AS_Warning : ActionState;
-}
-
-void URuleRangerActionContext::Error(const FText& InMessage)
-{
-    ErrorMessages.Add(InMessage);
-    ActionState = ActionState < ERuleRangerActionState::AS_Error ? ERuleRangerActionState::AS_Error : ActionState;
-}
-
-void URuleRangerActionContext::Fatal(const FText& InMessage)
-{
-    FatalMessages.Add(InMessage);
-    ActionState = ActionState < ERuleRangerActionState::AS_Fatal ? ERuleRangerActionState::AS_Fatal : ActionState;
 }

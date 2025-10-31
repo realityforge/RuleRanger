@@ -308,7 +308,7 @@ void UEnsureNameFollowsConventionAction::ResetCachesIfTablesModified(UObject* Ob
 
 void UEnsureNameFollowsConventionAction::ResetCaches()
 {
-    LogInfo(nullptr, TEXT("Resetting the Name Convention Caches"));
+    LogInfo(TEXT("Resetting the Name Convention Caches"));
 
     DeprecatedConventionsCache.Empty();
     ConventionsCache.Empty();
@@ -322,8 +322,7 @@ void UEnsureNameFollowsConventionAction::RebuildConfigConventionsTables(const UR
     ActionContext->GetConfig()->CollectDataTables(FNameConvention::StaticStruct(), ConfigConventionsTables);
     for (const auto DataTable : ConfigConventionsTables)
     {
-        LogInfo(nullptr,
-                FString::Printf(TEXT("Adding DataTable '%s' registered in Config %s to set of conventions applied"),
+        LogInfo(FString::Printf(TEXT("Adding DataTable '%s' registered in Config %s to set of conventions applied"),
                                 *DataTable.GetName(),
                                 *ActionContext->GetConfig()->GetName()));
     }
@@ -370,8 +369,7 @@ void UEnsureNameFollowsConventionAction::RebuildConventionCacheIfNecessary()
         }
         for (auto Entry : ConventionsCache)
         {
-            LogInfo(nullptr,
-                    FString::Printf(TEXT("Type %s contains %d conventions in cache"),
+            LogInfo(FString::Printf(TEXT("Type %s contains %d conventions in cache"),
                                     *Entry.Key->GetName(),
                                     Entry.Value.Num()));
         }
@@ -414,8 +412,7 @@ void UEnsureNameFollowsConventionAction::RebuildDeprecatedConventionCacheIfNeces
         }
         for (auto Entry : DeprecatedConventionsCache)
         {
-            LogInfo(nullptr,
-                    FString::Printf(TEXT("Type %s contains %d deprecated conventions in cache"),
+            LogInfo(FString::Printf(TEXT("Type %s contains %d deprecated conventions in cache"),
                                     *Entry.Key->GetName(),
                                     Entry.Value.Num()));
         }

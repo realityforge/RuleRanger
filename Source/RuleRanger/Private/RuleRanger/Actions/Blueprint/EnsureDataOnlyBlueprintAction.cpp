@@ -48,7 +48,7 @@ void UEnsureDataOnlyBlueprintAction::ResetCachesIfTablesModified(UObject* Object
 
 void UEnsureDataOnlyBlueprintAction::ResetCaches()
 {
-    LogInfo(nullptr, TEXT("Resetting the Name Convention Caches"));
+    LogInfo(TEXT("Resetting the Name Convention Caches"));
 
     ConventionsCache.Empty();
     FCoreUObjectDelegates::OnObjectModified.Remove(OnObjectModifiedDelegateHandle);
@@ -61,8 +61,7 @@ void UEnsureDataOnlyBlueprintAction::RebuildConfigConventionsTables(const URuleR
     ActionContext->GetConfig()->CollectDataTables(FDataOnlyBlueprintEntry::StaticStruct(), ConfigConventionsTables);
     for (const auto DataTable : ConfigConventionsTables)
     {
-        LogInfo(nullptr,
-                FString::Printf(TEXT("Adding DataTable '%s' registered in Config %s to set "
+        LogInfo(FString::Printf(TEXT("Adding DataTable '%s' registered in Config %s to set "
                                      "of DataOnlyBlueprint rules applied"),
                                 *DataTable.GetName(),
                                 *ActionContext->GetConfig()->GetName()));
@@ -106,8 +105,7 @@ void UEnsureDataOnlyBlueprintAction::RebuildConventionCacheIfNecessary()
                 }
             }
         }
-        LogInfo(nullptr,
-                FString::Printf(TEXT("ConventionsCache rebuilt: %d entries in cache"), ConventionsCache.Num()));
+        LogInfo(FString::Printf(TEXT("ConventionsCache rebuilt: %d entries in cache"), ConventionsCache.Num()));
     }
 }
 

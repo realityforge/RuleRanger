@@ -20,20 +20,34 @@
 
 void URuleRangerObjectBase::LogInfo(const UObject* const Object, const FString& Message) const
 {
-    UE_LOGFMT(LogRuleRanger,
-              VeryVerbose,
-              "{Type}:{Instance}: {Message}",
-              GetClass()->GetName(),
-              Object ? Object->GetName() : TEXT("-"),
-              Message);
+    if (Object)
+    {
+        UE_LOGFMT(LogRuleRanger,
+                  VeryVerbose,
+                  "{Type}:{Instance}: {Message}",
+                  GetClass()->GetName(),
+                  GetNameSafe(Object),
+                  Message);
+    }
+    else
+    {
+        UE_LOGFMT(LogRuleRanger, VeryVerbose, "{Type}: {Message}", GetClass()->GetName(), Message);
+    }
 }
 
 void URuleRangerObjectBase::LogError(const UObject* const Object, const FString& Message) const
 {
-    UE_LOGFMT(LogRuleRanger,
-              Error,
-              "{Type}:{Instance}: {Message}",
-              GetClass()->GetName(),
-              Object ? Object->GetName() : TEXT("-"),
-              Message);
+    if (Object)
+    {
+        UE_LOGFMT(LogRuleRanger,
+                  Error,
+                  "{Type}:{Instance}: {Message}",
+                  GetClass()->GetName(),
+                  GetNameSafe(Object),
+                  Message);
+    }
+    else
+    {
+        UE_LOGFMT(LogRuleRanger, Error, "{Type}: {Message}", GetClass()->GetName(), Message);
+    }
 }

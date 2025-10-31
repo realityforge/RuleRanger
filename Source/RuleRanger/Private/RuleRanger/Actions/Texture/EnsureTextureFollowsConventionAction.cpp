@@ -49,8 +49,7 @@ void UEnsureTextureFollowsConventionAction::ResetCacheIfTableModified(UObject* O
         // This is called on any object edited in the editor so cache and bust cache as appropriate;
         if (ConventionsTables.Contains(Object) || ConfigConventionsTables.Contains(Object))
         {
-            LogInfo(nullptr,
-                    FString::Printf(TEXT("ResetCacheIfTableModified invoked for %s and caused a reset"),
+            LogInfo(FString::Printf(TEXT("ResetCacheIfTableModified invoked for %s and caused a reset"),
                                     *Object->GetName()));
             ResetCaches();
         }
@@ -59,7 +58,7 @@ void UEnsureTextureFollowsConventionAction::ResetCacheIfTableModified(UObject* O
 
 void UEnsureTextureFollowsConventionAction::ResetCaches()
 {
-    LogInfo(nullptr, TEXT("Resetting the Conventions Cache"));
+    LogInfo(TEXT("Resetting the Conventions Cache"));
 
     ConventionsCache.Empty();
     FCoreUObjectDelegates::OnObjectModified.Remove(OnObjectModifiedDelegateHandle);
@@ -104,8 +103,7 @@ void UEnsureTextureFollowsConventionAction::RebuildConventionsCacheIfNecessary()
                 }
             }
         }
-        LogInfo(nullptr,
-                FString::Printf(TEXT("RebuildConventionsCacheIfNecessary rebuilt cache and added %d conventions"),
+        LogInfo(FString::Printf(TEXT("RebuildConventionsCacheIfNecessary rebuilt cache and added %d conventions"),
                                 ConventionsCache.Num()));
     }
 }
@@ -504,8 +502,7 @@ void UEnsureTextureFollowsConventionAction::RebuildConfigConventionsTables(
                                                   ConfigConventionsTables);
     for (const auto DataTable : ConfigConventionsTables)
     {
-        LogInfo(nullptr,
-                FString::Printf(TEXT("Adding DataTable '%s' registered in Config %s to set of conventions applied"),
+        LogInfo(FString::Printf(TEXT("Adding DataTable '%s' registered in Config %s to set of conventions applied"),
                                 *DataTable.GetName(),
                                 *ActionContext->GetConfig()->GetName()));
     }

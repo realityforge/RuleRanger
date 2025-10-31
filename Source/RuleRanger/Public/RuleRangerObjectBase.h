@@ -35,6 +35,14 @@ protected:
     void LogInfo(const UObject* const Object, const FString& Message) const;
 
     /**
+     * Log an informational message for debugging purposes.
+     * (By default this logs to the RuleRanger category using VeryVerbose level.)
+     *
+     * @param Message the message.
+     */
+    void LogInfo(const FString& Message) const { LogInfo(nullptr, Message); }
+
+    /**
      * Log an error message for debugging purposes.
      * This usually indicates a misconfigured object.
      * (By default this logs to the RuleRanger category using Error level.)
@@ -43,4 +51,13 @@ protected:
      * @param Message the message.
      */
     void LogError(const UObject* const Object, const FString& Message) const;
+
+    /**
+     * Log an error message for debugging purposes.
+     * This usually indicates a misconfigured object.
+     * (By default this logs to the RuleRanger category using Error level.)
+     *
+     * @param Message the message.
+     */
+    void LogError(const FString& Message) const { LogError(nullptr, Message); }
 };

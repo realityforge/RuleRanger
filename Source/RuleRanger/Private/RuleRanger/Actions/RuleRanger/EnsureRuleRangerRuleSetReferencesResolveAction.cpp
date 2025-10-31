@@ -30,6 +30,16 @@ void UEnsureRuleRangerRuleSetReferencesResolveAction::Apply(URuleRangerActionCon
         }
     }
 
+    for (auto RuleIt = RuleSet->ProjectRules.CreateIterator(); RuleIt; ++RuleIt)
+    {
+        if (!RuleIt->Get())
+        {
+            ActionContext->Error(FText::FromString(
+                FString::Printf(TEXT("RuleRangerRuleSet has a ProjectRule entry at index %d that does not resolve."),
+                                RuleIt.GetIndex())));
+        }
+    }
+
     for (auto RuleIt = RuleSet->Rules.CreateIterator(); RuleIt; ++RuleIt)
     {
         if (!RuleIt->Get())

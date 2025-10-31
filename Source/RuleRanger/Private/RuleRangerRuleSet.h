@@ -17,6 +17,7 @@
 #include "Engine/DataAsset.h"
 #include "RuleRangerRuleSet.generated.h"
 
+class URuleRangerProjectRule;
 class FObjectPreSaveContext;
 
 class URuleRangerRule;
@@ -45,6 +46,12 @@ public:
               Category = "Rules",
               meta = (AllowAbstract = "false", DisplayThumbnail = "false", ForceShowPluginContent = "true"))
     TArray<TObjectPtr<URuleRangerRuleSet>> RuleSets;
+
+    /** A set of project rules to be applied. */
+    UPROPERTY(EditDefaultsOnly,
+              Category = "Rules",
+              meta = (AllowAbstract = "false", DisplayThumbnail = "false", ForceShowPluginContent = "true"))
+    TArray<TObjectPtr<URuleRangerProjectRule>> ProjectRules;
 
     /** A set of rules to be applied to different types. */
     UPROPERTY(EditDefaultsOnly,

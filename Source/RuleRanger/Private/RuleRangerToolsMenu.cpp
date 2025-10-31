@@ -48,7 +48,7 @@ void FRuleRangerToolsMenu::RegisterMenus()
 {
     FToolMenuOwnerScoped OwnerScoped(&OwnerToken);
 
-    if (const auto ToolsMenu = UToolMenus::Get()->ExtendMenu("LevelEditor.MainMenu.Tools"))
+    if (const auto ToolsMenu = UToolMenus::Get()->ExtendMenu("MainFrame.MainMenu.Tools"))
     {
         auto& Section = ToolsMenu->AddSection("RuleRangerToolsSection",
                                               NSLOCTEXT("RuleRanger", "ToolsSectionHeading", "Rule Ranger"));

@@ -22,7 +22,7 @@ public class RuleRanger : ModuleRules
         PublicDependencyModuleNames.AddRange(new[] { "ContentBrowser", "Core" });
 
         // clang-format off
-		PrivateDependencyModuleNames.AddRange(new[]
+        PrivateDependencyModuleNames.AddRange(new[]
 		{
 			"AnimGraph",
 			"AssetTools",

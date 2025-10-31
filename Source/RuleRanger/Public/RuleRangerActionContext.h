@@ -52,14 +52,15 @@ class URuleRangerActionContext final : public URuleRangerCommonContext
     friend class URuleRangerEditorValidator;
 
 protected:
+    virtual void ClearContext() override;
+
+private:
     void ResetContext(URuleRangerConfig* const InConfig,
                       URuleRangerRuleSet* const InRuleSet,
                       URuleRangerRule* InRule,
                       UObject* InObject,
                       ERuleRangerActionTrigger InActionTrigger);
-    virtual void ClearContext() override;
 
-private:
     /** The rule that contains the associated action that is using the context. */
     UPROPERTY(Transient)
     TObjectPtr<URuleRangerRule> Rule{ nullptr };

@@ -58,19 +58,17 @@ void URuleRangerEditorSubsystem::Deinitialize()
 void URuleRangerEditorSubsystem::ScanObject(UObject* InObject, IRuleRangerResultHandler* InResultHandler)
 {
     const auto Handler = InResultHandler ? InResultHandler : DefaultResultHandler.GetInterface();
-    ProcessRule(InObject,
-                [this, Handler](auto Config, auto RuleSet, auto Rule, auto InnerInObject) mutable {
-                    return ProcessDemandScan(Config, RuleSet, Rule, InnerInObject, Handler);
-                });
+    ProcessRule(InObject, [this, Handler](auto Config, auto RuleSet, auto Rule, auto InnerInObject) mutable {
+        return ProcessDemandScan(Config, RuleSet, Rule, InnerInObject, Handler);
+    });
 }
 
 void URuleRangerEditorSubsystem::ScanAndFixObject(UObject* InObject, IRuleRangerResultHandler* InResultHandler)
 {
     const auto Handler = InResultHandler ? InResultHandler : DefaultResultHandler.GetInterface();
-    ProcessRule(InObject,
-                [this, Handler](auto Config, auto RuleSet, auto Rule, auto InnerInObject) mutable {
-                    return ProcessDemandScanAndFix(Config, RuleSet, Rule, InnerInObject, Handler);
-                });
+    ProcessRule(InObject, [this, Handler](auto Config, auto RuleSet, auto Rule, auto InnerInObject) mutable {
+        return ProcessDemandScanAndFix(Config, RuleSet, Rule, InnerInObject, Handler);
+    });
 }
 
 void URuleRangerEditorSubsystem::ValidateObject(UObject* InObject,
@@ -78,10 +76,9 @@ void URuleRangerEditorSubsystem::ValidateObject(UObject* InObject,
                                                 IRuleRangerResultHandler* InResultHandler)
 {
     const auto Handler = InResultHandler ? InResultHandler : DefaultResultHandler.GetInterface();
-    ProcessRule(InObject,
-                [this, bIsSave, Handler](auto Config, auto RuleSet, auto Rule, auto InnerInObject) mutable {
-                    return ProcessOnAssetValidateRule(Config, RuleSet, Rule, InnerInObject, bIsSave, Handler);
-                });
+    ProcessRule(InObject, [this, bIsSave, Handler](auto Config, auto RuleSet, auto Rule, auto InnerInObject) mutable {
+        return ProcessOnAssetValidateRule(Config, RuleSet, Rule, InnerInObject, bIsSave, Handler);
+    });
     // Ensure any per-object validation caches are cleared even if validator is not in play
     ClearValidationMatchCache();
 }
@@ -91,36 +88,35 @@ bool URuleRangerEditorSubsystem::CanValidateObject(UObject* InObject, bool bIsSa
     bool Result = false;
     // Begin caching matches for this object across CanValidate and Validate
     ResetValidationMatchCache(InObject);
-    ProcessRule(InObject,
-                [this, &Result, bIsSave](auto, auto, auto Rule, auto InnerObject) {
-                    if (CanValidateObject(Rule, InnerObject, bIsSave))
-                    {
-                        bool bMatches;
-                        if (ValidationMatchCacheObject == InnerObject)
-                        {
-                            const TWeakObjectPtr Key(Rule);
-                            if (const auto Cached = ValidationMatchCache.Find(Key))
-                            {
-                                bMatches = *Cached;
-                            }
-                            else
-                            {
-                                bMatches = Rule->Match(ActionContext, InnerObject);
-                                ValidationMatchCache.Add(Key, bMatches);
-                            }
-                        }
-                        else
-                        {
-                            bMatches = Rule->Match(ActionContext, InnerObject);
-                        }
+    ProcessRule(InObject, [this, &Result, bIsSave](auto, auto, auto Rule, auto InnerObject) {
+        if (CanValidateObject(Rule, InnerObject, bIsSave))
+        {
+            bool bMatches;
+            if (ValidationMatchCacheObject == InnerObject)
+            {
+                const TWeakObjectPtr Key(Rule);
+                if (const auto Cached = ValidationMatchCache.Find(Key))
+                {
+                    bMatches = *Cached;
+                }
+                else
+                {
+                    bMatches = Rule->Match(ActionContext, InnerObject);
+                    ValidationMatchCache.Add(Key, bMatches);
+                }
+            }
+            else
+            {
+                bMatches = Rule->Match(ActionContext, InnerObject);
+            }
 
-                        if (bMatches)
-                        {
-                            Result = true;
-                        }
-                    }
-                    return true;
-                });
+            if (bMatches)
+            {
+                Result = true;
+            }
+        }
+        return true;
+    });
     return Result;
 }
 
@@ -211,15 +207,14 @@ void URuleRangerEditorSubsystem::OnAssetPostImport([[maybe_unused]] UFactory* Fa
     // identify this through the presence of tag.
     const bool bIsReimport = Subsystem && Subsystem->GetMetadataTag(Object, NAME_ImportMarkerKey) == ImportMarkerValue;
 
-    ProcessRule(Object,
-                [this, bIsReimport](auto Config, auto RuleSet, auto Rule, auto InObject) {
-                    return ProcessOnAssetPostImportRule(Config,
-                                                        RuleSet,
-                                                        Rule,
-                                                        bIsReimport,
-                                                        InObject,
-                                                        DefaultResultHandler.GetInterface());
-                });
+    ProcessRule(Object, [this, bIsReimport](auto Config, auto RuleSet, auto Rule, auto InObject) {
+        return ProcessOnAssetPostImportRule(Config,
+                                            RuleSet,
+                                            Rule,
+                                            bIsReimport,
+                                            InObject,
+                                            DefaultResultHandler.GetInterface());
+    });
 
     // Mark asset as having been processed by RuleRanger during import so we can detect reimports later
     if (Subsystem && !bIsReimport)
@@ -472,9 +467,8 @@ bool URuleRangerEditorSubsystem::ProcessOnAssetValidateRule(URuleRangerConfig* c
                                     RuleSet,
                                     Rule,
                                     InObject,
-                                    bIsSave
-                                    ? ERuleRangerActionTrigger::AT_Save
-                                    : ERuleRangerActionTrigger::AT_Validate);
+                                    bIsSave ? ERuleRangerActionTrigger::AT_Save
+                                            : ERuleRangerActionTrigger::AT_Validate);
 
         Rule->Apply(ActionContext, InObject);
 

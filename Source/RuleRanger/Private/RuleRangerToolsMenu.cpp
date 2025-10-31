@@ -17,6 +17,7 @@
 #include "RuleRanger/RuleRangerEditorSubsystem.h"
 #include "RuleRangerStyle.h"
 #include "ToolMenus.h"
+#include "Widgets/Text/STextBlock.h"
 
 FDelegateHandle FRuleRangerToolsMenu::RegisterHandle;
 int32 FRuleRangerToolsMenu::OwnerToken = 0;
@@ -62,18 +63,45 @@ void FRuleRangerToolsMenu::RegisterMenus()
     }
 }
 
+bool FRuleRangerToolsMenu::HasAnyConfiguredDirs()
+{
+    const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>();
+    return Subsystem ? Subsystem->HasAnyConfiguredDirs() : false;
+}
+
 void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
 {
     auto& SubSection =
         Menu->AddSection("RuleRangerToolsSubSection", NSLOCTEXT("RuleRanger", "RuleRangerSection", "Actions"));
 
+    if (!HasAnyConfiguredDirs())
+    {
+        const auto InfoText =
+            NSLOCTEXT("RuleRanger",
+                      "NoConfiguredDirsHint",
+                      "No Rule Ranger directories configured.\nSet them in Project Settings → Editor → Rule Ranger.");
+        SubSection.AddEntry(
+            FToolMenuEntry::InitWidget(TEXT("RuleRanger.NoConfiguredDirsHint"),
+                                       SNew(STextBlock)
+                                           .Text(InfoText)
+                                           .WrapTextAt(380.f)
+                                           .Margin(FMargin(20.f, 4.f, 20.f, 4.f))
+                                           .ColorAndOpacity(FSlateColor(FLinearColor(0.6f, 0.6f, 0.6f))),
+                                       FText::GetEmpty(),
+                                       true));
+    }
+
     {
         auto Entry = FToolMenuEntry::InitMenuEntry(
             TEXT("RuleRanger.ScanConfiguredContent"),
             NSLOCTEXT("RuleRanger", "ScanConfiguredContent", "Scan Content"),
-            NSLOCTEXT("RuleRanger", "ScanConfiguredContent_Tooltip", "Scan content in configured directories"),
+            NSLOCTEXT(
+                "RuleRanger",
+                "ScanConfiguredContent_Tooltip",
+                "Scan content in configured directories (configure under Project Settings → Editor → Rule Ranger)"),
             FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.ScanProjectContent")),
-            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnScanConfiguredContent)));
+            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnScanConfiguredContent),
+                      FCanExecuteAction::CreateLambda([] { return HasAnyConfiguredDirs(); })));
         SubSection.AddEntry(MoveTemp(Entry));
     }
 
@@ -81,9 +109,13 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
         auto Entry = FToolMenuEntry::InitMenuEntry(
             TEXT("RuleRanger.FixConfiguredContent"),
             NSLOCTEXT("RuleRanger", "FixConfiguredContent", "Scan & Fix Content"),
-            NSLOCTEXT("RuleRanger", "FixConfiguredContent_Tooltip", "Scan and apply fixes in configured directories"),
+            NSLOCTEXT(
+                "RuleRanger",
+                "FixConfiguredContent_Tooltip",
+                "Scan and apply fixes in configured directories (configure under Project Settings → Editor → Rule Ranger)"),
             FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.FixProjectContent")),
-            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnFixConfiguredContent)));
+            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnFixConfiguredContent),
+                      FCanExecuteAction::CreateLambda([] { return HasAnyConfiguredDirs(); })));
         SubSection.AddEntry(MoveTemp(Entry));
     }
 }

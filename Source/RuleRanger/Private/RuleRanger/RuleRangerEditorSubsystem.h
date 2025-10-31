@@ -77,6 +77,12 @@ public:
 
     void OnFixConfiguredContent();
 
+    /**
+     * Returns true if any RuleRangerConfig in developer settings has at least one non-empty directory
+     * configured.
+     */
+    bool HasAnyConfiguredDirs() const;
+
 private:
     UPROPERTY(Transient)
     TScriptInterface<IRuleRangerResultHandler> DefaultResultHandler{ nullptr };

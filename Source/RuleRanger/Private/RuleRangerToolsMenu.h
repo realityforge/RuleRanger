@@ -28,6 +28,7 @@ public:
 
 private:
     static void RegisterMenus();
+    static bool HasAnyConfiguredDirs();
     static void FillRuleRangerSubMenu(UToolMenu* Menu);
 
     static void OnScanConfiguredContent();

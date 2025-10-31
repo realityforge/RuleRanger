@@ -1075,3 +1075,26 @@ void URuleRangerEditorSubsystem::OnFixConfiguredContent()
         MaybeOpenMessageLog(MessageLog);
     }
 }
+
+// ReSharper disable once CppMemberFunctionMayBeStatic
+bool URuleRangerEditorSubsystem::HasAnyConfiguredDirs() const
+{
+    const auto DevSettings = GetDefault<URuleRangerDeveloperSettings>();
+    if (IsValid(DevSettings))
+    {
+        for (const auto& SoftConfig : DevSettings->Configs)
+        {
+            if (const auto Config = SoftConfig.LoadSynchronous())
+            {
+                for (const auto& Dir : Config->Dirs)
+                {
+                    if (!Dir.Path.IsEmpty())
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}

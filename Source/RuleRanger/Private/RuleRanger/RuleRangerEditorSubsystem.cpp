@@ -15,6 +15,7 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Editor.h"
 #include "Logging/StructuredLog.h"
+#include "Misc/ScopedSlowTask.h"
 #include "RuleRangerActionContext.h"
 #include "RuleRangerConfig.h"
 #include "RuleRangerDefaultResultHandler.h"

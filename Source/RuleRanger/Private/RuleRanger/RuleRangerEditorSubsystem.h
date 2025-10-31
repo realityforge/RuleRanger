@@ -23,6 +23,7 @@
 #include "RuleRangerEditorSubsystem.generated.h"
 
 struct FRuleRangerRuleExclusion;
+struct FAssetData;
 class URuleRangerRule;
 class URuleRangerActionContext;
 class URuleRangerEditorValidator;

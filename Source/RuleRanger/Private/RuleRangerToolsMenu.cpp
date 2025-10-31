@@ -14,7 +14,6 @@
 
 #include "RuleRangerToolsMenu.h"
 #include "Editor.h"
-#include "Logging/StructuredLog.h"
 #include "RuleRanger/RuleRangerEditorSubsystem.h"
 #include "RuleRangerStyle.h"
 #include "ToolMenus.h"

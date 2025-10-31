@@ -104,10 +104,10 @@ static TSharedRef<FExtender> OnExtendForSelectedAssetsMenu(const TArray<FAssetDa
 
     const TSharedPtr<FUICommandList> CommandList = MakeShareable(new FUICommandList);
     CommandList->MapAction(FRuleRangerCommands::Get().ScanSelectedAssets,
-                           FExecuteAction::CreateLambda(([Assets]() { OnScanSelectedAssets(Assets); })),
+                           FExecuteAction::CreateLambda([Assets] { OnScanSelectedAssets(Assets); }),
                            FCanExecuteAction());
     CommandList->MapAction(FRuleRangerCommands::Get().FixSelectedAssets,
-                           FExecuteAction::CreateLambda(([Assets]() { OnFixSelectedAssets(Assets); })),
+                           FExecuteAction::CreateLambda([Assets] { OnFixSelectedAssets(Assets); }),
                            FCanExecuteAction());
 
     TSharedRef<FExtender> Extender = MakeShared<FExtender>();

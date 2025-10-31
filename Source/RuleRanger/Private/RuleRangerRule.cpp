@@ -139,8 +139,8 @@ bool URuleRangerRule::Match(URuleRangerActionContext* ActionContext, UObject* Ob
 void URuleRangerRule::PreSave(const FObjectPreSaveContext SaveContext)
 {
     // Remove invalid entries but preserve author-specified order
-    Matchers.RemoveAll([](const TObjectPtr<URuleRangerMatcher>& Value) { return Value == nullptr; });
-    Actions.RemoveAll([](const TObjectPtr<URuleRangerAction>& Value) { return Value == nullptr; });
+    Matchers.RemoveAll([](const auto& Value) { return Value == nullptr; });
+    Actions.RemoveAll([](const auto& Value) { return Value == nullptr; });
 
     // If there is exactly one action and the rule has no description,
     // derive the description from the single action's display name.

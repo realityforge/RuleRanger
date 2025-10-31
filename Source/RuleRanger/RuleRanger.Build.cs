@@ -21,29 +21,12 @@ public class RuleRanger : ModuleRules
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicDependencyModuleNames.AddRange(new[] { "ContentBrowser", "Core" });
 
-        // clang-format off
-        PrivateDependencyModuleNames.AddRange(new[]
-		{
-			"AnimGraph",
-			"AssetTools",
-			"CoreUObject",
-			"BlueprintGraph",
-			"DataValidation",
-			"DeveloperSettings",
-			"EditorSubsystem",
-			"Engine",
-			"Json",
-			"Kismet",
-			"Projects",
-			"MessageLog",
-			"NiagaraEditor",
-			"Niagara",
-			"Slate",
-			"SlateCore",
-			"ToolMenus",
-			"UnrealEd"
-		});
-        // clang-format on
+        PrivateDependencyModuleNames.AddRange(new[] {
+            "AssetRegistry",  "AnimGraph",         "AssetTools",      "CoreUObject",   "BlueprintGraph",
+            "DataValidation", "DeveloperSettings", "EditorSubsystem", "Engine",        "Json",
+            "Kismet",         "Projects",          "MessageLog",      "NiagaraEditor", "Niagara",
+            "Slate",          "SlateCore",         "ToolMenus",       "UnrealEd",
+        });
 
         PrivateIncludePathModuleNames.Add("MessageLog");
 

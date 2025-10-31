@@ -15,20 +15,20 @@
 
 #include "CoreMinimal.h"
 #include "EditorSubsystem.h"
-#include "Factories/Factory.h"
-#include "RuleRangerResultHandler.h"
-#include "RuleRangerRuleSet.h"
 #include "UObject/Object.h"
 #include <functional>
 #include "RuleRangerEditorSubsystem.generated.h"
 
 struct FRuleRangerRuleExclusion;
 struct FAssetData;
+class IRuleRangerResultHandler;
+class UFactory;
 class URuleRangerRule;
 class URuleRangerActionContext;
 class URuleRangerEditorValidator;
 class URuleRangerConfig;
 class URuleRangerContentBrowserExtensions;
+class URuleRangerRuleSet;
 
 // Shape of function called to check whether rule will run or actually execute rule.
 // The actual function is determined by where it is used.

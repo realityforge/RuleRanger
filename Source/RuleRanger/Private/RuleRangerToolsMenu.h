@@ -15,6 +15,8 @@
 
 #include "CoreMinimal.h"
 
+class UToolMenu;
+
 /**
  * Registers the Rule Ranger submenu under the Tools menu with actions to scan/fix configured content.
  */

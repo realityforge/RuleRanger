@@ -59,7 +59,7 @@ void FRuleRangerToolsMenu::RegisterMenus()
                            NSLOCTEXT("RuleRanger", "RuleRangerToolsMenu_Tooltip", "Rule Ranger operations"),
                            FNewToolMenuDelegate::CreateStatic(&FRuleRangerToolsMenu::FillRuleRangerSubMenu),
                            false,
-                           FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.ScanSelectedPaths")));
+                           FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.ScanProjectContent")));
     }
 }
 

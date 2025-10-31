@@ -26,7 +26,7 @@ public:
 
 private:
     static void RegisterMenus();
-    static void FillRuleRangerSubMenu(class UToolMenu* Menu);
+    static void FillRuleRangerSubMenu(UToolMenu* Menu);
 
     static void OnScanConfiguredContent();
     static void OnFixConfiguredContent();

@@ -46,6 +46,18 @@ void FRuleRangerCommands::RegisterCommands()
                "Scan and fix selected assets with RuleRanger",
                EUserInterfaceActionType::Button,
                FInputChord());
+
+    // Tools menu (project-wide) actions
+    UI_COMMAND(ScanProjectContent,
+               "Scan Content",
+               "Scan all configured content directories with RuleRanger",
+               EUserInterfaceActionType::Button,
+               FInputChord());
+    UI_COMMAND(FixProjectContent,
+               "Scan & Fix Content",
+               "Scan and fix all configured content directories with RuleRanger",
+               EUserInterfaceActionType::Button,
+               FInputChord());
 }
 
 #undef LOCTEXT_NAMESPACE

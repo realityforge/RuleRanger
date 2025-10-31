@@ -40,6 +40,7 @@ public class RuleRanger : ModuleRules
 			"Niagara",
 			"Slate",
 			"SlateCore",
+			"ToolMenus",
 			"UnrealEd"
 		});
         // clang-format on

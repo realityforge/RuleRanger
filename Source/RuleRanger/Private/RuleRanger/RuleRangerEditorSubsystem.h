@@ -64,6 +64,18 @@ public:
 
     IRuleRangerResultHandler* GetDefaultResultHandler() const;
 
+    void OnScanSelectedAssets(const TArray<FAssetData>& Assets);
+
+    void OnFixSelectedAssets(const TArray<FAssetData>& Assets);
+
+    void OnScanSelectedPaths(const TArray<FString>& AssetPaths);
+
+    void OnFixSelectedPaths(const TArray<FString>& AssetPaths);
+
+    void OnScanConfiguredContent();
+
+    void OnFixConfiguredContent();
+
 private:
     UPROPERTY(Transient)
     TScriptInterface<IRuleRangerResultHandler> DefaultResultHandler{ nullptr };

@@ -72,6 +72,10 @@ TSharedRef<FSlateStyleSet> FRuleRangerStyle::Create()
                new FSlateImageBrush(ResourcesDir / TEXT("Icons/magnifying_glass.png"), Icon16x16));
     Style->Set(TEXT("RuleRanger.FixSelectedAssets"),
                new FSlateImageBrush(ResourcesDir / TEXT("Icons/magnifying_glass.png"), Icon16x16));
+    Style->Set(TEXT("RuleRanger.ScanProjectContent"),
+               new FSlateImageBrush(ResourcesDir / TEXT("Icons/magnifying_glass.png"), Icon16x16));
+    Style->Set(TEXT("RuleRanger.FixProjectContent"),
+               new FSlateImageBrush(ResourcesDir / TEXT("Icons/magnifying_glass.png"), Icon16x16));
 
     return Style;
 }

@@ -14,23 +14,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Framework/Commands/Commands.h"
 
-class URuleRangerRule;
-
-class FRuleRangerCommands final : public TCommands<FRuleRangerCommands>
+/**
+ * Registers the Rule Ranger submenu under the Tools menu with actions to scan/fix configured content.
+ */
+class FRuleRangerToolsMenu
 {
 public:
-    FRuleRangerCommands();
+    static void Initialize();
+    static void Shutdown();
 
-    virtual void RegisterCommands() override;
+private:
+    static void RegisterMenus();
+    static void FillRuleRangerSubMenu(class UToolMenu* Menu);
 
-    TSharedPtr<FUICommandInfo> ScanSelectedPaths;
-    TSharedPtr<FUICommandInfo> FixSelectedPaths;
-    TSharedPtr<FUICommandInfo> ScanSelectedAssets;
-    TSharedPtr<FUICommandInfo> FixSelectedAssets;
+    static void OnScanConfiguredContent();
+    static void OnFixConfiguredContent();
 
-    // Tools menu (project-wide) actions
-    TSharedPtr<FUICommandInfo> ScanProjectContent;
-    TSharedPtr<FUICommandInfo> FixProjectContent;
+    static FDelegateHandle RegisterHandle;
+    static int32 OwnerToken;
 };

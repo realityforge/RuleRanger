@@ -19,6 +19,7 @@
 #include "RuleRangerLogging.h"
 #include "RuleRangerMessageLog.h"
 #include "RuleRangerStyle.h"
+#include "RuleRangerToolsMenu.h"
 
 const FName FRuleRangerModule::ModuleName{ TEXT("RuleRanger") };
 
@@ -39,6 +40,7 @@ void FRuleRangerModule::StartupModule()
         FRuleRangerCommands::Register();
         FRuleRangerContentBrowserExtensions::Initialize();
         FRuleRangerDefaultEvents::Initialize(this);
+        FRuleRangerToolsMenu::Initialize();
     }
     else
     {
@@ -54,6 +56,7 @@ void FRuleRangerModule::ShutdownModule()
     {
         // Remove integrations of RuleRanger into Editor UI
         FRuleRangerDefaultEvents::Shutdown(this);
+        FRuleRangerToolsMenu::Shutdown();
         FRuleRangerContentBrowserExtensions::Shutdown();
         FRuleRangerCommands::Unregister();
         FRuleRangerStyle::Shutdown();

@@ -16,7 +16,12 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerAction)
 
-void URuleRangerAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object) {}
+void URuleRangerAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
+{
+    checkf(false,
+           TEXT("Action either failed to override Apply method or calls Super. "
+                "Neither scenario is supported."));
+}
 
 UClass* URuleRangerAction::GetExpectedType() const
 {

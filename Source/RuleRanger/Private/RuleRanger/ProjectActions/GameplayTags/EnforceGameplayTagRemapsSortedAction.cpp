@@ -16,27 +16,30 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnforceGameplayTagRemapsSortedAction)
 
-static bool IsSortedAscending(const TArray<FGameplayTagCategoryRemap>& Remaps)
+namespace
 {
-    if (Remaps.Num() < 2)
+    bool IsSortedAscending(const TArray<FGameplayTagCategoryRemap>& Remaps)
     {
-        return true;
-    }
-    else
-    {
-        auto Prev = Remaps[0].BaseCategory;
-        for (auto i = 1; i < Remaps.Num(); ++i)
+        if (Remaps.Num() < 2)
         {
-            const auto& Curr = Remaps[i].BaseCategory;
-            if (Curr < Prev)
-            {
-                return false;
-            }
-            Prev = Curr;
+            return true;
         }
-        return true;
+        else
+        {
+            auto Prev = Remaps[0].BaseCategory;
+            for (auto i = 1; i < Remaps.Num(); ++i)
+            {
+                const auto& Curr = Remaps[i].BaseCategory;
+                if (Curr < Prev)
+                {
+                    return false;
+                }
+                Prev = Curr;
+            }
+            return true;
+        }
     }
-}
+} // namespace
 
 void UEnforceGameplayTagRemapsSortedAction::Apply(URuleRangerProjectActionContext* ActionContext)
 {

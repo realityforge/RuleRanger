@@ -18,22 +18,25 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnforceGameplayTagRemapsPresentAction)
 
-static FText MakeMissingMessage(const FString& Name)
+namespace
 {
-    return FText::Format(NSLOCTEXT("RuleRanger",
-                                   "MissingGameplayTagRemap_Multiple",
-                                   "Gameplay Tag CategoryRemapping is missing an entry for '{0}'."),
-                         FText::FromString(Name));
-}
+    FText MakeMissingMessage(const FString& Name)
+    {
+        return FText::Format(NSLOCTEXT("RuleRanger",
+                                       "MissingGameplayTagRemap_Multiple",
+                                       "Gameplay Tag CategoryRemapping is missing an entry for '{0}'."),
+                             FText::FromString(Name));
+    }
 
-static FText MakeAddedMessage(const FString& Name, const TArray<FString>& Targets)
-{
-    return FText::Format(NSLOCTEXT("RuleRanger",
-                                   "AddedGameplayTagRemap_Multiple",
-                                   "Added Gameplay Tag CategoryRemapping for '{0}' with targets: {1}"),
-                         FText::FromString(Name),
-                         FText::FromString(FString::Join(Targets, TEXT(", "))));
-}
+    FText MakeAddedMessage(const FString& Name, const TArray<FString>& Targets)
+    {
+        return FText::Format(NSLOCTEXT("RuleRanger",
+                                       "AddedGameplayTagRemap_Multiple",
+                                       "Added Gameplay Tag CategoryRemapping for '{0}' with targets: {1}"),
+                             FText::FromString(Name),
+                             FText::FromString(FString::Join(Targets, TEXT(", "))));
+    }
+} // namespace
 
 void UEnforceGameplayTagRemapsPresentAction::Apply(URuleRangerProjectActionContext* ActionContext)
 {

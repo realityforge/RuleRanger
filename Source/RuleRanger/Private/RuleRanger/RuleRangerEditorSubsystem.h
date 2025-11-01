@@ -188,4 +188,11 @@ private:
                                  URuleRangerRule* Rule,
                                  UObject* InObject,
                                  IRuleRangerResultHandler* ResultHandler) const;
+
+    void ProcessAssetsCommon(const TArray<FAssetData>& Assets,
+                             const FText& SlowTaskText,
+                             const FText& StartAtText,
+                             const FText& CancelText,
+                             const FText& CompletedText,
+                             const bool bFix);
 };

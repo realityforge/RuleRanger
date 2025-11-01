@@ -722,91 +722,92 @@ static void TickTask(FScopedSlowTask& SlowTask)
     SlowTask.TickProgress();
 }
 
-void URuleRangerEditorSubsystem::OnScanSelectedAssets(const TArray<FAssetData>& Assets)
+void URuleRangerEditorSubsystem::ProcessAssetsCommon(const TArray<FAssetData>& Assets,
+                                                     const FText& SlowTaskText,
+                                                     const FText& StartAtText,
+                                                     const FText& CancelText,
+                                                     const FText& CompletedText,
+                                                     const bool bFix)
 {
-    if (Assets.Num() > 0)
+    if (Assets.Num() <= 0)
     {
-        FScopedSlowTask SlowTask(
-            Assets.Num(),
-            NSLOCTEXT("RuleRanger", "ScanAssetsStarting", "Rule Ranger: Scan the selected assets"));
-        SlowTask.MakeDialogDelayed(.5f, true);
-        FMessageLog MessageLog(FRuleRangerMessageLog::GetMessageLogName());
-        MessageLog.Info()->AddToken(
-            FTextToken::Create(FText::Format(NSLOCTEXT("RuleRanger",
-                                                       "ScanSelectedAssetsStartingAt",
-                                                       "Rule Ranger has started scanning the selected assets at {0}"),
-                                             FText::AsDateTime(FDateTime::UtcNow()))));
+        return;
+    }
 
-        for (const auto& Asset : Assets)
+    FScopedSlowTask SlowTask(Assets.Num(), SlowTaskText);
+    SlowTask.MakeDialogDelayed(.5f, true);
+    FMessageLog MessageLog(FRuleRangerMessageLog::GetMessageLogName());
+    MessageLog.Info()->AddToken(FTextToken::Create(FText::Format(StartAtText, FText::AsDateTime(FDateTime::UtcNow()))));
+
+    TSet<FSoftObjectPath> Seen;
+
+    for (const auto& AssetData : Assets)
+    {
+        if (SlowTask.ShouldCancel())
         {
-            if (SlowTask.ShouldCancel())
+            MessageLog.Info()->AddToken(
+                FTextToken::Create(FText::Format(CancelText, FText::AsDateTime(FDateTime::UtcNow()))));
+            MaybeOpenMessageLog(MessageLog);
+            return;
+        }
+
+        if (const auto Object = AssetData.GetAsset())
+        {
+            const FSoftObjectPath ObjPath = AssetData.GetSoftObjectPath();
+            if (Seen.Contains(ObjPath))
             {
-                MessageLog.Info()->AddToken(FTextToken::Create(FText::Format(
-                    NSLOCTEXT("RuleRanger",
-                              "CancelScanSelectedAssets",
-                              "User requested that Rule Ranger cancel the scanning of the selected assets at {0}"),
-                    FText::AsDateTime(FDateTime::UtcNow()))));
-                MaybeOpenMessageLog(MessageLog);
-                return;
+                TickTask(SlowTask);
+                continue;
             }
-            // Object can be null if it is a redirect
-            if (const auto Object = Asset.GetAsset())
+            Seen.Add(ObjPath);
+            if (bFix)
+            {
+                ScanAndFixObject(Object);
+            }
+            else
             {
                 ScanObject(Object);
             }
-            TickTask(SlowTask);
         }
-        MessageLog.Info()->AddToken(FTextToken::Create(
-            FText::Format(NSLOCTEXT("RuleRanger",
-                                    "ScanSelectedAssetsCompleted",
-                                    "Rule Ranger has completed scanning of the selected assets at {0}"),
-                          FText::AsDateTime(FDateTime::UtcNow()))));
-        MaybeOpenMessageLog(MessageLog);
+        TickTask(SlowTask);
     }
+
+    MessageLog.Info()->AddToken(
+        FTextToken::Create(FText::Format(CompletedText, FText::AsDateTime(FDateTime::UtcNow()))));
+    MaybeOpenMessageLog(MessageLog);
+}
+
+void URuleRangerEditorSubsystem::OnScanSelectedAssets(const TArray<FAssetData>& Assets)
+{
+    ProcessAssetsCommon(Assets,
+                        NSLOCTEXT("RuleRanger", "ScanAssetsStarting", "Rule Ranger: Scan the selected assets"),
+                        NSLOCTEXT("RuleRanger",
+                                  "ScanSelectedAssetsStartingAt",
+                                  "Rule Ranger has started scanning the selected assets at {0}"),
+                        NSLOCTEXT("RuleRanger",
+                                  "CancelScanSelectedAssets",
+                                  "User requested that Rule Ranger cancel the scanning of the selected assets at {0}"),
+                        NSLOCTEXT("RuleRanger",
+                                  "ScanSelectedAssetsCompleted",
+                                  "Rule Ranger has completed scanning of the selected assets at {0}"),
+                        false);
 }
 
 void URuleRangerEditorSubsystem::OnFixSelectedAssets(const TArray<FAssetData>& Assets)
 {
-    if (Assets.Num() > 0)
-    {
-        FScopedSlowTask SlowTask(
-            Assets.Num(),
-            NSLOCTEXT("RuleRanger", "ScanAndFixAssetsStarting", "Rule Ranger: Scan and fix the selected assets"));
-        SlowTask.MakeDialogDelayed(.5f, true);
-        FMessageLog MessageLog(FRuleRangerMessageLog::GetMessageLogName());
-        MessageLog.Info()->AddToken(FTextToken::Create(
-            FText::Format(NSLOCTEXT("RuleRanger",
-                                    "ScanAndFixSelectedAssetsStartingAt",
-                                    "Rule Ranger has started scanning and fixing of the selected assets at {0}"),
-                          FText::AsDateTime(FDateTime::UtcNow()))));
-
-        for (const auto& Asset : Assets)
-        {
-            if (SlowTask.ShouldCancel())
-            {
-                MessageLog.Info()->AddToken(FTextToken::Create(FText::Format(
-                    NSLOCTEXT(
-                        "RuleRanger",
-                        "CancelScanAndFixSelectedAssets",
-                        "User requested that Rule Ranger cancel the scanning and fixing of the selected assets at {0}"),
-                    FText::AsDateTime(FDateTime::UtcNow()))));
-                MaybeOpenMessageLog(MessageLog);
-                return;
-            }
-            // Object can be null if it is a redirect
-            if (const auto Object = Asset.GetAsset())
-            {
-                ScanAndFixObject(Object);
-            }
-            TickTask(SlowTask);
-        }
-        MessageLog.Info()->AddToken(FTextToken::Create(
-            FText::Format(NSLOCTEXT("RuleRanger",
-                                    "ScanAndFixSelectedAssetsCompleted",
-                                    "Rule Ranger has completed scanning and fixing of the selected assets at {0}"),
-                          FText::AsDateTime(FDateTime::UtcNow()))));
-        MaybeOpenMessageLog(MessageLog);
-    }
+    ProcessAssetsCommon(
+        Assets,
+        NSLOCTEXT("RuleRanger", "ScanAndFixAssetsStarting", "Rule Ranger: Scan and fix the selected assets"),
+        NSLOCTEXT("RuleRanger",
+                  "ScanAndFixSelectedAssetsStartingAt",
+                  "Rule Ranger has started scanning and fixing of the selected assets at {0}"),
+        NSLOCTEXT("RuleRanger",
+                  "CancelScanAndFixSelectedAssets",
+                  "User requested that Rule Ranger cancel the scanning and fixing of the selected assets at {0}"),
+        NSLOCTEXT("RuleRanger",
+                  "ScanAndFixSelectedAssetsCompleted",
+                  "Rule Ranger has completed scanning and fixing of the selected assets at {0}"),
+        true);
 }
 
 static void CollectAssetsFromPaths(const TArray<FString>& AssetPaths, TArray<FAssetData>& Assets)
@@ -843,94 +844,37 @@ void URuleRangerEditorSubsystem::OnScanSelectedPaths(const TArray<FString>& Asse
 {
     TArray<FAssetData> Assets;
     CollectAssetsFromPaths(AssetPaths, Assets);
-
-    if (Assets.Num() > 0)
-    {
-        FScopedSlowTask SlowTask(
-            Assets.Num(),
-            NSLOCTEXT("RuleRanger", "ScanSelectedPathsStarting", "Rule Ranger: Scan the selected paths"));
-        SlowTask.MakeDialogDelayed(.5f, true);
-        FMessageLog MessageLog(FRuleRangerMessageLog::GetMessageLogName());
-        MessageLog.Info()->AddToken(
-            FTextToken::Create(FText::Format(NSLOCTEXT("RuleRanger",
-                                                       "ScanSelectedPathsStartingAt",
-                                                       "Rule Ranger has started scanning the selected paths at {0}"),
-                                             FText::AsDateTime(FDateTime::UtcNow()))));
-
-        for (const auto& AssetData : Assets)
-        {
-            if (SlowTask.ShouldCancel())
-            {
-                MessageLog.Info()->AddToken(FTextToken::Create(FText::Format(
-                    NSLOCTEXT("RuleRanger",
-                              "CancelScanSelectedPaths",
-                              "User requested that Rule Ranger cancel the scanning of the selected paths at {0}"),
-                    FText::AsDateTime(FDateTime::UtcNow()))));
-                MaybeOpenMessageLog(MessageLog);
-                return;
-            }
-
-            if (const auto Object = AssetData.GetAsset())
-            {
-                ScanObject(Object);
-            }
-            TickTask(SlowTask);
-        }
-        MessageLog.Info()->AddToken(FTextToken::Create(
-            FText::Format(NSLOCTEXT("RuleRanger",
-                                    "ScanSelectedPathsCompleted",
-                                    "Rule Ranger has completed scanning of the selected paths at {0}"),
-                          FText::AsDateTime(FDateTime::UtcNow()))));
-        MaybeOpenMessageLog(MessageLog);
-    }
+    ProcessAssetsCommon(Assets,
+                        NSLOCTEXT("RuleRanger", "ScanSelectedPathsStarting", "Rule Ranger: Scan the selected paths"),
+                        NSLOCTEXT("RuleRanger",
+                                  "ScanSelectedPathsStartingAt",
+                                  "Rule Ranger has started scanning the selected paths at {0}"),
+                        NSLOCTEXT("RuleRanger",
+                                  "CancelScanSelectedPaths",
+                                  "User requested that Rule Ranger cancel the scanning of the selected paths at {0}"),
+                        NSLOCTEXT("RuleRanger",
+                                  "ScanSelectedPathsCompleted",
+                                  "Rule Ranger has completed scanning of the selected paths at {0}"),
+                        false);
 }
 
 void URuleRangerEditorSubsystem::OnFixSelectedPaths(const TArray<FString>& AssetPaths)
 {
     TArray<FAssetData> Assets;
     CollectAssetsFromPaths(AssetPaths, Assets);
-
-    if (Assets.Num() > 0)
-    {
-        FScopedSlowTask SlowTask(
-            Assets.Num(),
-            NSLOCTEXT("RuleRanger", "ScanAndFixSelectedPathsStarting", "Rule Ranger: Scan and fix the selected paths"));
-        SlowTask.MakeDialogDelayed(.5f, true);
-        FMessageLog MessageLog(FRuleRangerMessageLog::GetMessageLogName());
-        MessageLog.Info()->AddToken(FTextToken::Create(
-            FText::Format(NSLOCTEXT("RuleRanger",
-                                    "ScanAndFixSelectedPathsStartingAt",
-                                    "Rule Ranger has started scanning and fixing of the selected paths at {0}"),
-                          FText::AsDateTime(FDateTime::UtcNow()))));
-
-        for (const auto& AssetData : Assets)
-        {
-            if (SlowTask.ShouldCancel())
-            {
-                MessageLog.Info()->AddToken(FTextToken::Create(FText::Format(
-                    NSLOCTEXT(
-                        "RuleRanger",
-                        "CancelScanAndFixSelectedPaths",
-                        "User requested that Rule Ranger cancel the scanning and fixing of the selected paths at {0}"),
-                    FText::AsDateTime(FDateTime::UtcNow()))));
-                MaybeOpenMessageLog(MessageLog);
-                return;
-            }
-
-            if (const auto Object = AssetData.GetAsset())
-            {
-                ScanAndFixObject(Object);
-            }
-            TickTask(SlowTask);
-        }
-
-        MessageLog.Info()->AddToken(FTextToken::Create(
-            FText::Format(NSLOCTEXT("RuleRanger",
-                                    "ScanAndFixSelectedPathsCompleted",
-                                    "Rule Ranger has completed scanning and fixing of the selected paths at {0}"),
-                          FText::AsDateTime(FDateTime::UtcNow()))));
-        MaybeOpenMessageLog(MessageLog);
-    }
+    ProcessAssetsCommon(
+        Assets,
+        NSLOCTEXT("RuleRanger", "ScanAndFixSelectedPathsStarting", "Rule Ranger: Scan and fix the selected paths"),
+        NSLOCTEXT("RuleRanger",
+                  "ScanAndFixSelectedPathsStartingAt",
+                  "Rule Ranger has started scanning and fixing of the selected paths at {0}"),
+        NSLOCTEXT("RuleRanger",
+                  "CancelScanAndFixSelectedPaths",
+                  "User requested that Rule Ranger cancel the scanning and fixing of the selected paths at {0}"),
+        NSLOCTEXT("RuleRanger",
+                  "ScanAndFixSelectedPathsCompleted",
+                  "Rule Ranger has completed scanning and fixing of the selected paths at {0}"),
+        true);
 }
 
 static void CollectConfiguredPaths(TArray<FString>& OutPaths)
@@ -969,52 +913,19 @@ void URuleRangerEditorSubsystem::OnScanConfiguredContent()
     TArray<FAssetData> Assets;
     CollectAssetsFromPaths(AssetPaths, Assets);
 
-    if (Assets.Num() > 0)
-    {
-        FScopedSlowTask SlowTask(
-            Assets.Num(),
-            NSLOCTEXT("RuleRanger", "ScanConfiguredPathsStarting", "Rule Ranger: Scan configured content"));
-        SlowTask.MakeDialogDelayed(.5f, true);
-        FMessageLog MessageLog(FRuleRangerMessageLog::GetMessageLogName());
-        MessageLog.Info()->AddToken(FTextToken::Create(
-            FText::Format(NSLOCTEXT("RuleRanger",
-                                    "ScanConfiguredContentStartingAt",
-                                    "Rule Ranger has started scanning the configured content at {0}"),
-                          FText::AsDateTime(FDateTime::UtcNow()))));
-
-        TSet<FSoftObjectPath> Seen;
-        for (const auto& AssetData : Assets)
-        {
-            if (SlowTask.ShouldCancel())
-            {
-                MessageLog.Info()->AddToken(FTextToken::Create(FText::Format(
-                    NSLOCTEXT("RuleRanger",
-                              "CancelScanConfiguredContent",
-                              "User requested that Rule Ranger cancel the scanning of the configured content at {0}"),
-                    FText::AsDateTime(FDateTime::UtcNow()))));
-                MaybeOpenMessageLog(MessageLog);
-                return;
-            }
-
-            if (const auto Object = AssetData.GetAsset())
-            {
-                const auto ObjPath = AssetData.GetSoftObjectPath();
-                if (!Seen.Contains(ObjPath))
-                {
-                    Seen.Add(ObjPath);
-                    ScanObject(Object);
-                }
-            }
-            SlowTask.EnterProgressFrame();
-            SlowTask.TickProgress();
-        }
-        MessageLog.Info()->AddToken(FTextToken::Create(
-            FText::Format(NSLOCTEXT("RuleRanger",
-                                    "ScanConfiguredContentCompleted",
-                                    "Rule Ranger has completed scanning of the configured content at {0}"),
-                          FText::AsDateTime(FDateTime::UtcNow()))));
-        MaybeOpenMessageLog(MessageLog);
-    }
+    ProcessAssetsCommon(
+        Assets,
+        NSLOCTEXT("RuleRanger", "ScanConfiguredPathsStarting", "Rule Ranger: Scan configured content"),
+        NSLOCTEXT("RuleRanger",
+                  "ScanConfiguredContentStartingAt",
+                  "Rule Ranger has started scanning the configured content at {0}"),
+        NSLOCTEXT("RuleRanger",
+                  "CancelScanConfiguredContent",
+                  "User requested that Rule Ranger cancel the scanning of the configured content at {0}"),
+        NSLOCTEXT("RuleRanger",
+                  "ScanConfiguredContentCompleted",
+                  "Rule Ranger has completed scanning of the configured content at {0}"),
+        false);
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
@@ -1026,54 +937,19 @@ void URuleRangerEditorSubsystem::OnFixConfiguredContent()
     TArray<FAssetData> Assets;
     CollectAssetsFromPaths(AssetPaths, Assets);
 
-    if (Assets.Num() > 0)
-    {
-        FScopedSlowTask SlowTask(Assets.Num(),
-                                 NSLOCTEXT("RuleRanger",
-                                           "ScanAndFixConfiguredPathsStarting",
-                                           "Rule Ranger: Scan and fix configured content"));
-        SlowTask.MakeDialogDelayed(.5f, true);
-        FMessageLog MessageLog(FRuleRangerMessageLog::GetMessageLogName());
-        MessageLog.Info()->AddToken(FTextToken::Create(
-            FText::Format(NSLOCTEXT("RuleRanger",
-                                    "ScanAndFixConfiguredContentStartingAt",
-                                    "Rule Ranger has started scanning and fixing of the configured content at {0}"),
-                          FText::AsDateTime(FDateTime::UtcNow()))));
-
-        TSet<FSoftObjectPath> Seen;
-        for (const auto& AssetData : Assets)
-        {
-            if (SlowTask.ShouldCancel())
-            {
-                MessageLog.Info()->AddToken(FTextToken::Create(FText::Format(
-                    NSLOCTEXT(
-                        "RuleRanger",
-                        "CancelScanAndFixConfiguredContent",
-                        "User requested that Rule Ranger cancel the scanning and fixing of the configured content at {0}"),
-                    FText::AsDateTime(FDateTime::UtcNow()))));
-                MaybeOpenMessageLog(MessageLog);
-                return;
-            }
-
-            if (const auto Object = AssetData.GetAsset())
-            {
-                const auto ObjPath = AssetData.GetSoftObjectPath();
-                if (!Seen.Contains(ObjPath))
-                {
-                    Seen.Add(ObjPath);
-                    ScanAndFixObject(Object);
-                }
-            }
-            SlowTask.EnterProgressFrame();
-            SlowTask.TickProgress();
-        }
-        MessageLog.Info()->AddToken(FTextToken::Create(
-            FText::Format(NSLOCTEXT("RuleRanger",
-                                    "ScanAndFixConfiguredContentCompleted",
-                                    "Rule Ranger has completed scanning and fixing of the configured content at {0}"),
-                          FText::AsDateTime(FDateTime::UtcNow()))));
-        MaybeOpenMessageLog(MessageLog);
-    }
+    ProcessAssetsCommon(
+        Assets,
+        NSLOCTEXT("RuleRanger", "ScanAndFixConfiguredPathsStarting", "Rule Ranger: Scan and fix configured content"),
+        NSLOCTEXT("RuleRanger",
+                  "ScanAndFixConfiguredContentStartingAt",
+                  "Rule Ranger has started scanning and fixing of the configured content at {0}"),
+        NSLOCTEXT("RuleRanger",
+                  "CancelScanAndFixConfiguredContent",
+                  "User requested that Rule Ranger cancel the scanning and fixing of the configured content at {0}"),
+        NSLOCTEXT("RuleRanger",
+                  "ScanAndFixConfiguredContentCompleted",
+                  "Rule Ranger has completed scanning and fixing of the configured content at {0}"),
+        true);
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic

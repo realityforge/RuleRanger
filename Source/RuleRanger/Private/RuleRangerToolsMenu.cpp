@@ -108,7 +108,6 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
         SubSection.AddEntry(MoveTemp(Entry));
     }
 
-    // Separator between actions and utilities
     SubSection.AddSeparator(NAME_None);
 
     {

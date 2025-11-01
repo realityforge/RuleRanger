@@ -16,12 +16,15 @@
 #include "Editor.h"
 #include "Logging/StructuredLog.h"
 #include "Misc/ScopedSlowTask.h"
+#include "Misc/UObjectToken.h"
 #include "RuleRangerActionContext.h"
 #include "RuleRangerConfig.h"
 #include "RuleRangerDefaultResultHandler.h"
 #include "RuleRangerDeveloperSettings.h"
 #include "RuleRangerLogging.h"
 #include "RuleRangerMessageLog.h"
+#include "RuleRangerProjectActionContext.h"
+#include "RuleRangerProjectRule.h"
 #include "RuleRangerRule.h"
 #include "RuleRangerRuleExclusion.h"
 #include "RuleRangerRuleSet.h"
@@ -178,6 +181,7 @@ TConstArrayView<TWeakObjectPtr<URuleRangerConfig>> URuleRangerEditorSubsystem::G
     return CachedRuleSetConfigs;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void URuleRangerEditorSubsystem::MarkRuleSetConfigCacheDirty()
 {
     if (!bRuleSetConfigCacheDirty)
@@ -428,6 +432,35 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
     {
         ActionContext->ClearContext();
     }
+}
+
+static void EmitProjectMessages(const URuleRangerProjectActionContext* ProjectContext)
+{
+    auto Log = FMessageLog(FRuleRangerMessageLog::GetMessageLogName());
+
+    const auto Add = [&](const auto& InMessages, const auto Severity) {
+        for (const auto& Msg : InMessages)
+        {
+            auto Message = FTokenizedMessage::Create(Severity);
+            if (const auto RuleSet = ProjectContext->GetRuleSet())
+            {
+                Message->AddToken(FTextToken::Create(NSLOCTEXT("RuleRanger", "RuleSetPrefix", "RuleSet: ")));
+                Message->AddToken(FUObjectToken::Create(RuleSet));
+            }
+            if (const auto Rule = ProjectContext->GetRule())
+            {
+                Message->AddToken(FTextToken::Create(NSLOCTEXT("RuleRanger", "RulePrefix", "  Rule: ")));
+                Message->AddToken(FUObjectToken::Create(Rule));
+            }
+            Message->AddToken(FTextToken::Create(Msg));
+            Log.AddMessage(Message);
+        }
+    };
+
+    Add(ProjectContext->GetInfoMessages(), EMessageSeverity::Info);
+    Add(ProjectContext->GetWarningMessages(), EMessageSeverity::Warning);
+    Add(ProjectContext->GetErrorMessages(), EMessageSeverity::Error);
+    Add(ProjectContext->GetFatalMessages(), EMessageSeverity::Error);
 }
 
 bool URuleRangerEditorSubsystem::ProcessOnAssetValidateRule(URuleRangerConfig* const Config,
@@ -709,6 +742,255 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerConfig* cons
     }
 }
 
+// Project rules traversal over all configured rule sets (ignores content path matching)
+void URuleRangerEditorSubsystem::ProcessProjectRules(const FRuleRangerProjectRuleFn& ProcessRuleFunction)
+{
+    if (!ProjectActionContext)
+    {
+        UE_LOGFMT(LogRuleRanger, VeryVerbose, "RuleRangerEditorSubsystem: Creating the initial ProjectActionContext");
+        ProjectActionContext =
+            NewObject<URuleRangerProjectActionContext>(this, URuleRangerProjectActionContext::StaticClass());
+    }
+
+    const auto Configs = GetCachedRuleSetConfigs();
+    TSet<const URuleRangerRuleSet*> Visited;
+    bool bStop = false;
+    for (const auto ConfigPtr : Configs)
+    {
+        if (bStop)
+        {
+            break;
+        }
+        if (const auto Config = ConfigPtr.Get())
+        {
+            for (const auto& RuleSetPtr : Config->RuleSets)
+            {
+                if (const auto RuleSet = RuleSetPtr.Get())
+                {
+                    if (!ProcessProjectRuleSet(Config, RuleSet, ProcessRuleFunction, Visited))
+                    {
+                        bStop = true;
+                        break;
+                    }
+                }
+                else
+                {
+                    UE_LOGFMT(LogRuleRanger,
+                              Error,
+                              "ProcessProjectRules: Invalid RuleSet skipped when processing project rules "
+                              "for config {Config}",
+                              Config->GetName());
+                }
+            }
+        }
+        else
+        {
+            UE_LOGFMT(LogRuleRanger, Error, "Invalid RuleSetConfig skipped when processing project rules");
+        }
+    }
+
+    if (IsValid(ProjectActionContext))
+    {
+        ProjectActionContext->ClearContext();
+    }
+}
+
+bool URuleRangerEditorSubsystem::ProcessProjectRuleSet(URuleRangerConfig* const Config,
+                                                       URuleRangerRuleSet* const RuleSet,
+                                                       const FRuleRangerProjectRuleFn& ProcessRuleFunction,
+                                                       TSet<const URuleRangerRuleSet*>& Visited)
+{
+    UE_LOGFMT(LogRuleRanger, VeryVerbose, "ProcessProjectRuleSet: Processing Rule Set {RuleSet}", RuleSet->GetName());
+
+    if (Visited.Contains(RuleSet))
+    {
+        UE_LOGFMT(
+            LogRuleRanger,
+            Error,
+            "ProcessProjectRuleSet: Detected cyclic reference involving Rule Set {RuleSet}. Skipping nested traversal.",
+            RuleSet->GetName());
+        return true;
+    }
+
+    Visited.Add(RuleSet);
+
+    for (const auto& NestedRuleSetPtr : RuleSet->RuleSets)
+    {
+        if (const auto NestedRuleSet = NestedRuleSetPtr.Get())
+        {
+            if (!ProcessProjectRuleSet(Config, NestedRuleSet, ProcessRuleFunction, Visited))
+            {
+                return false;
+            }
+        }
+        else
+        {
+            UE_LOGFMT(
+                LogRuleRanger,
+                Error,
+                "ProcessProjectRuleSet: Invalid Nested RuleSet skipped when processing project rules in {RuleSet}",
+                RuleSet->GetName());
+        }
+    }
+
+    int RuleIndex = 0;
+    for (const auto RulePtr : RuleSet->ProjectRules)
+    {
+        if (const auto Rule = RulePtr.Get(); IsValid(Rule))
+        {
+            if (!ProcessRuleFunction(Config, RuleSet, Rule))
+            {
+                UE_LOGFMT(LogRuleRanger,
+                          VeryVerbose,
+                          "ProcessProjectRuleSet: Rule {Rule} from RuleSet {RuleSet} indicated to stop processing.",
+                          Rule->GetName(),
+                          RuleSet->GetName());
+                ProjectActionContext->ClearContext();
+                return false;
+            }
+        }
+        else
+        {
+            UE_LOGFMT(LogRuleRanger,
+                      Error,
+                      "ProcessProjectRuleSet: Invalid ProjectRule skipped at index {Index} in rule set '{RuleSet}'",
+                      RuleIndex,
+                      RuleSet->GetName());
+        }
+        RuleIndex++;
+    }
+
+    return true;
+}
+
+bool URuleRangerEditorSubsystem::ProcessProjectDemandScan(URuleRangerConfig* const Config,
+                                                          URuleRangerRuleSet* const RuleSet,
+                                                          URuleRangerProjectRule* Rule) const
+{
+    check(ProjectActionContext);
+
+    if (Rule->bApplyOnDemand)
+    {
+        UE_LOGFMT(LogRuleRanger,
+                  VeryVerbose,
+                  "ProcessProjectDemandScan applying project rule {Rule}.",
+                  Rule->GetName());
+        ProjectActionContext->ResetContext(Config, RuleSet, Rule, ERuleRangerProjectActionTrigger::AT_Report);
+
+        Rule->Apply(ProjectActionContext);
+
+        EmitProjectMessages(ProjectActionContext);
+
+        const auto State = ProjectActionContext->GetState();
+        ProjectActionContext->ClearContext();
+
+        if (ERuleRangerActionState::AS_Fatal == State)
+        {
+            UE_LOGFMT(
+                LogRuleRanger,
+                VeryVerbose,
+                "ProcessProjectDemandScan applied project rule {Rule} which resulted in fatal error. Processing rules will not continue.",
+                Rule->GetName());
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+    else
+    {
+        UE_LOGFMT(LogRuleRanger,
+                  VeryVerbose,
+                  "ProcessProjectDemandScan skipped project rule {Rule} as rule is not enabled on demand.",
+                  Rule->GetName());
+        return true;
+    }
+}
+
+bool URuleRangerEditorSubsystem::ProcessProjectDemandScanAndFix(URuleRangerConfig* const Config,
+                                                                URuleRangerRuleSet* const RuleSet,
+                                                                URuleRangerProjectRule* Rule) const
+{
+    check(ProjectActionContext);
+
+    if (Rule->bApplyOnDemand)
+    {
+        UE_LOGFMT(LogRuleRanger,
+                  VeryVerbose,
+                  "ProcessProjectDemandScanAndFix applying project rule {Rule}.",
+                  Rule->GetName());
+        ProjectActionContext->ResetContext(Config, RuleSet, Rule, ERuleRangerProjectActionTrigger::AT_Fix);
+
+        Rule->Apply(ProjectActionContext);
+
+        EmitProjectMessages(ProjectActionContext);
+
+        const auto State = ProjectActionContext->GetState();
+        ProjectActionContext->ClearContext();
+
+        if (ERuleRangerActionState::AS_Fatal == State)
+        {
+            UE_LOGFMT(
+                LogRuleRanger,
+                VeryVerbose,
+                "ProcessProjectDemandScanAndFix applied project rule {Rule} which resulted in fatal error. Processing rules will not continue.",
+                Rule->GetName());
+            return false;
+        }
+        else if (!Rule->bContinueOnError && ERuleRangerActionState::AS_Error == State)
+        {
+            UE_LOGFMT(
+                LogRuleRanger,
+                VeryVerbose,
+                "ProcessProjectDemandScanAndFix applied project rule {Rule} which resulted in error. Processing rules will not continue as ContinueOnError=False.",
+                Rule->GetName());
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+    else
+    {
+        UE_LOGFMT(LogRuleRanger,
+                  VeryVerbose,
+                  "ProcessProjectDemandScanAndFix skipped project rule {Rule} as rule is not enabled on demand.",
+                  Rule->GetName());
+        return true;
+    }
+}
+
+int32 URuleRangerEditorSubsystem::CountProjectRulesInRuleSet(const URuleRangerRuleSet* RuleSet,
+                                                             TSet<const URuleRangerRuleSet*>& Visited)
+{
+    if (!IsValid(RuleSet) || Visited.Contains(RuleSet))
+    {
+        return 0;
+    }
+    else
+    {
+        Visited.Add(RuleSet);
+        int32 Count = 0;
+        for (const auto RulePtr : RuleSet->ProjectRules)
+        {
+            if (const auto Rule = RulePtr.Get(); IsValid(Rule))
+            {
+                if (Rule->bApplyOnDemand)
+                {
+                    ++Count;
+                }
+            }
+        }
+        for (const auto NestedPtr : RuleSet->RuleSets)
+        {
+            Count += CountProjectRulesInRuleSet(NestedPtr.Get(), Visited);
+        }
+        return Count;
+    }
+}
+
 static void MaybeOpenMessageLog(FMessageLog& MessageLog)
 {
     const auto DeveloperSettings = GetMutableDefault<URuleRangerDeveloperSettings>();
@@ -973,4 +1255,133 @@ bool URuleRangerEditorSubsystem::HasAnyConfiguredDirs() const
         }
     }
     return false;
+}
+
+bool URuleRangerEditorSubsystem::HasAnyProjectRules() const
+{
+    TSet<const URuleRangerRuleSet*> Visited;
+    for (const auto ConfigPtr : GetCachedRuleSetConfigs())
+    {
+        if (const auto Config = ConfigPtr.Get())
+        {
+            for (const auto& RuleSetPtr : Config->RuleSets)
+            {
+                if (CountProjectRulesInRuleSet(RuleSetPtr.Get(), Visited) > 0)
+                {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+void URuleRangerEditorSubsystem::OnScanProject()
+{
+    // Determine total work for a better progress dialog
+    int32 Total = 0;
+    TSet<const URuleRangerRuleSet*> Visited;
+    for (const auto ConfigPtr : GetCachedRuleSetConfigs())
+    {
+        if (const auto Config = ConfigPtr.Get())
+        {
+            for (const auto& RuleSetPtr : Config->RuleSets)
+            {
+                Total += CountProjectRulesInRuleSet(RuleSetPtr.Get(), Visited);
+            }
+        }
+    }
+
+    FMessageLog MessageLog(FRuleRangerMessageLog::GetMessageLogName());
+    if (0 == Total)
+    {
+        MessageLog.Info()->AddToken(FTextToken::Create(
+            NSLOCTEXT("RuleRanger",
+                      "NoProjectRulesFound",
+                      "No project rules found. Add project rules to a RuleRanger RuleSet to enable project scans.")));
+        MaybeOpenMessageLog(MessageLog);
+        return;
+    }
+
+    FScopedSlowTask SlowTask(FMath::Max(1, Total),
+                             NSLOCTEXT("RuleRanger", "ScanProjectStarting", "Rule Ranger: Scan the project"));
+    SlowTask.MakeDialogDelayed(.5f, true);
+    MessageLog.Info()->AddToken(FTextToken::Create(FText::Format(
+        NSLOCTEXT("RuleRanger", "ScanProjectStartingAt", "Rule Ranger has started scanning the project at {0}"),
+        FText::AsDateTime(FDateTime::UtcNow()))));
+
+    ProcessProjectRules([&](auto Config, auto RuleSet, auto Rule) {
+        if (SlowTask.ShouldCancel())
+        {
+            MessageLog.Info()->AddToken(FTextToken::Create(
+                FText::Format(NSLOCTEXT("RuleRanger",
+                                        "CancelScanProject",
+                                        "User requested that Rule Ranger cancel the project scan at {0}"),
+                              FText::AsDateTime(FDateTime::UtcNow()))));
+            MaybeOpenMessageLog(MessageLog);
+            return false;
+        }
+
+        const bool bContinue = ProcessProjectDemandScan(Config, RuleSet, Rule);
+        TickTask(SlowTask);
+        return bContinue;
+    });
+
+    MessageLog.Info()->AddToken(FTextToken::Create(FText::Format(
+        NSLOCTEXT("RuleRanger", "ScanProjectCompleted", "Rule Ranger has completed scanning of the project at {0}"),
+        FText::AsDateTime(FDateTime::UtcNow()))));
+    MaybeOpenMessageLog(MessageLog);
+}
+
+void URuleRangerEditorSubsystem::OnFixProject()
+{
+    // Determine total work for a better progress dialog
+    int32 Total = 0;
+    TSet<const URuleRangerRuleSet*> Visited;
+    for (const auto ConfigPtr : GetCachedRuleSetConfigs())
+    {
+        if (const auto Config = ConfigPtr.Get())
+        {
+            for (const auto& RuleSetPtr : Config->RuleSets)
+            {
+                Total += CountProjectRulesInRuleSet(RuleSetPtr.Get(), Visited);
+            }
+        }
+    }
+
+    FScopedSlowTask SlowTask(
+        FMath::Max(1, Total),
+        NSLOCTEXT("RuleRanger", "ScanAndFixProjectStarting", "Rule Ranger: Scan & fix the project"));
+    SlowTask.MakeDialogDelayed(.5f, true);
+
+    FMessageLog MessageLog(FRuleRangerMessageLog::GetMessageLogName());
+    MessageLog.Info()->AddToken(
+        FTextToken::Create(FText::Format(NSLOCTEXT("RuleRanger",
+                                                   "ScanAndFixProjectStartingAt",
+                                                   "Rule Ranger has started scanning and fixing the project at {0}"),
+                                         FText::AsDateTime(FDateTime::UtcNow()))));
+
+    ProcessProjectRules([&](auto Config, auto RuleSet, auto Rule) {
+        if (SlowTask.ShouldCancel())
+        {
+            MessageLog.Info()->AddToken(FTextToken::Create(FText::Format(
+                NSLOCTEXT("RuleRanger",
+                          "CancelScanAndFixProject",
+                          "User requested that Rule Ranger cancel the scanning and fixing of the project at {0}"),
+                FText::AsDateTime(FDateTime::UtcNow()))));
+            MaybeOpenMessageLog(MessageLog);
+            return false;
+        }
+
+        const bool bContinue = ProcessProjectDemandScanAndFix(Config, RuleSet, Rule);
+        TickTask(SlowTask);
+        return bContinue;
+    });
+
+    MessageLog.Info()->AddToken(FTextToken::Create(
+        FText::Format(NSLOCTEXT("RuleRanger",
+                                "ScanAndFixProjectCompleted",
+                                "Rule Ranger has completed scanning and fixing of the project at {0}"),
+                      FText::AsDateTime(FDateTime::UtcNow()))));
+    MaybeOpenMessageLog(MessageLog);
 }

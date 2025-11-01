@@ -73,6 +73,12 @@ bool FRuleRangerToolsMenu::HasAnyConfiguredDirs()
     return Subsystem ? Subsystem->HasAnyConfiguredDirs() : false;
 }
 
+bool FRuleRangerToolsMenu::HasAnyProjectRules()
+{
+    const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>();
+    return Subsystem ? Subsystem->HasAnyProjectRules() : false;
+}
+
 void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
 {
     auto& SubSection =
@@ -110,6 +116,36 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
 
     SubSection.AddSeparator(NAME_None);
 
+    // Project-level actions
+    {
+        auto Entry = FToolMenuEntry::InitMenuEntry(
+            TEXT("RuleRanger.ScanProject"),
+            NSLOCTEXT("RuleRanger", "ScanProject", "Scan Project"),
+            NSLOCTEXT("RuleRanger",
+                      "ScanProject_Tooltip",
+                      "Execute project-level rules defined in configured RuleRanger rule sets"),
+            FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.ScanProjectContent")),
+            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnScanProject),
+                      FCanExecuteAction::CreateLambda([] { return HasAnyProjectRules(); })));
+        SubSection.AddEntry(MoveTemp(Entry));
+    }
+
+    {
+        auto Entry = FToolMenuEntry::InitMenuEntry(
+            TEXT("RuleRanger.FixProject"),
+            NSLOCTEXT("RuleRanger", "FixProject", "Scan & Fix Project"),
+            NSLOCTEXT("RuleRanger",
+                      "FixProject_Tooltip",
+                      "Execute project-level rules and apply fixes where supported"),
+            FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.FixProjectContent")),
+            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnFixProject),
+                      FCanExecuteAction::CreateLambda([] { return HasAnyProjectRules(); })));
+        SubSection.AddEntry(MoveTemp(Entry));
+    }
+
+    SubSection.AddSeparator(NAME_None);
+
+    // Content actions
     {
         auto Entry = FToolMenuEntry::InitMenuEntry(
             TEXT("RuleRanger.ScanConfiguredContent"),
@@ -152,6 +188,22 @@ void FRuleRangerToolsMenu::OnFixConfiguredContent()
     if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
     {
         Subsystem->OnFixConfiguredContent();
+    }
+}
+
+void FRuleRangerToolsMenu::OnScanProject()
+{
+    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
+    {
+        Subsystem->OnScanProject();
+    }
+}
+
+void FRuleRangerToolsMenu::OnFixProject()
+{
+    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
+    {
+        Subsystem->OnFixProject();
     }
 }
 

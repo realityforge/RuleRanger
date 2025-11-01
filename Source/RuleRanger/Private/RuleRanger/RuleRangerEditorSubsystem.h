@@ -29,11 +29,17 @@ class URuleRangerEditorValidator;
 class URuleRangerConfig;
 class URuleRangerContentBrowserExtensions;
 class URuleRangerRuleSet;
+class URuleRangerProjectRule;
+class URuleRangerProjectActionContext;
 
 // Shape of function called to check whether rule will run or actually execute rule.
 // The actual function is determined by where it is used.
 using FRuleRangerRuleFn = std::function<
     bool(URuleRangerConfig* const Config, URuleRangerRuleSet* const RuleSet, URuleRangerRule* Rule, UObject* InObject)>;
+
+// Shape of function called to check whether project rule will run or actually execute project rule.
+using FRuleRangerProjectRuleFn = std::function<
+    bool(URuleRangerConfig* const Config, URuleRangerRuleSet* const RuleSet, URuleRangerProjectRule* Rule)>;
 
 /**
  * The subsystem responsible for managing callbacks to other subsystems such as ImportSubsystem callbacks.
@@ -77,6 +83,15 @@ public:
 
     void OnFixConfiguredContent();
 
+    // Execute project-level rules across all configured RuleRangerConfigs
+    void OnScanProject();
+
+    // Execute and fix project-level rules across all configured RuleRangerConfigs
+    void OnFixProject();
+
+    // Returns true if any project rules are discoverable via configured RuleSets
+    bool HasAnyProjectRules() const;
+
     /**
      * Returns true if any RuleRangerConfig in developer settings has at least one non-empty directory
      * configured.
@@ -96,6 +111,10 @@ private:
 
     UPROPERTY(Transient)
     URuleRangerActionContext* ActionContext{ nullptr };
+
+    // Project-level action context used when applying URuleRangerProjectRule
+    UPROPERTY(Transient)
+    URuleRangerProjectActionContext* ProjectActionContext{ nullptr };
 
     // Cached results of Rule->Match(Object) calculated during CanValidate stage
     UPROPERTY(Transient)
@@ -188,6 +207,26 @@ private:
                                  URuleRangerRule* Rule,
                                  UObject* InObject,
                                  IRuleRangerResultHandler* ResultHandler) const;
+
+    // Project rule traversal and execution helpers
+    void ProcessProjectRules(const FRuleRangerProjectRuleFn& ProcessRuleFunction);
+
+    bool ProcessProjectRuleSet(URuleRangerConfig* const Config,
+                               URuleRangerRuleSet* const RuleSet,
+                               const FRuleRangerProjectRuleFn& ProcessRuleFunction,
+                               TSet<const URuleRangerRuleSet*>& Visited);
+
+    bool ProcessProjectDemandScan(URuleRangerConfig* const Config,
+                                  URuleRangerRuleSet* const RuleSet,
+                                  URuleRangerProjectRule* Rule) const;
+
+    bool ProcessProjectDemandScanAndFix(URuleRangerConfig* const Config,
+                                        URuleRangerRuleSet* const RuleSet,
+                                        URuleRangerProjectRule* Rule) const;
+
+    // Utility used by Tools menu actions to count rules for progress UI
+    static int32 CountProjectRulesInRuleSet(const URuleRangerRuleSet* RuleSet,
+                                            TSet<const URuleRangerRuleSet*>& Visited);
 
     void ProcessAssetsCommon(const TArray<FAssetData>& Assets,
                              const FText& SlowTaskText,

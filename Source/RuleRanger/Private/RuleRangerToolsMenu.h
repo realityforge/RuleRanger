@@ -29,10 +29,14 @@ public:
 private:
     static void RegisterMenus();
     static bool HasAnyConfiguredDirs();
+    static bool HasAnyProjectRules();
     static void FillRuleRangerSubMenu(UToolMenu* Menu);
 
     static void OnScanConfiguredContent();
     static void OnFixConfiguredContent();
+
+    static void OnScanProject();
+    static void OnFixProject();
 
     static void OnOpenProjectSettings();
 

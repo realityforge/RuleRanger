@@ -17,7 +17,10 @@
 #include "Logging/StructuredLog.h"
 #include "RuleRanger/RuleRangerEditorSubsystem.h"
 #include "RuleRangerCommands.h"
+#include "RuleRangerConfig.h"
+#include "RuleRangerDeveloperSettings.h"
 #include "RuleRangerLogging.h"
+#include "RuleRangerStyle.h"
 
 static void OnScanSelectedAssets(const TArray<FAssetData>& Assets)
 {
@@ -51,19 +54,89 @@ static void OnFixSelectedPaths(const TArray<FString>& AssetPaths)
     }
 }
 
-// ReSharper disable once CppPassValueParameterByConstReference
-static void OnExtendForSelectedPaths(FMenuBuilder& MenuBuilder)
+static bool HasAnyConfiguredDirs()
 {
-    UE_LOGFMT(LogRuleRanger, VeryVerbose, "FRuleRangerContentBrowserExtensions: OnExtendContentBrowser() invoked.");
+    const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>();
+    return Subsystem ? Subsystem->HasAnyConfiguredDirs() : false;
+}
 
-    MenuBuilder.BeginSection("RuleRangerContentBrowserContext",
-                             NSLOCTEXT("RuleRanger", "ContextMenuSectionName", "Rule Ranger"));
+static bool SelectionIntersectsConfiguredDirs(const TArray<FString>& Paths)
+{
+    const auto DevSettings = GetDefault<URuleRangerDeveloperSettings>();
+    if (IsValid(DevSettings))
+    {
+        TArray<FString> DirPaths;
+        for (const auto& SoftConfig : DevSettings->Configs)
+        {
+            if (const auto Config = SoftConfig.LoadSynchronous())
+            {
+                for (const auto& Dir : Config->Dirs)
+                {
+                    if (!Dir.Path.IsEmpty())
+                    {
+                        DirPaths.Add(Dir.Path);
+                    }
+                }
+            }
+        }
+        for (auto P : Paths)
+        {
+            if (!P.IsEmpty() && !P.EndsWith(TEXT("/")))
+            {
+                P.Append(TEXT("/"));
+            }
+            for (const auto& D : DirPaths)
+            {
+                if (P.StartsWith(D, ESearchCase::CaseSensitive) || D.StartsWith(P, ESearchCase::CaseSensitive))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    else
+    {
+        return false;
+    }
+}
 
-    MenuBuilder.AddMenuEntry(FRuleRangerCommands::Get().ScanSelectedPaths);
-    MenuBuilder.AddMenuEntry(FRuleRangerCommands::Get().FixSelectedPaths);
-
-    MenuBuilder.AddSeparator();
-    MenuBuilder.EndSection();
+static bool SelectionIntersectsConfiguredDirs(const TArray<FAssetData>& Assets)
+{
+    const auto DevSettings = GetDefault<URuleRangerDeveloperSettings>();
+    if (IsValid(DevSettings))
+    {
+        TArray<FString> DirPaths;
+        for (const auto& SoftConfig : DevSettings->Configs)
+        {
+            if (const auto Config = SoftConfig.LoadSynchronous())
+            {
+                for (const auto& Dir : Config->Dirs)
+                {
+                    if (!Dir.Path.IsEmpty())
+                    {
+                        DirPaths.Add(Dir.Path);
+                    }
+                }
+            }
+        }
+        for (const auto& A : Assets)
+        {
+            const auto PathStr = A.GetSoftObjectPath().ToString();
+            for (const auto& D : DirPaths)
+            {
+                if (PathStr.StartsWith(D, ESearchCase::CaseSensitive))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 static TSharedRef<FExtender> OnExtendSelectedPathsMenu(const TArray<FString>& Paths)
@@ -71,31 +144,54 @@ static TSharedRef<FExtender> OnExtendSelectedPathsMenu(const TArray<FString>& Pa
     UE_LOGFMT(LogRuleRanger, VeryVerbose, "OnExtendSelectedPathsMenu() invoked.");
 
     const TSharedPtr<FUICommandList> CommandList = MakeShareable(new FUICommandList);
+    const bool bHasDirs = HasAnyConfiguredDirs();
+    const bool bIntersects = bHasDirs && SelectionIntersectsConfiguredDirs(Paths);
     CommandList->MapAction(FRuleRangerCommands::Get().ScanSelectedPaths,
                            FExecuteAction::CreateLambda([Paths] { OnScanSelectedPaths(Paths); }),
-                           FCanExecuteAction());
+                           FCanExecuteAction::CreateLambda([bIntersects] { return bIntersects; }));
     CommandList->MapAction(FRuleRangerCommands::Get().FixSelectedPaths,
                            FExecuteAction::CreateLambda([Paths] { OnFixSelectedPaths(Paths); }),
-                           FCanExecuteAction());
+                           FCanExecuteAction::CreateLambda([bIntersects] { return bIntersects; }));
     auto Extender = MakeShared<FExtender>();
-    const auto MenuExtensionDelegate = FMenuExtensionDelegate::CreateStatic(&OnExtendForSelectedPaths);
+    FText ScanTip;
+    FText FixTip;
+    if (!bHasDirs)
+    {
+        ScanTip =
+            NSLOCTEXT("RuleRanger",
+                      "CBNoDirsScanTip",
+                      "No RuleRanger directories configured. Set them in Project Settings → Editor → Rule Ranger.");
+        FixTip = ScanTip;
+    }
+    else if (!bIntersects)
+    {
+        ScanTip =
+            NSLOCTEXT("RuleRanger", "CBNoIntersectScanTip", "Selection is outside configured RuleRanger directories.");
+        FixTip = ScanTip;
+    }
+    else
+    {
+        ScanTip = NSLOCTEXT("RuleRanger", "CBScanPathsTip", "Scan selected paths with RuleRanger.");
+        FixTip = NSLOCTEXT("RuleRanger", "CBFixPathsTip", "Scan and fix selected paths with RuleRanger.");
+    }
+    const auto MenuExtensionDelegate = FMenuExtensionDelegate::CreateLambda([ScanTip, FixTip](auto& MenuBuilder) {
+        MenuBuilder.BeginSection("RuleRangerContentBrowserContext",
+                                 NSLOCTEXT("RuleRanger", "ContextMenuSectionName", "Rule Ranger"));
+        MenuBuilder.AddMenuEntry(FRuleRangerCommands::Get().ScanSelectedPaths,
+                                 NAME_None,
+                                 TAttribute<FText>(),
+                                 TAttribute<FText>(ScanTip),
+                                 FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.ScanSelectedPaths")));
+        MenuBuilder.AddMenuEntry(FRuleRangerCommands::Get().FixSelectedPaths,
+                                 NAME_None,
+                                 TAttribute<FText>(),
+                                 TAttribute<FText>(FixTip),
+                                 FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.FixSelectedPaths")));
+        MenuBuilder.AddSeparator();
+        MenuBuilder.EndSection();
+    });
     Extender->AddMenuExtension("PathContextBulkOperations", EExtensionHook::After, CommandList, MenuExtensionDelegate);
     return Extender;
-}
-
-// ReSharper disable once CppPassValueParameterByConstReference
-static void OnExtendForSelectedAssets(FMenuBuilder& MenuBuilder)
-{
-    UE_LOGFMT(LogRuleRanger, VeryVerbose, "OnExtendForSelectedAssets() invoked.");
-
-    MenuBuilder.BeginSection("RuleRangerContentBrowserContext",
-                             NSLOCTEXT("RuleRanger", "ContextMenuSectionName", "Rule Ranger"));
-
-    MenuBuilder.AddMenuEntry(FRuleRangerCommands::Get().ScanSelectedAssets);
-    MenuBuilder.AddMenuEntry(FRuleRangerCommands::Get().FixSelectedAssets);
-
-    MenuBuilder.AddSeparator();
-    MenuBuilder.EndSection();
 }
 
 static TSharedRef<FExtender> OnExtendForSelectedAssetsMenu(const TArray<FAssetData>& Assets)
@@ -103,15 +199,54 @@ static TSharedRef<FExtender> OnExtendForSelectedAssetsMenu(const TArray<FAssetDa
     UE_LOGFMT(LogRuleRanger, VeryVerbose, "OnExtendForSelectedAssetsMenu() invoked.");
 
     const TSharedPtr<FUICommandList> CommandList = MakeShareable(new FUICommandList);
+    const bool bHasDirs = HasAnyConfiguredDirs();
+    const bool bIntersects = bHasDirs && SelectionIntersectsConfiguredDirs(Assets);
     CommandList->MapAction(FRuleRangerCommands::Get().ScanSelectedAssets,
                            FExecuteAction::CreateLambda([Assets] { OnScanSelectedAssets(Assets); }),
-                           FCanExecuteAction());
+                           FCanExecuteAction::CreateLambda([bIntersects] { return bIntersects; }));
     CommandList->MapAction(FRuleRangerCommands::Get().FixSelectedAssets,
                            FExecuteAction::CreateLambda([Assets] { OnFixSelectedAssets(Assets); }),
-                           FCanExecuteAction());
+                           FCanExecuteAction::CreateLambda([bIntersects] { return bIntersects; }));
 
     TSharedRef<FExtender> Extender = MakeShared<FExtender>();
-    const auto MenuExtensionDelegate = FMenuExtensionDelegate::CreateStatic(&OnExtendForSelectedAssets);
+    FText ScanTip;
+    FText FixTip;
+    if (!bHasDirs)
+    {
+        ScanTip =
+            NSLOCTEXT("RuleRanger",
+                      "CBNoDirsScanTipA",
+                      "No RuleRanger directories configured. Set them in Project Settings → Editor → Rule Ranger.");
+        FixTip = ScanTip;
+    }
+    else if (!bIntersects)
+    {
+        ScanTip =
+            NSLOCTEXT("RuleRanger", "CBNoIntersectScanTipA", "Selection is outside configured RuleRanger directories.");
+        FixTip = ScanTip;
+    }
+    else
+    {
+        ScanTip = NSLOCTEXT("RuleRanger", "CBScanAssetsTip", "Scan selected assets with RuleRanger.");
+        FixTip = NSLOCTEXT("RuleRanger", "CBFixAssetsTip", "Scan and fix selected assets with RuleRanger.");
+    }
+    const auto MenuExtensionDelegate = FMenuExtensionDelegate::CreateLambda([ScanTip, FixTip](auto& MenuBuilder) {
+        MenuBuilder.BeginSection("RuleRangerContentBrowserContext",
+                                 NSLOCTEXT("RuleRanger", "ContextMenuSectionName", "Rule Ranger"));
+        MenuBuilder.AddMenuEntry(
+            FRuleRangerCommands::Get().ScanSelectedAssets,
+            NAME_None,
+            TAttribute<FText>(),
+            TAttribute<FText>(ScanTip),
+            FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.ScanSelectedAssets")));
+        MenuBuilder.AddMenuEntry(FRuleRangerCommands::Get().FixSelectedAssets,
+                                 NAME_None,
+                                 TAttribute<FText>(),
+                                 TAttribute<FText>(FixTip),
+                                 FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.FixSelectedAssets")));
+        MenuBuilder.AddSeparator();
+        MenuBuilder.EndSection();
+    });
     Extender->AddMenuExtension("CommonAssetActions", EExtensionHook::After, CommandList, MenuExtensionDelegate);
 
     return Extender;

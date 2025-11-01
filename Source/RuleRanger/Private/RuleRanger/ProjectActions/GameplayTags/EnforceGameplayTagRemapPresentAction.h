@@ -22,18 +22,18 @@
  * In dry-run (Scan) mode it reports an error if missing; in Fix mode and DefaultTargets is configured,
  * it adds a new remapping entry using the provided defaults.
  */
-UCLASS(CollapseCategories, DefaultToInstanced, EditInlineNew)
+UCLASS(DisplayName = "Enforce Gameplay Tag Remap Present", CollapseCategories, DefaultToInstanced, EditInlineNew)
 class UEnforceGameplayTagRemapPresentAction final : public URuleRangerProjectAction
 {
     GENERATED_BODY()
 
 public:
     /** The category name that must be present in GameplayTags CategoryRemapping. */
-    UPROPERTY(EditAnywhere, Category = "Default")
+    UPROPERTY(EditAnywhere, Category = "Default", meta = (DisplayName = "Base Category"))
     FString Name;
 
-    /** Default remap targets used when fixing a missing mapping. */
-    UPROPERTY(EditAnywhere, Category = "Default")
+    /** Targets used when creating a missing remap during Fix mode. */
+    UPROPERTY(EditAnywhere, Category = "Default", meta = (DisplayName = "Default Targets"))
     TArray<FString> DefaultTargets;
 
     virtual void Apply(URuleRangerProjectActionContext* ActionContext) override;

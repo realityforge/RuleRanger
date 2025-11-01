@@ -88,11 +88,11 @@ private:
     TScriptInterface<IRuleRangerResultHandler> DefaultResultHandler{ nullptr };
 
     UPROPERTY(Transient)
-    TArray<TWeakObjectPtr<URuleRangerConfig>> CachedRuleSetConfigs;
+    mutable TArray<TWeakObjectPtr<URuleRangerConfig>> CachedRuleSetConfigs;
 
-    bool bRuleSetConfigCacheDirty{ true };
+    mutable bool bRuleSetConfigCacheDirty{ true };
 
-    TConstArrayView<TWeakObjectPtr<URuleRangerConfig>> GetCachedRuleSetConfigs();
+    TConstArrayView<TWeakObjectPtr<URuleRangerConfig>> GetCachedRuleSetConfigs() const;
 
     UPROPERTY(Transient)
     URuleRangerActionContext* ActionContext{ nullptr };

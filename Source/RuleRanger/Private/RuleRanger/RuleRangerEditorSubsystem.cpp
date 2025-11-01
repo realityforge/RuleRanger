@@ -151,7 +151,7 @@ bool URuleRangerEditorSubsystem::CanValidateObject(const URuleRangerRule* Rule,
     }
 }
 
-TConstArrayView<TWeakObjectPtr<URuleRangerConfig>> URuleRangerEditorSubsystem::GetCachedRuleSetConfigs()
+TConstArrayView<TWeakObjectPtr<URuleRangerConfig>> URuleRangerEditorSubsystem::GetCachedRuleSetConfigs() const
 {
     if (bRuleSetConfigCacheDirty)
     {

@@ -4,3 +4,4 @@ RuleRangerMatcher,"/Script/RuleRanger.RuleRangerMatcher","","RRM_","","True","Tr
 RuleRangerRule,"/Script/RuleRanger.RuleRangerRule","","RRR_","","True","True",""
 RuleRangerRuleSet,"/Script/RuleRanger.RuleRangerRuleSet","","RR_","_Rules","True","True",""
 RuleRangerRuleSetScope,"/Script/RuleRanger.RuleRangerConfig","","RR_","_Config","True","True",""
+RuleRangerProjectRule,"/Script/RuleRanger.RuleRangerProjectRule","","RRPR_","","True","True",""

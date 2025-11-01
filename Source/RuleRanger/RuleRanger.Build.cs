@@ -25,7 +25,7 @@ public class RuleRanger : ModuleRules
             "AssetRegistry",  "AnimGraph",         "AssetTools",      "CoreUObject",   "BlueprintGraph",
             "DataValidation", "DeveloperSettings", "EditorSubsystem", "Engine",        "Json",
             "Kismet",         "Projects",          "MessageLog",      "NiagaraEditor", "Niagara",
-            "Slate",          "SlateCore",         "ToolMenus",       "UnrealEd",
+            "Slate",          "SlateCore",         "Settings",        "ToolMenus",     "UnrealEd",
         });
 
         PrivateIncludePathModuleNames.Add("MessageLog");

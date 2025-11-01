@@ -34,6 +34,8 @@ private:
     static void OnScanConfiguredContent();
     static void OnFixConfiguredContent();
 
+    static void OnOpenProjectSettings();
+
     static FDelegateHandle RegisterHandle;
     static int32 OwnerToken;
 };

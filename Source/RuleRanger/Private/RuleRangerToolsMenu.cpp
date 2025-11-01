@@ -14,7 +14,11 @@
 
 #include "RuleRangerToolsMenu.h"
 #include "Editor.h"
+#include "Framework/Docking/TabManager.h"
+#include "ISettingsModule.h"
+#include "Modules/ModuleManager.h"
 #include "RuleRanger/RuleRangerEditorSubsystem.h"
+#include "RuleRangerDeveloperSettings.h"
 #include "RuleRangerStyle.h"
 #include "ToolMenus.h"
 #include "Widgets/Text/STextBlock.h"
@@ -91,6 +95,22 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                                        true));
     }
 
+    // Always-present convenience action
+    {
+        auto Entry = FToolMenuEntry::InitMenuEntry(
+            TEXT("RuleRanger.OpenProjectSettings"),
+            NSLOCTEXT("RuleRanger", "OpenProjectSettings", "Open Project Settings…"),
+            NSLOCTEXT("RuleRanger",
+                      "OpenProjectSettings_Tooltip",
+                      "Open Project Settings to the Editor → Rule Ranger page"),
+            FSlateIcon(),
+            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnOpenProjectSettings)));
+        SubSection.AddEntry(MoveTemp(Entry));
+    }
+
+    // Separator between actions and utilities
+    SubSection.AddSeparator(NAME_None);
+
     {
         auto Entry = FToolMenuEntry::InitMenuEntry(
             TEXT("RuleRanger.ScanConfiguredContent"),
@@ -133,5 +153,23 @@ void FRuleRangerToolsMenu::OnFixConfiguredContent()
     if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
     {
         Subsystem->OnFixConfiguredContent();
+    }
+}
+
+void FRuleRangerToolsMenu::OnOpenProjectSettings()
+{
+    if (const auto SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>(TEXT("Settings")))
+    {
+        if (const auto Settings = GetDefault<URuleRangerDeveloperSettings>())
+        {
+            const auto Container = Settings->GetContainerName();
+            const auto Category = Settings->GetCategoryName();
+            const auto Section = Settings->GetSectionName();
+            SettingsModule->ShowViewer(Container, Category, Section);
+        }
+    }
+    else
+    {
+        FGlobalTabmanager::Get()->TryInvokeTab(FName(TEXT("ProjectSettings")));
     }
 }

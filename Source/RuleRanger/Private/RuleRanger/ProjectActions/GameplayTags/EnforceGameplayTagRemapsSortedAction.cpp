@@ -48,53 +48,206 @@ void UEnforceGameplayTagRemapsSortedAction::Apply(URuleRangerProjectActionContex
     {
         auto& Remaps = Settings->CategoryRemapping;
 
-        // Compute desired state: keep only last occurrence for each BaseCategory, then sort ascending by BaseCategory
-        TMap<FString, int32> RemapMap;
+        // Clean up whitespace-only entries and remove remaps that end up empty after cleaning.
+        int32 EmptyRemovedCount = 0;
+        int32 WhitespaceRemovedCount = 0;
+        int32 CategoryDupesRemovedCount = 0;
+        int32 CategoriesUnsortedCount = 0;
+        int32 NonEmptyCount = 0;
+        TMap<FString, FGameplayTagCategoryRemap> RemapMap; // BaseCategory -> last cleaned remap
         RemapMap.Reserve(Remaps.Num());
         for (int32 i = 0; i < Remaps.Num(); ++i)
         {
-            RemapMap.Add(Remaps[i].BaseCategory, i); // overwrite to keep last
+            const auto& R = Remaps[i];
+            FGameplayTagCategoryRemap CleanRemap;
+            CleanRemap.BaseCategory = R.BaseCategory;
+            CleanRemap.RemapCategories.Reserve(R.RemapCategories.Num());
+            TSet<FString> SeenCats;
+            for (const auto& Cat : R.RemapCategories)
+            {
+                const auto Trimmed = Cat.TrimStartAndEnd();
+                if (!Trimmed.IsEmpty())
+                {
+                    if (!SeenCats.Contains(Trimmed))
+                    {
+                        CleanRemap.RemapCategories.Add(Trimmed);
+                        SeenCats.Add(Trimmed);
+                    }
+                    else
+                    {
+                        ++CategoryDupesRemovedCount;
+                    }
+                }
+                else
+                {
+                    ++WhitespaceRemovedCount;
+                }
+            }
+            if (CleanRemap.RemapCategories.Num() <= 0)
+            {
+                ++EmptyRemovedCount;
+                continue;
+            }
+            else
+            {
+                // Would sorting categories alphabetically change order?
+                auto Sorted = CleanRemap.RemapCategories;
+                Sorted.Sort([](const auto& A, const auto& B) { return A < B; });
+                if (Sorted != CleanRemap.RemapCategories)
+                {
+                    ++CategoriesUnsortedCount;
+                }
+            }
+            ++NonEmptyCount;
+            RemapMap.Add(CleanRemap.BaseCategory, MoveTemp(CleanRemap)); // keep last
         }
 
-        const int32 DuplicateCount = Remaps.Num() - RemapMap.Num();
+        const int32 DuplicateCount = FMath::Max(0, NonEmptyCount - RemapMap.Num());
 
+        // Build the new list from the last non-empty cleaned occurrences, then sort ascending by BaseCategory
         TArray<FGameplayTagCategoryRemap> Unique;
         Unique.Reserve(RemapMap.Num());
-        for (const auto& Pair : RemapMap)
+        for (auto& Pair : RemapMap)
         {
-            Unique.Add(Remaps[Pair.Value]);
+            Unique.Add(MoveTemp(Pair.Value));
         }
         Unique.Sort([](const auto& A, const auto& B) { return A.BaseCategory < B.BaseCategory; });
 
-        if (0 != DuplicateCount || !IsSortedAscending(Remaps))
+        const bool bUnsorted = !IsSortedAscending(Remaps);
+        const bool bHasIssues = (DuplicateCount > 0) || bUnsorted || (EmptyRemovedCount > 0)
+            || (WhitespaceRemovedCount > 0) || (CategoryDupesRemovedCount > 0) || (CategoriesUnsortedCount > 0);
+
+        if (bHasIssues)
         {
             if (ActionContext->IsDryRun())
             {
+                if (WhitespaceRemovedCount > 0)
+                {
+                    ActionContext->Error(
+                        FText::Format(NSLOCTEXT("RuleRanger",
+                                                "GameplayTagsRemapsHaveWhitespaceEntries",
+                                                "Gameplay Tag CategoryRemapping has {0} whitespace-only "
+                                                "ent{0}|plural(one=ry,other=ries) within RemapCategories; "
+                                                "these would be removed if in Fix mode."),
+                                      FText::AsNumber(WhitespaceRemovedCount)));
+                }
+                if (EmptyRemovedCount > 0)
+                {
+                    ActionContext->Error(
+                        FText::Format(NSLOCTEXT("RuleRanger",
+                                                "GameplayTagsRemapsHaveEmptyEntries",
+                                                "Gameplay Tag CategoryRemapping has {0} "
+                                                "entr{0}|plural(one=y,other=ies) with an empty RemapCategories list; "
+                                                "these would be removed if in Fix mode."),
+                                      FText::AsNumber(EmptyRemovedCount)));
+                }
+                if (CategoryDupesRemovedCount > 0)
+                {
+                    ActionContext->Error(
+                        FText::Format(NSLOCTEXT("RuleRanger",
+                                                "GameplayTagsRemapsHaveCategoryDuplicates",
+                                                "Gameplay Tag CategoryRemapping has {0} duplicate "
+                                                "ent{0}|plural(one=ry,other=ries) within RemapCategories lists; "
+                                                "these would be removed if in Fix mode."),
+                                      FText::AsNumber(CategoryDupesRemovedCount)));
+                }
                 if (DuplicateCount > 0)
                 {
-                    ActionContext->Error(FText::Format(NSLOCTEXT("RuleRanger",
-                                                                 "GameplayTagsRemapsHaveDuplicates",
-                                                                 "Gameplay Tag CategoryRemapping has {0} duplicate "
-                                                                 "entr{0}|plural(one=y,other=ies)."),
-                                                       FText::AsNumber(DuplicateCount)));
+                    ActionContext->Error(FText::Format(
+                        NSLOCTEXT("RuleRanger",
+                                  "GameplayTagsRemapsHaveDuplicates",
+                                  "Gameplay Tag CategoryRemapping has {0} duplicate entr{0}|plural(one=y,other=ies)."),
+                        FText::AsNumber(DuplicateCount)));
                 }
-                if (!IsSortedAscending(Remaps))
+                if (DuplicateCount > 0)
                 {
-                    ActionContext->Error(NSLOCTEXT("RuleRanger",
-                                                   "GameplayTagsRemapsUnsorted",
-                                                   "Gameplay Tag CategoryRemapping is not sorted "
-                                                   "by BaseCategory (ascending)."));
+                    ActionContext->Error(FText::Format(
+                        NSLOCTEXT("RuleRanger",
+                                  "GameplayTagsRemapsHaveDuplicates",
+                                  "Gameplay Tag CategoryRemapping has {0} duplicate entr{0}|plural(one=y,other=ies)."),
+                        FText::AsNumber(DuplicateCount)));
+                }
+                if (CategoriesUnsortedCount > 0)
+                {
+                    ActionContext->Error(FText::Format(
+                        NSLOCTEXT("RuleRanger",
+                                  "GameplayTagsRemapCategoriesUnsorted",
+                                  "{0} RemapCategories entr{0}|plural(one=y,other=ies) "
+                                  "are not sorted alphabetically and would be re-ordered if in Fix mode."),
+                        FText::AsNumber(CategoriesUnsortedCount)));
+                }
+                if (bUnsorted)
+                {
+                    ActionContext->Error(
+                        NSLOCTEXT("RuleRanger",
+                                  "GameplayTagsRemapsUnsorted",
+                                  "Gameplay Tag CategoryRemapping is not sorted by BaseCategory (ascending)."));
                 }
             }
             else
             {
+                // Sort RemapCategories alphabetically within each remap when applying fix
+                for (auto& R : Unique)
+                {
+                    R.RemapCategories.Sort([](const FString& A, const FString& B) { return A < B; });
+                }
+
                 Remaps = MoveTemp(Unique);
                 Settings->SaveConfig();
-                ActionContext->Info(FText::Format(NSLOCTEXT("RuleRanger",
-                                                            "GameplayTagsRemapsSorted",
-                                                            "Sorted Gameplay Tag CategoryRemapping and removed "
-                                                            "{0} duplicate entr{0}|plural(one=y,other=ies)."),
-                                                  FText::AsNumber(DuplicateCount)));
+
+                // Report changes
+                if (DuplicateCount > 0 || bUnsorted)
+                {
+                    ActionContext->Info(FText::Format(NSLOCTEXT("RuleRanger",
+                                                                "GameplayTagsRemapsSorted",
+                                                                "Sorted Gameplay Tag CategoryRemapping and removed {0} "
+                                                                "duplicate entr{0}|plural(one=y,other=ies)."),
+                                                      FText::AsNumber(DuplicateCount)));
+                }
+                if (EmptyRemovedCount > 0)
+                {
+                    ActionContext->Info(FText::Format(NSLOCTEXT("RuleRanger",
+                                                                "GameplayTagsRemapsRemovedEmpty",
+                                                                "Removed {0} empty Gameplay Tag CategoryRemapping "
+                                                                "entr{0}|plural(one=y,other=ies)."),
+                                                      FText::AsNumber(EmptyRemovedCount)));
+                }
+                if (WhitespaceRemovedCount > 0)
+                {
+                    ActionContext->Info(
+                        FText::Format(NSLOCTEXT("RuleRanger",
+                                                "GameplayTagsRemapsRemovedWhitespaceEntries",
+                                                "Removed {0} whitespace-only ent{0}|plural(one=ry,other=ries) "
+                                                "from RemapCategories lists."),
+                                      FText::AsNumber(WhitespaceRemovedCount)));
+                }
+                if (CategoryDupesRemovedCount > 0)
+                {
+                    ActionContext->Info(
+                        FText::Format(NSLOCTEXT("RuleRanger",
+                                                "GameplayTagsRemapsRemovedCategoryDuplicates",
+                                                "Removed {0} duplicate ent{0}|plural(one=ry,other=ries) "
+                                                "within RemapCategories lists."),
+                                      FText::AsNumber(CategoryDupesRemovedCount)));
+                }
+                if (CategoriesUnsortedCount > 0)
+                {
+                    ActionContext->Info(
+                        FText::Format(NSLOCTEXT("RuleRanger",
+                                                "GameplayTagsRemapCategoriesSorted",
+                                                "Sorted {0} RemapCategories entr{0}|plural(one=y,other=ies) "
+                                                "alphabetically."),
+                                      FText::AsNumber(CategoriesUnsortedCount)));
+                }
+                if (CategoryDupesRemovedCount > 0)
+                {
+                    ActionContext->Info(
+                        FText::Format(NSLOCTEXT("RuleRanger",
+                                                "GameplayTagsRemapsRemovedCategoryDuplicates",
+                                                "Removed {0} duplicate ent{0}|plural(one=ry,other=ries) "
+                                                "within RemapCategories lists."),
+                                      FText::AsNumber(CategoryDupesRemovedCount)));
+                }
             }
         }
     }

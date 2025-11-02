@@ -88,11 +88,33 @@ void UEnforceGameplayTagRemapsPresentAction::Apply(URuleRangerProjectActionConte
         {
             if (ActionContext->IsDryRun())
             {
-                ActionContext->Error(
-                    FText::Format(NSLOCTEXT("RuleRanger",
-                                            "MissingGameplayTagRemap_Multiple",
-                                            "Gameplay Tag CategoryRemapping is missing an entry for '{0}'."),
-                                  FText::FromString(BaseCategory)));
+                if (Pair.Value.IsEmpty())
+                {
+                    ActionContext->Error(
+                        FText::Format(NSLOCTEXT("RuleRanger",
+                                                "MissingGameplayTagRemap_Multiple",
+                                                "Gameplay Tag CategoryRemapping is missing an entry for '{0}'."),
+                                      FText::FromString(BaseCategory)));
+                }
+                else
+                {
+                    ActionContext->Error(FText::Format(NSLOCTEXT("RuleRanger",
+                                                                 "MissingGameplayTagRemap_Multiple",
+                                                                 "Gameplay Tag CategoryRemapping is missing an "
+                                                                 "entry for '{0}' but has defined defaults "
+                                                                 "and thus would be initialized if the rule "
+                                                                 "was run in Fix mode."),
+                                                       FText::FromString(BaseCategory)));
+                }
+            }
+            else if (Pair.Value.IsEmpty())
+            {
+                ActionContext->Error(FText::Format(NSLOCTEXT("RuleRanger",
+                                                             "MissingGameplayTagRemap_Multiple",
+                                                             "Gameplay Tag CategoryRemapping is missing an "
+                                                             "entry for '{0}' but no defaults are defined by "
+                                                             "the rule so unable to create a default entry."),
+                                                   FText::FromString(BaseCategory)));
             }
             else
             {

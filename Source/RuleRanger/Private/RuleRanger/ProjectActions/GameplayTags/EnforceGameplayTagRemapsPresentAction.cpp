@@ -18,26 +18,6 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnforceGameplayTagRemapsPresentAction)
 
-namespace
-{
-    static FText MakeMissingMessage(const FString& Name)
-    {
-        return FText::Format(NSLOCTEXT("RuleRanger",
-                                       "MissingGameplayTagRemap_Multiple",
-                                       "Gameplay Tag CategoryRemapping is missing an entry for '{0}'."),
-                             FText::FromString(Name));
-    }
-
-    static FText MakeAddedMessage(const FString& Name, const TArray<FString>& Targets)
-    {
-        return FText::Format(NSLOCTEXT("RuleRanger",
-                                       "AddedGameplayTagRemap_Multiple",
-                                       "Added Gameplay Tag CategoryRemapping for '{0}' with targets: {1}"),
-                             FText::FromString(Name),
-                             FText::FromString(FString::Join(Targets, TEXT(", "))));
-    }
-} // namespace
-
 void UEnforceGameplayTagRemapsPresentAction::Apply(URuleRangerProjectActionContext* ActionContext)
 {
     UGameplayTagsSettings* const Settings = GetMutableDefault<UGameplayTagsSettings>();
@@ -109,7 +89,11 @@ void UEnforceGameplayTagRemapsPresentAction::Apply(URuleRangerProjectActionConte
         {
             if (ActionContext->IsDryRun())
             {
-                ActionContext->Error(MakeMissingMessage(BaseCategory));
+                ActionContext->Error(
+                    FText::Format(NSLOCTEXT("RuleRanger",
+                                            "MissingGameplayTagRemap_Multiple",
+                                            "Gameplay Tag CategoryRemapping is missing an entry for '{0}'."),
+                                  FText::FromString(BaseCategory)));
             }
             else
             {
@@ -123,7 +107,12 @@ void UEnforceGameplayTagRemapsPresentAction::Apply(URuleRangerProjectActionConte
                     }
                 }
                 RemapsRef.Add(MoveTemp(NewRemap));
-                ActionContext->Info(MakeAddedMessage(BaseCategory, Pair.Value));
+                ActionContext->Info(
+                    FText::Format(NSLOCTEXT("RuleRanger",
+                                            "AddedGameplayTagRemap_Multiple",
+                                            "Added Gameplay Tag CategoryRemapping for '{0}' with targets: {1}"),
+                                  FText::FromString(BaseCategory),
+                                  FText::FromString(FString::Join(Pair.Value, TEXT(", ")))));
                 bChanged = true;
             }
         }

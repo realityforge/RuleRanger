@@ -17,26 +17,6 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnforceGameplayTagRemapPresentAction)
 
-namespace
-{
-    static FText MakeMissingMessage(const FString& Name)
-    {
-        return FText::Format(NSLOCTEXT("RuleRanger",
-                                       "MissingGameplayTagRemap",
-                                       "Gameplay Tag CategoryRemapping is missing an entry for '{0}'."),
-                             FText::FromString(Name));
-    }
-
-    static FText MakeAddedMessage(const FString& Name, const TArray<FString>& Targets)
-    {
-        return FText::Format(NSLOCTEXT("RuleRanger",
-                                       "AddedGameplayTagRemap",
-                                       "Added Gameplay Tag CategoryRemapping for '{0}' with targets: {1}"),
-                             FText::FromString(Name),
-                             FText::FromString(FString::Join(Targets, TEXT(", "))));
-    }
-} // namespace
-
 void UEnforceGameplayTagRemapPresentAction::Apply(URuleRangerProjectActionContext* ActionContext)
 {
     if (Name.TrimStartAndEnd().IsEmpty())
@@ -57,37 +37,89 @@ void UEnforceGameplayTagRemapPresentAction::Apply(URuleRangerProjectActionContex
         else
         {
             auto& Remaps = Settings->CategoryRemapping;
-            if (!Remaps.FindByPredicate([&](const auto& Remap) { return Remap.BaseCategory == Name; }))
+            const auto Existing = Remaps.FindByPredicate([&](const auto& Remap) { return Remap.BaseCategory == Name; });
+            if (!Existing)
             {
                 if (ActionContext->IsDryRun())
                 {
-                    ActionContext->Error(MakeMissingMessage(Name));
+                    ActionContext->Error(
+                        FText::Format(NSLOCTEXT("RuleRanger",
+                                                "MissingGameplayTagRemap",
+                                                "Gameplay Tag CategoryRemapping is missing an entry for '{0}'."),
+                                      FText::FromString(Name)));
+                }
+                else if (DefaultTargets.Num() <= 0)
+                {
+                    // No fix strategy configured
+                    ActionContext->Error(FText::Format(NSLOCTEXT("RuleRanger",
+                                                                 "MissingGameplayTagRemap",
+                                                                 "Gameplay Tag CategoryRemapping is missing an "
+                                                                 "entry for '{0}' and no DefaultTargets "
+                                                                 "are defined in rule."),
+                                                       FText::FromString(Name)));
                 }
                 else
                 {
-                    if (DefaultTargets.Num() <= 0)
+                    // Create the remap using defaults
+                    FGameplayTagCategoryRemap NewRemap;
+                    NewRemap.BaseCategory = Name;
+                    for (const auto& Target : DefaultTargets)
                     {
-                        // No fix strategy configured
-                        ActionContext->Error(MakeMissingMessage(Name));
-                    }
-                    else
-                    {
-                        // Create the remap using defaults
-                        FGameplayTagCategoryRemap NewRemap;
-                        NewRemap.BaseCategory = Name;
-                        for (const auto& Target : DefaultTargets)
+                        if (!Target.TrimStartAndEnd().IsEmpty())
                         {
-                            if (!Target.TrimStartAndEnd().IsEmpty())
-                            {
-                                NewRemap.RemapCategories.Add(Target);
-                            }
+                            NewRemap.RemapCategories.Add(Target);
                         }
-
-                        Remaps.Add(MoveTemp(NewRemap));
-                        Settings->SaveConfig();
-
-                        ActionContext->Info(MakeAddedMessage(Name, DefaultTargets));
                     }
+
+                    Remaps.Add(MoveTemp(NewRemap));
+                    Settings->SaveConfig();
+
+                    ActionContext->Info(
+                        FText::Format(NSLOCTEXT("RuleRanger",
+                                                "AddedGameplayTagRemap",
+                                                "Added Gameplay Tag CategoryRemapping for '{0}' with targets: {1}"),
+                                      FText::FromString(Name),
+                                      FText::FromString(FString::Join(DefaultTargets, TEXT(", ")))));
+                }
+            }
+            else if (0 == Existing->RemapCategories.Num())
+            {
+                if (ActionContext->IsDryRun())
+                {
+                    ActionContext->Error(FText::Format(NSLOCTEXT("RuleRanger",
+                                                                 "MissingGameplayTagRemap",
+                                                                 "Gameplay Tag has an entry for '{0}' that "
+                                                                 "has no RemapCategories specified."),
+                                                       FText::FromString(Name)));
+                }
+                else if (DefaultTargets.Num() <= 0)
+                {
+                    ActionContext->Error(FText::Format(NSLOCTEXT("RuleRanger",
+                                                                 "MissingGameplayTagRemap",
+                                                                 "Gameplay Tag has an entry for '{0}' that "
+                                                                 "has no RemapCategories specified "
+                                                                 "and no DefaultTargets are defined in the rule."),
+                                                       FText::FromString(Name)));
+                }
+                else
+                {
+                    // Create the remap using defaults
+                    for (const auto& Target : DefaultTargets)
+                    {
+                        if (!Target.TrimStartAndEnd().IsEmpty())
+                        {
+                            Existing->RemapCategories.Add(Target);
+                        }
+                    }
+
+                    Settings->SaveConfig();
+
+                    ActionContext->Info(FText::Format(NSLOCTEXT("RuleRanger",
+                                                                "AddedGameplayTagRemap",
+                                                                "Updated empty Gameplay Tag CategoryRemapping "
+                                                                "for '{0}' with targets: {1}"),
+                                                      FText::FromString(Name),
+                                                      FText::FromString(FString::Join(DefaultTargets, TEXT(", ")))));
                 }
             }
         }

@@ -58,7 +58,7 @@ public:
     UPROPERTY(EditAnywhere,
               Category = "Default",
               meta = (DisplayName = "Remap Tables",
-                      RequiredAssetDataTags = "RowStructure=/Script/RuleRanger.RuleRangerTagCategoryRow",
+                      RequiredAssetDataTags = "RowStructure=/Script/RuleRangerGameplayTags.RuleRangerTagCategoryRow",
                       ForceShowPluginContent = "true"))
     TArray<TObjectPtr<UDataTable>> RemapTables;
 

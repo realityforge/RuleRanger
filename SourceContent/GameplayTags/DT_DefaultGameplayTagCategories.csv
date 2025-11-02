@@ -1,0 +1,7 @@
+---,Description,DefaultTargets
+TriggerTagCategory,"NSLOCTEXT(""[67F2B3EED3114C7BC38301A050BEFCC4]"", ""6794981A4218311A5AB0C2BD7287FAFB"", ""Used by GameplayAbility for TriggerTag when triggering via events"")","(""Ability.Trigger"")"
+AbilityTagCategory,"NSLOCTEXT(""[67F2B3EED3114C7BC38301A050BEFCC4]"", ""40F2BF7F44DFA42B6F9368834CEB4844"", ""Used by GameplayAbility for AbilityTags, CancelAbilitiesWithTag, BlockAbilitiesWithTag"")","(""Ability"")"
+OwnedTagsCategory,"NSLOCTEXT(""[67F2B3EED3114C7BC38301A050BEFCC4]"", ""6CB1508A43385A3BAC4B5DAEC21B7299"", ""Used by GameplayAbility for ActivationOwnedTags, ActivationRequiredTags, ActivationBlockedTags"")","(""Ability"")"
+SourceTagsCategory,"NSLOCTEXT(""[67F2B3EED3114C7BC38301A050BEFCC4]"", ""C0C4D7AD41DA647CA8718295B401DE22"", ""Used by GameplayAbility for SourceRequiredTags, SourceBlockedTags"")","(""Ability"")"
+TargetTagsCategory,"NSLOCTEXT(""[67F2B3EED3114C7BC38301A050BEFCC4]"", ""627EE6244CBBF9CA44901A9CDD65980A"", ""Used by GameplayAbility for TargetRequiredTags, TargetBlockedTags"")","(""Ability"")"
+GameplayEventTagsCategory,"NSLOCTEXT(""[67F2B3EED3114C7BC38301A050BEFCC4]"", ""6251C2334B397D27AD22E9917E790456"", ""Default category for Events that are sent to actors. Used by SendGameplayEventToActor and related infrastructure."")","(""Event"")"

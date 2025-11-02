@@ -27,11 +27,21 @@
       "Name": "Metasound",
       "Enabled": true,
       "Optional": true
+    },
+    {
+      "Name": "GameplayTagsEditor",
+      "Enabled": true,
+      "Optional": true
     }
   ],
   "Modules": [
     {
       "Name": "RuleRanger",
+      "Type": "Editor",
+      "LoadingPhase": "Default"
+    },
+    {
+      "Name": "RuleRangerGameplayTags",
       "Type": "Editor",
       "LoadingPhase": "Default"
     }

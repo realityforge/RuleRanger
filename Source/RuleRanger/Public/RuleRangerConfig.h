@@ -64,7 +64,8 @@ public:
      * @param RowStructure The type representing each row in data table.
      * @param OutDataTables The variable in which to place matching DataTables.
      */
-    void CollectDataTables(const UScriptStruct* RowStructure, TArray<TObjectPtr<UDataTable>>& OutDataTables) const;
+    RULERANGER_API void CollectDataTables(const UScriptStruct* RowStructure,
+                                          TArray<TObjectPtr<UDataTable>>& OutDataTables) const;
 
     /**
      * Updates the editor only titles for subobjects.

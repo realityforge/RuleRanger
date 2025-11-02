@@ -22,29 +22,10 @@ public class RuleRanger : ModuleRules
         PublicDependencyModuleNames.AddRange(new[] { "ContentBrowser", "Core" });
 
         PrivateDependencyModuleNames.AddRange(new[] {
-            "AssetRegistry",
-            "AnimGraph",
-            "AssetTools",
-            "CoreUObject",
-            "BlueprintGraph",
-            "DataValidation",
-            "DeveloperSettings",
-            "EditorSubsystem",
-            "Engine",
-            "Json",
-            "Kismet",
-            "Projects",
-            "MessageLog",
-            "NiagaraEditor",
-            "Niagara",
-            "Slate",
-            "SlateCore",
-            "Settings",
-            "ToolMenus",
-            "UnrealEd",
-            // Gameplay Tags settings access for project actions
-            "GameplayTags",
-            "GameplayTagsEditor",
+            "AssetRegistry",  "AnimGraph",         "AssetTools",      "CoreUObject",   "BlueprintGraph",
+            "DataValidation", "DeveloperSettings", "EditorSubsystem", "Engine",        "Json",
+            "Kismet",         "Projects",          "MessageLog",      "NiagaraEditor", "Niagara",
+            "Slate",          "SlateCore",         "Settings",        "ToolMenus",     "UnrealEd",
         });
 
         PrivateIncludePathModuleNames.Add("MessageLog");

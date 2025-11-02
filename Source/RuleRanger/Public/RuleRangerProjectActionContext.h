@@ -42,6 +42,7 @@ class URuleRangerProjectActionContext final : public URuleRangerCommonContext
     GENERATED_BODY()
     friend class URuleRangerEditorSubsystem;
     friend class URuleRangerEditorValidator;
+    friend class URuleRangerCommandlet;
 
 protected:
     virtual void ClearContext() override;

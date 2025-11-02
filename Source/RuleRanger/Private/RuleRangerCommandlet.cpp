@@ -75,7 +75,9 @@ void URuleRangerCommandlet::ResetState()
     NumWarnings = 0;
     NumFatals = 0;
     NumAssetsScanned = 0;
-    JsonResults.Reset();
+    NumProjectRulesScanned = 0;
+    AssetRuleResults.Reset();
+    ProjectRuleResults.Reset();
 }
 
 int32 URuleRangerCommandlet::Main(const FString& Params)
@@ -85,15 +87,21 @@ int32 URuleRangerCommandlet::Main(const FString& Params)
         const auto bFix = Params.Contains(TEXT("fix"));
         const auto bExitOnWarning = Params.Contains(TEXT("exitOnWarning"));
         const auto bQuiet = Params.Contains(TEXT("quiet"));
+        const bool bAssetsOnly = Params.Contains(TEXT("assetsOnly"));
+        const bool bProjectOnly = Params.Contains(TEXT("projectOnly"));
+        const bool bRunAssets = bAssetsOnly || !bProjectOnly;  // run unless explicitly project-only
+        const bool bRunProject = bProjectOnly || !bAssetsOnly; // run unless explicitly assets-only
 
         FString ReportPath;
         FParse::Value(*Params, TEXT("report="), ReportPath);
 
-        TArray<FString> AllowlistPaths;
-        DeriveAllowlistPaths(Params, AllowlistPaths);
-
         TArray<FAssetData> Assets;
-        CollectAssetsFromAllowlist(AllowlistPaths, Assets);
+        if (bRunAssets)
+        {
+            TArray<FString> AllowlistPaths;
+            DeriveAllowlistPaths(Params, AllowlistPaths);
+            CollectAssetsFromAllowlist(AllowlistPaths, Assets);
+        }
 
         // Reset state
         ResetState();
@@ -105,21 +113,30 @@ int32 URuleRangerCommandlet::Main(const FString& Params)
         WaitForShaders();
 
         // --- Scan assets ---
-        for (const auto& Asset : Assets)
+        if (bRunAssets)
         {
-            CurrentAsset = Asset;
-            if (const auto Object = Asset.GetAsset())
+            for (const auto& Asset : Assets)
             {
-                NumAssetsScanned++;
-                if (bFix)
+                CurrentAsset = Asset;
+                if (const auto Object = Asset.GetAsset())
                 {
-                    Subsystem->ScanAndFixObject(Object, this);
-                }
-                else
-                {
-                    Subsystem->ScanObject(Object, this);
+                    NumAssetsScanned++;
+                    if (bFix)
+                    {
+                        Subsystem->ScanAndFixObject(Object, this);
+                    }
+                    else
+                    {
+                        Subsystem->ScanObject(Object, this);
+                    }
                 }
             }
+        }
+
+        // Execute project-level rules (scan or fix)
+        if (bRunProject)
+        {
+            ExecuteProjectRules(bFix);
         }
 
         // --- JSON report ---
@@ -133,10 +150,12 @@ int32 URuleRangerCommandlet::Main(const FString& Params)
             Summary->SetNumberField(TEXT("Errors"), NumErrors);
             Summary->SetNumberField(TEXT("Warnings"), NumWarnings);
             Summary->SetNumberField(TEXT("Fatals"), NumFatals);
+            Summary->SetNumberField(TEXT("ProjectRulesExecuted"), NumProjectRulesScanned);
             Root->SetObjectField(TEXT("Summary"), Summary);
 
             // Results
-            Root->SetArrayField(TEXT("Results"), JsonResults);
+            Root->SetArrayField(TEXT("AssetRuleResults"), AssetRuleResults);
+            Root->SetArrayField(TEXT("ProjectRuleResults"), ProjectRuleResults);
 
             FString OutputString;
             const auto Writer = TJsonWriterFactory<>::Create(&OutputString);
@@ -201,6 +220,181 @@ void URuleRangerCommandlet::OnRuleApplied(URuleRangerActionContext* ActionContex
             AssetResult->SetArrayField(TEXT("Warnings"), WarningsJson);
         }
 
-        JsonResults.Add(MakeShared<FJsonValueObject>(AssetResult));
+        AssetRuleResults.Add(MakeShared<FJsonValueObject>(AssetResult));
+    }
+}
+
+void URuleRangerCommandlet::ExecuteProjectRules(const bool bFix)
+{
+    // Build list of configured RuleRangerConfig assets from developer settings
+    const auto DevSettings = GetDefault<URuleRangerDeveloperSettings>();
+    if (!IsValid(DevSettings))
+    {
+        UE_LOGFMT(LogRuleRanger, Error, "RuleRangerCommandlet: Unable to get URuleRangerDeveloperSettings");
+        return;
+    }
+
+    // Single reusable project action context
+    const auto ProjectContext =
+        NewObject<URuleRangerProjectActionContext>(this, URuleRangerProjectActionContext::StaticClass());
+
+    for (const auto& SoftConfig : DevSettings->Configs)
+    {
+        if (auto* Config = SoftConfig.LoadSynchronous())
+        {
+            TSet<const URuleRangerRuleSet*> Visited;
+            for (const auto& RuleSetPtr : Config->RuleSets)
+            {
+                if (const auto RuleSet = RuleSetPtr.Get())
+                {
+                    if (!ProcessProjectRuleSet(Config, RuleSet, ProjectContext, bFix, Visited))
+                    {
+                        // Stop processing project rules if requested
+                        return;
+                    }
+                }
+                else
+                {
+                    UE_LOGFMT(LogRuleRanger,
+                              Error,
+                              "RuleRangerCommandlet: Invalid RuleSet skipped when processing "
+                              "project rules for config {Config}",
+                              Config->GetName());
+                }
+            }
+        }
+        else
+        {
+            UE_LOGFMT(LogRuleRanger, Error, "RuleRangerCommandlet: Invalid Config in DeveloperSettings skipped");
+        }
+    }
+}
+
+bool URuleRangerCommandlet::ProcessProjectRuleSet(URuleRangerConfig* const Config,
+                                                  URuleRangerRuleSet* const RuleSet,
+                                                  URuleRangerProjectActionContext* const ProjectContext,
+                                                  const bool bFix,
+                                                  TSet<const URuleRangerRuleSet*>& Visited)
+{
+    if (!IsValid(RuleSet))
+    {
+        return true;
+    }
+    else if (Visited.Contains(RuleSet))
+    {
+        UE_LOGFMT(LogRuleRanger,
+                  Error,
+                  "RuleRangerCommandlet: Detected cyclic reference involving Rule Set {RuleSet}. "
+                  "Skipping nested traversal.",
+                  RuleSet->GetName());
+        return true;
+    }
+    else
+    {
+        Visited.Add(RuleSet);
+
+        // Recurse into nested rule sets first
+        for (const auto& NestedRuleSetPtr : RuleSet->RuleSets)
+        {
+            if (auto* Nested = NestedRuleSetPtr.Get())
+            {
+                if (!ProcessProjectRuleSet(Config, Nested, ProjectContext, bFix, Visited))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                UE_LOGFMT(LogRuleRanger,
+                          Error,
+                          "RuleRangerCommandlet: Invalid Nested RuleSet skipped when "
+                          "processing project rules in {RuleSet}",
+                          RuleSet->GetName());
+            }
+        }
+
+        // Apply project rules
+        for (const auto RulePtr : RuleSet->ProjectRules)
+        {
+            if (auto* Rule = RulePtr.Get())
+            {
+                if (!Rule->bApplyOnDemand)
+                {
+                    continue;
+                }
+
+                const auto Trigger =
+                    bFix ? ERuleRangerProjectActionTrigger::AT_Fix : ERuleRangerProjectActionTrigger::AT_Report;
+
+                ProjectContext->ResetContext(Config, RuleSet, Rule, Trigger);
+
+                Rule->Apply(ProjectContext);
+
+                // Aggregate messages into counts and JSON results
+                const auto Fatals = ProjectContext->GetFatalMessages().Num();
+                const auto Errors = ProjectContext->GetErrorMessages().Num();
+                const auto Warnings = ProjectContext->GetWarningMessages().Num();
+
+                NumFatals += Fatals;
+                NumErrors += Errors;
+                NumWarnings += Warnings;
+                ++NumProjectRulesScanned;
+
+                if (Warnings > 0 || Errors > 0 || Fatals > 0)
+                {
+                    auto Result = MakeShared<FJsonObject>();
+                    Result->SetStringField(TEXT("RuleName"), Rule->GetName());
+                    Result->SetStringField(TEXT("RulePath"), Rule->GetPathName());
+                    Result->SetStringField(TEXT("RuleSetPath"), RuleSet->GetPathName());
+
+                    if (Errors > 0 || Fatals > 0)
+                    {
+                        TArray<TSharedPtr<FJsonValue>> ErrorsJson;
+                        for (const auto& Msg : ProjectContext->GetErrorMessages())
+                        {
+                            ErrorsJson.Add(MakeShared<FJsonValueString>(Msg.ToString()));
+                        }
+                        for (const auto& Msg : ProjectContext->GetFatalMessages())
+                        {
+                            ErrorsJson.Add(MakeShared<FJsonValueString>(Msg.ToString()));
+                        }
+                        Result->SetArrayField(TEXT("Errors"), ErrorsJson);
+                    }
+
+                    if (Warnings > 0)
+                    {
+                        TArray<TSharedPtr<FJsonValue>> WarningsJson;
+                        for (const auto& Msg : ProjectContext->GetWarningMessages())
+                        {
+                            WarningsJson.Add(MakeShared<FJsonValueString>(Msg.ToString()));
+                        }
+                        Result->SetArrayField(TEXT("Warnings"), WarningsJson);
+                    }
+
+                    ProjectRuleResults.Add(MakeShared<FJsonValueObject>(Result));
+                }
+
+                const auto State = ProjectContext->GetState();
+                ProjectContext->ClearContext();
+
+                if (ERuleRangerActionState::AS_Fatal == State)
+                {
+                    return false; // stop processing
+                }
+                else if (bFix && ERuleRangerActionState::AS_Error == State && !Rule->bContinueOnError)
+                {
+                    return false; // stop processing on error in fix mode if rule disallows continue
+                }
+            }
+            else
+            {
+                UE_LOGFMT(LogRuleRanger,
+                          Error,
+                          "RuleRangerCommandlet: Invalid ProjectRule skipped in rule set '{RuleSet}'",
+                          RuleSet->GetName());
+            }
+        }
+
+        return true;
     }
 }

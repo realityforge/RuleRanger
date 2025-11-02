@@ -17,6 +17,11 @@
 #include "RuleRangerResultHandler.h"
 #include "RuleRangerCommandlet.generated.h"
 
+class URuleRangerConfig;
+class URuleRangerRuleSet;
+class URuleRangerProjectRule;
+class URuleRangerProjectActionContext;
+
 UCLASS()
 class URuleRangerCommandlet final : public UCommandlet, public IRuleRangerResultHandler
 {
@@ -25,14 +30,22 @@ class URuleRangerCommandlet final : public UCommandlet, public IRuleRangerResult
     void CollectAssetsFromAllowlist(const TArray<FString>& AllowlistPaths, TArray<FAssetData>& Assets);
     void DeriveAllowlistPaths(const FString& Params, TArray<FString>& AllowlistPaths);
     void ResetState();
+    void ExecuteProjectRules(bool bFix);
+    bool ProcessProjectRuleSet(URuleRangerConfig* Config,
+                               URuleRangerRuleSet* RuleSet,
+                               URuleRangerProjectActionContext* ProjectContext,
+                               bool bFix,
+                               TSet<const URuleRangerRuleSet*>& Visited);
 
     FAssetData CurrentAsset;
     int32 NumErrors{ 0 };
     int32 NumWarnings{ 0 };
     int32 NumFatals{ 0 };
     int32 NumAssetsScanned{ 0 };
+    int32 NumProjectRulesScanned{ 0 };
 
-    TArray<TSharedPtr<FJsonValue>> JsonResults;
+    TArray<TSharedPtr<FJsonValue>> AssetRuleResults;
+    TArray<TSharedPtr<FJsonValue>> ProjectRuleResults;
 
 public:
     URuleRangerCommandlet();

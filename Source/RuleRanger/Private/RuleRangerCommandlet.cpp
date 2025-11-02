@@ -20,7 +20,12 @@
 #include "Misc/FileHelper.h"
 #include "RuleRanger/RuleRangerEditorSubsystem.h"
 #include "RuleRangerActionContext.h"
+#include "RuleRangerConfig.h"
+#include "RuleRangerDeveloperSettings.h"
 #include "RuleRangerLogging.h"
+#include "RuleRangerProjectActionContext.h"
+#include "RuleRangerProjectRule.h"
+#include "RuleRangerRuleSet.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
 #include "ShaderCompiler.h"
@@ -33,6 +38,26 @@ static void WaitForShaders()
     {
         GShaderCompilingManager->FinishAllCompilation();
     }
+}
+
+static void PrintRuleRangerCommandletUsage()
+{
+    FString Usage;
+    Usage.Append(TEXT("RuleRangerCommandlet usage:\n"));
+    Usage.Append(TEXT("  -run=RuleRangerCommandlet [options]\n\n"));
+    Usage.Append(TEXT("Options:\n"));
+    Usage.Append(TEXT("  -help                       Show this help and exit\n"));
+    Usage.Append(TEXT("  -paths=/Game[,/Game/Foo]    Comma-separated content roots to scan (assets)\n"));
+    Usage.Append(TEXT("  -fix                        Apply autofixes where supported (assets + project)\n"));
+    Usage.Append(TEXT("  -report=Path                Write JSON report to the given file\n"));
+    Usage.Append(TEXT("  -exitOnWarning              Exit non-zero if warnings are present\n"));
+    Usage.Append(TEXT("  -quiet                      Suppress \"report written\" log\n"));
+    Usage.Append(TEXT("  -assetsOnly                 Run only asset rules\n"));
+    Usage.Append(TEXT("  -projectOnly                Run only project rules\n\n"));
+    Usage.Append(TEXT("Notes:\n"));
+    Usage.Append(TEXT("  - By default, both asset and project rules run.\n"));
+    Usage.Append(TEXT("  - Default asset scan path is /Game when -paths is not supplied.\n"));
+    UE_LOG(LogRuleRanger, Display, TEXT("%s"), *Usage);
 }
 
 URuleRangerCommandlet::URuleRangerCommandlet()
@@ -82,6 +107,11 @@ void URuleRangerCommandlet::ResetState()
 
 int32 URuleRangerCommandlet::Main(const FString& Params)
 {
+    if (FParse::Param(*Params, TEXT("help")))
+    {
+        PrintRuleRangerCommandletUsage();
+        return 0;
+    }
     if (const auto Subsystem = GEditor ? GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>() : nullptr)
     {
         const auto bFix = Params.Contains(TEXT("fix"));

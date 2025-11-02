@@ -20,7 +20,7 @@
 
 namespace
 {
-    FText MakeMissingMessage(const FString& Name)
+    static FText MakeMissingMessage(const FString& Name)
     {
         return FText::Format(NSLOCTEXT("RuleRanger",
                                        "MissingGameplayTagRemap_Multiple",
@@ -28,7 +28,7 @@ namespace
                              FText::FromString(Name));
     }
 
-    FText MakeAddedMessage(const FString& Name, const TArray<FString>& Targets)
+    static FText MakeAddedMessage(const FString& Name, const TArray<FString>& Targets)
     {
         return FText::Format(NSLOCTEXT("RuleRanger",
                                        "AddedGameplayTagRemap_Multiple",

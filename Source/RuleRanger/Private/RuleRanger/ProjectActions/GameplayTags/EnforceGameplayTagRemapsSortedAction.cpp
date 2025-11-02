@@ -18,7 +18,7 @@
 
 namespace
 {
-    bool IsSortedAscending(const TArray<FGameplayTagCategoryRemap>& Remaps)
+    static bool IsSortedAscending(const TArray<FGameplayTagCategoryRemap>& Remaps)
     {
         if (Remaps.Num() < 2)
         {

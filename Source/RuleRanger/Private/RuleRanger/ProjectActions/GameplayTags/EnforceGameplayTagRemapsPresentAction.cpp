@@ -81,7 +81,6 @@ void UEnforceGameplayTagRemapsPresentAction::Apply(URuleRangerProjectActionConte
         Existing.Add(Remap.BaseCategory);
     }
 
-    bool bChanged = false;
     for (const auto& Pair : Expected)
     {
         const auto& BaseCategory = Pair.Key;
@@ -107,19 +106,14 @@ void UEnforceGameplayTagRemapsPresentAction::Apply(URuleRangerProjectActionConte
                     }
                 }
                 RemapsRef.Add(MoveTemp(NewRemap));
+                Settings->SaveConfig();
                 ActionContext->Info(
                     FText::Format(NSLOCTEXT("RuleRanger",
                                             "AddedGameplayTagRemap_Multiple",
                                             "Added Gameplay Tag CategoryRemapping for '{0}' with targets: {1}"),
                                   FText::FromString(BaseCategory),
                                   FText::FromString(FString::Join(Pair.Value, TEXT(", ")))));
-                bChanged = true;
             }
         }
-    }
-
-    if (bChanged)
-    {
-        Settings->SaveConfig();
     }
 }

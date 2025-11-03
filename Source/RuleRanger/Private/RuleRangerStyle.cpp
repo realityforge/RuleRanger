@@ -15,6 +15,7 @@
 #include "Framework/Application/SlateApplication.h"
 #include "Interfaces/IPluginManager.h"
 #include "Logging/StructuredLog.h"
+#include "RuleRanger.h"
 #include "RuleRangerLogging.h"
 #include "Styling/SlateStyleRegistry.h"
 
@@ -52,10 +53,19 @@ FName FRuleRangerStyle::GetStyleSetName()
     return StyleSetName;
 }
 
+FSlateIcon FRuleRangerStyle::GetScanIcon()
+{
+    return FSlateIcon(FAppStyle::GetAppStyleSetName(), "Symbols.SearchGlass");
+}
+
+FSlateIcon FRuleRangerStyle::GetScanAndFixIcon()
+{
+    return FSlateIcon(FAppStyle::GetAppStyleSetName(), "MessageLog.Fix");
+}
+
 TSharedRef<FSlateStyleSet> FRuleRangerStyle::Create()
 {
-    const FName RuleRangerModuleName = FName(TEXT("RuleRanger"));
-    const FVector2D Icon16x16(16.0f, 16.0f);
+    const auto RuleRangerModuleName = FRuleRangerModule::GetModuleName();
 
     // The resources directory of the RuleRanger Plugin
     const auto ResourcesDir =
@@ -63,19 +73,6 @@ TSharedRef<FSlateStyleSet> FRuleRangerStyle::Create()
 
     TSharedRef<FSlateStyleSet> Style = MakeShareable(new FSlateStyleSet(GetStyleSetName()));
     Style->SetContentRoot(ResourcesDir);
-
-    Style->Set(TEXT("RuleRanger.ScanSelectedPaths"),
-               new FSlateImageBrush(ResourcesDir / TEXT("Icons/magnifying_glass.png"), Icon16x16));
-    Style->Set(TEXT("RuleRanger.FixSelectedPaths"),
-               new FSlateImageBrush(ResourcesDir / TEXT("Icons/magnifying_glass.png"), Icon16x16));
-    Style->Set(TEXT("RuleRanger.ScanSelectedAssets"),
-               new FSlateImageBrush(ResourcesDir / TEXT("Icons/magnifying_glass.png"), Icon16x16));
-    Style->Set(TEXT("RuleRanger.FixSelectedAssets"),
-               new FSlateImageBrush(ResourcesDir / TEXT("Icons/magnifying_glass.png"), Icon16x16));
-    Style->Set(TEXT("RuleRanger.ScanProjectContent"),
-               new FSlateImageBrush(ResourcesDir / TEXT("Icons/magnifying_glass.png"), Icon16x16));
-    Style->Set(TEXT("RuleRanger.FixProjectContent"),
-               new FSlateImageBrush(ResourcesDir / TEXT("Icons/magnifying_glass.png"), Icon16x16));
 
     return Style;
 }

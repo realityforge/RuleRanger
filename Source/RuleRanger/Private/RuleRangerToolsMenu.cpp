@@ -63,7 +63,7 @@ void FRuleRangerToolsMenu::RegisterMenus()
                            NSLOCTEXT("RuleRanger", "RuleRangerToolsMenu_Tooltip", "Rule Ranger operations"),
                            FNewToolMenuDelegate::CreateStatic(&FRuleRangerToolsMenu::FillRuleRangerSubMenu),
                            false,
-                           FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.ScanProjectContent")));
+                           FRuleRangerStyle::GetScanIcon());
     }
 }
 
@@ -125,7 +125,7 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                       "ScanProject_Tooltip",
                       "Execute project-level rules defined in configured RuleRanger rule sets\n"
                       "(Disabled if no project rules exist)"),
-            FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.ScanProjectContent")),
+            FRuleRangerStyle::GetScanIcon(),
             FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnScanProject),
                       FCanExecuteAction::CreateLambda([] { return HasAnyProjectRules(); })));
         SubSection.AddEntry(MoveTemp(Entry));
@@ -139,7 +139,7 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                       "FixProject_Tooltip",
                       "Execute project-level rules and apply fixes where supported\n"
                       "(Disabled if no project rules exist)"),
-            FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.FixProjectContent")),
+            FRuleRangerStyle::GetScanAndFixIcon(),
             FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnFixProject),
                       FCanExecuteAction::CreateLambda([] { return HasAnyProjectRules(); })));
         SubSection.AddEntry(MoveTemp(Entry));
@@ -157,7 +157,7 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                 "ScanConfiguredContent_Tooltip",
                 "Scan content in configured directories (configure under Project Settings → Editor → Rule Ranger)\n"
                 "(Disabled if no directories are configured)"),
-            FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.ScanProjectContent")),
+            FRuleRangerStyle::GetScanIcon(),
             FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnScanConfiguredContent),
                       FCanExecuteAction::CreateLambda([] { return HasAnyConfiguredDirs(); })));
         SubSection.AddEntry(MoveTemp(Entry));
@@ -172,7 +172,7 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                 "FixConfiguredContent_Tooltip",
                 "Scan and apply fixes in configured directories (configure under Project Settings → Editor → Rule Ranger)\n"
                 "(Disabled if no directories are configured)"),
-            FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.FixProjectContent")),
+            FRuleRangerStyle::GetScanAndFixIcon(),
             FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnFixConfiguredContent),
                       FCanExecuteAction::CreateLambda([] { return HasAnyConfiguredDirs(); })));
         SubSection.AddEntry(MoveTemp(Entry));

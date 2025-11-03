@@ -32,6 +32,9 @@ public:
 
     static FName GetStyleSetName();
 
+    static FSlateIcon GetScanIcon();
+    static FSlateIcon GetScanAndFixIcon();
+
 private:
     static TSharedRef<FSlateStyleSet> Create();
     static TSharedPtr<FSlateStyleSet> StyleInstance;

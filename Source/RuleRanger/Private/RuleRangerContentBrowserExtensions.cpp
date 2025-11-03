@@ -181,12 +181,12 @@ static TSharedRef<FExtender> OnExtendSelectedPathsMenu(const TArray<FString>& Pa
                                  NAME_None,
                                  TAttribute<FText>(),
                                  TAttribute<FText>(ScanTip),
-                                 FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.ScanSelectedPaths")));
+                                 FRuleRangerStyle::GetScanIcon());
         MenuBuilder.AddMenuEntry(FRuleRangerCommands::Get().FixSelectedPaths,
                                  NAME_None,
                                  TAttribute<FText>(),
                                  TAttribute<FText>(FixTip),
-                                 FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.FixSelectedPaths")));
+                                 FRuleRangerStyle::GetScanAndFixIcon());
         MenuBuilder.AddSeparator();
         MenuBuilder.EndSection();
     });
@@ -233,17 +233,16 @@ static TSharedRef<FExtender> OnExtendForSelectedAssetsMenu(const TArray<FAssetDa
     const auto MenuExtensionDelegate = FMenuExtensionDelegate::CreateLambda([ScanTip, FixTip](auto& MenuBuilder) {
         MenuBuilder.BeginSection("RuleRangerContentBrowserContext",
                                  NSLOCTEXT("RuleRanger", "ContextMenuSectionName", "Rule Ranger"));
-        MenuBuilder.AddMenuEntry(
-            FRuleRangerCommands::Get().ScanSelectedAssets,
-            NAME_None,
-            TAttribute<FText>(),
-            TAttribute<FText>(ScanTip),
-            FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.ScanSelectedAssets")));
+        MenuBuilder.AddMenuEntry(FRuleRangerCommands::Get().ScanSelectedAssets,
+                                 NAME_None,
+                                 TAttribute<FText>(),
+                                 TAttribute<FText>(ScanTip),
+                                 FRuleRangerStyle::GetScanIcon());
         MenuBuilder.AddMenuEntry(FRuleRangerCommands::Get().FixSelectedAssets,
                                  NAME_None,
                                  TAttribute<FText>(),
                                  TAttribute<FText>(FixTip),
-                                 FSlateIcon(FRuleRangerStyle::GetStyleSetName(), TEXT("RuleRanger.FixSelectedAssets")));
+                                 FRuleRangerStyle::GetScanAndFixIcon());
         MenuBuilder.AddSeparator();
         MenuBuilder.EndSection();
     });

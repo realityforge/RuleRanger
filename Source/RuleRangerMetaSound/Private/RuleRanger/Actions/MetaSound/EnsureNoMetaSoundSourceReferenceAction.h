@@ -43,7 +43,9 @@ private:
     /** Non-Preset MetaSourceSource instances that are allowed to be referenced directly */
     UPROPERTY(EditAnywhere,
               Category = "Rule Ranger",
-              meta = (AllowedClasses = "/Script/MetasoundEngine.MetaSoundSource", AllowPrivateAccess = true))
+              meta = (DisplayThumbnail = "false",
+                      AllowedClasses = "/Script/MetasoundEngine.MetaSoundSource",
+                      AllowPrivateAccess = true))
     TArray<FSoftObjectPath> AllowList;
 
     bool IsReferenceAllowed(const UObject* MetaSoundSource, const UObject* Other) const;

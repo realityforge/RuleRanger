@@ -17,9 +17,4 @@
 
 class FRuleRangerGameplayTagsModule final : public IModuleInterface
 {
-private:
-    static const FName ModuleName;
-
-public:
-    FORCEINLINE static const FName& GetModuleName() { return ModuleName; }
 };

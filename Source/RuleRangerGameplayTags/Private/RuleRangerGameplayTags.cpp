@@ -13,6 +13,4 @@
  */
 #include "RuleRangerGameplayTags.h"
 
-const FName FRuleRangerGameplayTagsModule::ModuleName{ TEXT("RuleRangerGameplayTags") };
-
 IMPLEMENT_MODULE(FRuleRangerGameplayTagsModule, RuleRangerGameplayTags)

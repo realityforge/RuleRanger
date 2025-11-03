@@ -38,6 +38,9 @@ private:
     static void OnScanProject();
     static void OnFixProject();
 
+    static void OnScanAll();
+    static void OnFixAll();
+
     static void OnOpenProjectSettings();
 
     static FDelegateHandle RegisterHandle;

@@ -116,6 +116,35 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
 
     SubSection.AddSeparator(NAME_None);
 
+    // Global convenience actions
+    {
+        auto Entry = FToolMenuEntry::InitMenuEntry(
+            TEXT("RuleRanger.ScanAll"),
+            NSLOCTEXT("RuleRanger", "ScanAll", "Scan All"),
+            NSLOCTEXT("RuleRanger",
+                      "ScanAll_Tooltip",
+                      "Run both project-level rule scans and content scans in configured directories"),
+            FRuleRangerStyle::GetScanIcon(),
+            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnScanAll),
+                      FCanExecuteAction::CreateLambda([] { return HasAnyProjectRules() || HasAnyConfiguredDirs(); })));
+        SubSection.AddEntry(MoveTemp(Entry));
+    }
+
+    {
+        auto Entry = FToolMenuEntry::InitMenuEntry(
+            TEXT("RuleRanger.FixAll"),
+            NSLOCTEXT("RuleRanger", "FixAll", "Scan & Fix All"),
+            NSLOCTEXT("RuleRanger",
+                      "FixAll_Tooltip",
+                      "Run both project-level rules and content scans and apply fixes where supported"),
+            FRuleRangerStyle::GetScanAndFixIcon(),
+            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnFixAll),
+                      FCanExecuteAction::CreateLambda([] { return HasAnyProjectRules() || HasAnyConfiguredDirs(); })));
+        SubSection.AddEntry(MoveTemp(Entry));
+    }
+
+    SubSection.AddSeparator(NAME_None);
+
     // Project-level actions
     {
         auto Entry = FToolMenuEntry::InitMenuEntry(
@@ -208,6 +237,24 @@ void FRuleRangerToolsMenu::OnFixProject()
     if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
     {
         Subsystem->OnFixProject();
+    }
+}
+
+void FRuleRangerToolsMenu::OnScanAll()
+{
+    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
+    {
+        Subsystem->OnScanProject();
+        Subsystem->OnScanConfiguredContent();
+    }
+}
+
+void FRuleRangerToolsMenu::OnFixAll()
+{
+    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
+    {
+        Subsystem->OnFixProject();
+        Subsystem->OnFixConfiguredContent();
     }
 }
 

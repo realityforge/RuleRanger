@@ -19,9 +19,12 @@ reasonable alternatives.
 
 - `RuleRanger.uplugin` declares modules; each module sits under `Source/<Module>/Public` and `Source/<Module>/Private`
   so shared headers stay isolated from implementation-only details. There exists a single `RuleRanger` module at this time.
-- The `RuleRanger` module is broken down into the:
-  - Rule Ranger Core: `Source/RuleRanger/Public/*`, `Source/RuleRanger/Public/RuleRanger/*`, `Source/RuleRanger/Private/*`, `Source/RuleRanger/Private/RuleRanger/*`
-  - Separate matcher and action classes defined as a header and implementation pair present in `Source/RuleRanger/Private/RuleRanger/*` subdirectories.
+- The `RuleRanger` plugin has several modules that are separated based on dependencies:
+  - `Source/RuleRanger` - This contains the core RuleRanger engine and some common actions and matchers.
+  - `Source/RuleRangerGameplayTags` - This contains matchers and actions that dependend on the GameplayTags module.
+  - `Source/RuleRangerMetaSound` - This contains matchers and actions that dependend on the MetaSounds module.
+  - `Source/RuleRangerNiagara` - This contains matchers and actions that dependend on the Niagara module.
+- Matcher and action classes defined as a header and implementation pair present in `Source/[RuleRangerModule]/Private/RuleRanger/*` subdirectories.
 - Raw files (such as `.csv` files) from which Unreal assets are imported belong in `SourceContent`, while `Content` is
 reserved for runtime assets that ship with the plugin.
 - Generated binaries and build artifacts should stay out of version control and should stay untouched unless you are

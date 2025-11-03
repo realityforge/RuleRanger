@@ -20,8 +20,6 @@ public class RuleRangerMetaSound : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new[] { "Core", "RuleRanger" });
-
         PrivateDependencyModuleNames.AddRange(new[] {
             "AssetRegistry",
             "Core",

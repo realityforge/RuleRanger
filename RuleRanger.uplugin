@@ -44,6 +44,11 @@
       "Name": "RuleRangerGameplayTags",
       "Type": "Editor",
       "LoadingPhase": "Default"
+    },
+    {
+      "Name": "RuleRangerMetaSound",
+      "Type": "Editor",
+      "LoadingPhase": "Default"
     }
   ]
 }

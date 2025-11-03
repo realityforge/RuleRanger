@@ -12,27 +12,18 @@
  * limitations under the License.
  */
 #include "EnsureMetaSoundAuthorBlankAction.h"
-#if WITH_RULERANGER_METASOUND_RULES
-    #include "MetasoundSource.h"
-#else
-    #include "Sound/SoundWaveProcedural.h"
-#endif
+#include "MetasoundSource.h"
 #include "RuleRangerActionContext.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureMetaSoundAuthorBlankAction)
 
 UClass* UEnsureMetaSoundAuthorBlankAction::GetExpectedType() const
 {
-#if WITH_RULERANGER_METASOUND_RULES
     return UMetaSoundSource::StaticClass();
-#else
-    return USoundWaveProcedural::StaticClass();
-#endif
 }
 
 void UEnsureMetaSoundAuthorBlankAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
-#if WITH_RULERANGER_METASOUND_RULES
     if (const auto MetaSound = Cast<UMetaSoundSource>(Object))
     {
         auto& Metadata = MetaSound->GetDocumentChecked().RootGraph.Metadata;
@@ -58,5 +49,4 @@ void UEnsureMetaSoundAuthorBlankAction::Apply(URuleRangerActionContext* ActionCo
             }
         }
     }
-#endif
 }

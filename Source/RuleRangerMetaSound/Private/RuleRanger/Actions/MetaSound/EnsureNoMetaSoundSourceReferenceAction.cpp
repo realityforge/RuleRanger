@@ -14,12 +14,8 @@
 #include "EnsureNoMetaSoundSourceReferenceAction.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Logging/StructuredLog.h"
+#include "MetasoundSource.h"
 #include "RuleRangerActionContext.h"
-#if WITH_RULERANGER_METASOUND_RULES
-    #include "MetasoundSource.h"
-#else
-    #include "Sound/SoundWaveProcedural.h"
-#endif
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureNoMetaSoundSourceReferenceAction)
 

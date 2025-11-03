@@ -29,21 +29,5 @@ public class RuleRanger : ModuleRules
         });
 
         PrivateIncludePathModuleNames.Add("MessageLog");
-
-        if (IsPluginEnabled("MetaSound"))
-        {
-            PublicDefinitions.Add("WITH_RULERANGER_METASOUND_RULES=1");
-            PrivateDependencyModuleNames.Add("MetasoundEngine");
-            PrivateDependencyModuleNames.Add("MetasoundFrontend");
-        }
-        else
-        {
-            PublicDefinitions.Add("WITH_RULERANGER_METASOUND_RULES=0");
-        }
-    }
-
-    private static bool IsPluginEnabled(string PluginName)
-    {
-        return Plugins.GetPlugin(PluginName) is not null;
     }
 }

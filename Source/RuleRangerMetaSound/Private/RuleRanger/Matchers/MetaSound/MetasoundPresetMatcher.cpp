@@ -12,15 +12,12 @@
  * limitations under the License.
  */
 #include "MetasoundPresetMatcher.h"
-#if WITH_RULERANGER_METASOUND_RULES
-    #include "MetasoundSource.h"
-#endif
+#include "MetasoundSource.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(MetasoundPresetMatcher)
 
 bool UMetasoundPresetMatcher::Test(UObject* Object) const
 {
-#if WITH_RULERANGER_METASOUND_RULES
     if (Object->IsA(UMetaSoundSource::StaticClass()))
     {
         return CastChecked<UMetaSoundSource>(Object)->GetConstDocument().RootGraph.PresetOptions.bIsPreset;
@@ -29,7 +26,4 @@ bool UMetasoundPresetMatcher::Test(UObject* Object) const
     {
         return false;
     }
-#else
-    return false;
-#endif
 }

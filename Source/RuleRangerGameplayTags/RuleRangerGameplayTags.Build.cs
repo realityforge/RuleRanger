@@ -19,16 +19,15 @@ public class RuleRangerGameplayTags : ModuleRules
     public RuleRangerGameplayTags(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        PublicDependencyModuleNames.AddRange(new[] { "ContentBrowser", "Core", "RuleRanger" });
 
         PrivateDependencyModuleNames.AddRange(new[] {
             "CoreUObject",
+            "Core",
+            "RuleRanger",
             "DeveloperSettings",
             "Engine",
             "GameplayTags",
             "GameplayTagsEditor",
         });
-
-        PrivateIncludePathModuleNames.Add("MessageLog");
     }
 }

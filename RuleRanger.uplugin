@@ -21,7 +21,8 @@
     },
     {
       "Name": "Niagara",
-      "Enabled": true
+      "Enabled": false,
+      "Optional": true
     },
     {
       "Name": "Metasound",
@@ -47,6 +48,11 @@
     },
     {
       "Name": "RuleRangerMetaSound",
+      "Type": "Editor",
+      "LoadingPhase": "PostEngineInit"
+    },
+    {
+      "Name": "RuleRangerNiagara",
       "Type": "Editor",
       "LoadingPhase": "PostEngineInit"
     }

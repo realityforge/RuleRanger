@@ -14,34 +14,21 @@
 
 using UnrealBuildTool;
 
-public class RuleRanger : ModuleRules
+public class RuleRangerNiagara : ModuleRules
 {
-    public RuleRanger(ReadOnlyTargetRules Target) : base(Target)
+    public RuleRangerNiagara(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        PublicDependencyModuleNames.AddRange(new[] { "ContentBrowser", "Core" });
 
         PrivateDependencyModuleNames.AddRange(new[] {
             "AssetRegistry",
-            "AnimGraph",
-            "AssetTools",
+            "Core",
+            "RuleRanger",
             "CoreUObject",
-            "BlueprintGraph",
-            "DataValidation",
-            "DeveloperSettings",
-            "EditorSubsystem",
             "Engine",
-            "Json",
-            "Kismet",
-            "Projects",
-            "MessageLog",
-            "Slate",
-            "SlateCore",
-            "Settings",
-            "ToolMenus",
-            "UnrealEd",
+            "NiagaraEditor",
+            "Niagara",
         });
-
         PrivateIncludePathModuleNames.Add("MessageLog");
     }
 }

@@ -30,7 +30,7 @@ class UCheckNiagaraEmitterCompileStatusAction final : public URuleRangerAction
 
     /** Should the action generate an error on "Unknown" Compile Status. */
     UPROPERTY(EditAnywhere)
-    bool bErrorOnUnknown{ true };
+    bool bErrorOnUnknown{ false };
 
     /** Should the action generate an error on "UpToDateWithWarnings" Compile Status. */
     UPROPERTY(EditAnywhere)

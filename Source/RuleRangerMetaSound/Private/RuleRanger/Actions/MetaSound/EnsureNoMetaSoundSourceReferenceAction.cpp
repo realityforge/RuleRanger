@@ -16,6 +16,7 @@
 #include "Logging/StructuredLog.h"
 #include "MetasoundSource.h"
 #include "RuleRangerActionContext.h"
+#include "UObject/ObjectSaveContext.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureNoMetaSoundSourceReferenceAction)
 
@@ -119,4 +120,26 @@ void UEnsureNoMetaSoundSourceReferenceAction::Apply(URuleRangerActionContext* Ac
         }
     }
 #endif
+}
+
+void UEnsureNoMetaSoundSourceReferenceAction::PreSave(const FObjectPreSaveContext SaveContext)
+{
+    // Remove null/empty paths
+    AllowList.RemoveAll([](const auto& Value) { return Value.IsNull(); });
+
+    // Deduplicate entries
+    {
+        TSet<FSoftObjectPath> Unique;
+        Unique.Reserve(AllowList.Num());
+        for (const auto& Path : AllowList)
+        {
+            Unique.Add(Path);
+        }
+        AllowList = Unique.Array();
+    }
+
+    // Sort by path string (stable, case-sensitive)
+    AllowList.Sort([](const auto& A, const auto& B) { return A.GetAssetName() < B.GetAssetName(); });
+
+    Super::PreSave(SaveContext);
 }

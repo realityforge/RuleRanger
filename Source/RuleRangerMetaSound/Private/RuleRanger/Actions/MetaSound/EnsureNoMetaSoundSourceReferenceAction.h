@@ -18,6 +18,7 @@
 #include "EnsureNoMetaSoundSourceReferenceAction.generated.h"
 
 class UMetaSoundSource;
+class FObjectPreSaveContext;
 
 /**
  * A specialized rule enforcement action designed to ensure that no direct references to MetaSoundSource
@@ -36,6 +37,7 @@ public:
 
 protected:
     virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override;
+    virtual void PreSave(FObjectPreSaveContext SaveContext) override;
 
 private:
     /** Non-Preset MetaSourceSource instances that are allowed to be referenced directly */

@@ -105,7 +105,7 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
     {
         auto Entry = FToolMenuEntry::InitMenuEntry(
             TEXT("RuleRanger.OpenProjectSettings"),
-            NSLOCTEXT("RuleRanger", "OpenProjectSettings", "Open Project Settings…"),
+            NSLOCTEXT("RuleRanger", "OpenProjectSettings", "Open RuleRanger Settings…"),
             NSLOCTEXT("RuleRanger",
                       "OpenProjectSettings_Tooltip",
                       "Open Project Settings to the Editor → Rule Ranger page"),

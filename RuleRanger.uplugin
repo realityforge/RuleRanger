@@ -25,12 +25,12 @@
     },
     {
       "Name": "Metasound",
-      "Enabled": true,
+      "Enabled": false,
       "Optional": true
     },
     {
       "Name": "GameplayTagsEditor",
-      "Enabled": true,
+      "Enabled": false,
       "Optional": true
     }
   ],
@@ -38,17 +38,17 @@
     {
       "Name": "RuleRanger",
       "Type": "Editor",
-      "LoadingPhase": "Default"
+      "LoadingPhase": "PostEngineInit"
     },
     {
       "Name": "RuleRangerGameplayTags",
       "Type": "Editor",
-      "LoadingPhase": "Default"
+      "LoadingPhase": "PostEngineInit"
     },
     {
       "Name": "RuleRangerMetaSound",
       "Type": "Editor",
-      "LoadingPhase": "Default"
+      "LoadingPhase": "PostEngineInit"
     }
   ]
 }

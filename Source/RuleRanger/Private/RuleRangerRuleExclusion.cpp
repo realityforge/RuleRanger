@@ -12,6 +12,11 @@
  * limitations under the License.
  */
 #include "RuleRangerRuleExclusion.h"
+#if WITH_EDITOR
+    #include "Misc/DataValidation.h"
+    #include "RuleRangerRule.h"
+    #include "RuleRangerRuleSet.h"
+#endif
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerRuleExclusion)
 
@@ -63,6 +68,74 @@ FString FRuleRangerRuleExclusion::DeriveSuffix() const
     }
     return FString::Join(Suffixes, TEXT(", "));
 }
+
+#if WITH_EDITOR
+EDataValidationResult FRuleRangerRuleExclusion::IsDataValid(const FString& Label, FDataValidationContext& Context) const
+{
+    auto Result = EDataValidationResult::Valid;
+
+    int32 RuleSpecifierCount = 0;
+    for (const auto RuleSet : RuleSets)
+    {
+        if (IsValid(RuleSet))
+        {
+            ++RuleSpecifierCount;
+        }
+    }
+    for (const auto Rule : Rules)
+    {
+        if (IsValid(Rule))
+        {
+            ++RuleSpecifierCount;
+        }
+    }
+
+    int32 TargetSpecifierCount = 0;
+    for (const auto Object : Objects)
+    {
+        if (IsValid(Object))
+        {
+            ++TargetSpecifierCount;
+        }
+    }
+    for (const auto& Dir : Dirs)
+    {
+        if (!Dir.Path.IsEmpty())
+        {
+            ++TargetSpecifierCount;
+        }
+    }
+
+    if (0 == RuleSpecifierCount)
+    {
+        FFormatNamedArguments Arguments;
+        Arguments.Add(TEXT("Exclusion"), FText::FromString(Label));
+        Arguments.Add(TEXT("ExclusionDescription"), FText::FromString(EditorFriendlyTitle));
+
+        Context.AddError(FText::Format(NSLOCTEXT("RuleRanger",
+                                                 "ConfigExclusionMissingRuleSpecifier",
+                                                 "Each exclusion must specify at least one RuleSet or Rule. "
+                                                 "Exclusion {Exclusion} ({ExclusionDescription}) does not comply."),
+                                       Arguments));
+        Result = EDataValidationResult::Invalid;
+    }
+    if (0 == TargetSpecifierCount)
+    {
+        FFormatNamedArguments Arguments;
+        Arguments.Add(TEXT("Exclusion"), FText::FromString(Label));
+        Arguments.Add(TEXT("ExclusionDescription"), FText::FromString(EditorFriendlyTitle));
+
+        Context.AddError(FText::Format(NSLOCTEXT("RuleRanger",
+                                                 "ConfigExclusionMissingRuleSpecifier",
+                                                 "Each exclusion must target at least one Object or Dir. "
+                                                 "Exclusion {Exclusion} ({ExclusionDescription}) does not comply."),
+                                       Arguments));
+        Result = EDataValidationResult::Invalid;
+    }
+
+    return Result;
+}
+#endif
 
 void FRuleRangerRuleExclusion::InitEditorFriendlyTitleProperty()
 {

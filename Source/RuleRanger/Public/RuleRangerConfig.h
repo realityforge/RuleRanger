@@ -19,6 +19,7 @@
 
 struct FRuleRangerRuleExclusion;
 class URuleRangerRuleSet;
+class URuleRangerExclusionSet;
 class FObjectPreSaveContext;
 
 /**
@@ -46,13 +47,17 @@ public:
               meta = (AllowAbstract = "false", DisplayThumbnail = "false", ForceShowPluginContent = "true"))
     TArray<TObjectPtr<URuleRangerRuleSet>> RuleSets;
 
-    /** A set of exclusions when applying rules. */
+    /** Reusable exclusion sets to apply in addition to local exclusions. */
     UPROPERTY(EditDefaultsOnly,
               Category = "Rule Sets",
               meta = (AllowAbstract = "false",
                       DisplayThumbnail = "false",
                       ForceShowPluginContent = "true",
-                      TitleProperty = "EditorFriendlyTitle"))
+                      TitleProperty = "Description"))
+    TArray<TObjectPtr<URuleRangerExclusionSet>> ExclusionSets;
+
+    /** A set of exclusions when applying rules. */
+    UPROPERTY(EditDefaultsOnly, Category = "Rule Sets", meta = (TitleProperty = "EditorFriendlyTitle"))
     TArray<FRuleRangerRuleExclusion> Exclusions;
 
     bool ConfigMatches(const FString& Path) const;
@@ -85,6 +90,10 @@ public:
 
     // Sort certain properties before saving
     virtual void PreSave(FObjectPreSaveContext SaveContext) override;
+
+#if WITH_EDITOR
+    virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
+#endif
 
 private:
     void UpdateExclusionsEditorFriendlyTitles();

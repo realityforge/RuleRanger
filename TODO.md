@@ -5,7 +5,6 @@ Shorthand notes of where to go next with this experiment:
 * Change the way that Texture conventions are driven so that suffix is driven by variant in NameConventions. Also change `DT_DefaultTextureConventions` so that they are driven by variants
 * Change naming convention so that if a variant is not specified but the type has variants and the name has a suffix that matches a variant then auto-set variant (i.e. importing a texture named `T_Blah_BC` will automatically set `BaseTexture`). Maybe add a flag per NameConvention row that allows auto-setting variant?
 
-* Add concept of ExclusionSet that is a set of Rules and RuleSets that can be excluded? So we can have a common exclude for all ThirdParty stuff across projects?
 * Add rules so that we can enforce constraints about asset referencing.
   * Rules stored in DataTable.
   * What color should the folder appear in the Content Browser?

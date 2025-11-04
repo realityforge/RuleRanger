@@ -21,6 +21,7 @@
 #include "RuleRangerConfig.h"
 #include "RuleRangerDefaultResultHandler.h"
 #include "RuleRangerDeveloperSettings.h"
+#include "RuleRangerExclusionSet.h"
 #include "RuleRangerLogging.h"
 #include "RuleRangerMessageLog.h"
 #include "RuleRangerProjectActionContext.h"
@@ -386,6 +387,21 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
                         if (Exclusion.ExclusionMatches(*Object, Path))
                         {
                             Exclusions.Add(Exclusion);
+                        }
+                    }
+
+                    // Merge exclusions from referenced exclusion sets
+                    for (const auto& ExclusionSetPtr : Config->ExclusionSets)
+                    {
+                        if (const auto ExclusionSet = ExclusionSetPtr.Get())
+                        {
+                            for (auto& Exclusion : ExclusionSet->Exclusions)
+                            {
+                                if (Exclusion.ExclusionMatches(*Object, Path))
+                                {
+                                    Exclusions.Add(Exclusion);
+                                }
+                            }
                         }
                     }
 

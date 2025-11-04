@@ -11,61 +11,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "RuleRangerConfig.h"
-#include "RuleRanger/RuleRangerSortUtils.h"
-// ReSharper disable once CppUnusedIncludeDirective
 #include "RuleRangerExclusionSet.h"
+#include "Misc/DataValidation.h"
+#include "RuleRanger/RuleRangerSortUtils.h"
 #include "RuleRangerRule.h"
 #include "RuleRangerRuleExclusion.h"
 #include "RuleRangerRuleSet.h"
 #include "UObject/ObjectSaveContext.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerConfig)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerExclusionSet)
 
-bool URuleRangerConfig::ConfigMatches(const FString& Path) const
+void URuleRangerExclusionSet::PostLoad()
 {
-    for (const auto& Dir : Dirs)
-    {
-        const auto& DirPath = Dir.Path;
-        if (!DirPath.IsEmpty())
-        {
-            if (Path.StartsWith(DirPath, ESearchCase::CaseSensitive))
-            {
-                return true;
-            }
-        }
-    }
-    return false;
+    Super::PostLoad();
+    UpdateExclusionsEditorFriendlyTitles();
 }
 
-void URuleRangerConfig::CollectDataTables(const UScriptStruct* RowStructure,
-                                          TArray<TObjectPtr<UDataTable>>& OutDataTables) const
-{
-    for (const auto DataTable : DataTables)
-    {
-        if (IsValid(DataTable) && RowStructure == DataTable->RowStruct)
-        {
-            OutDataTables.Add(DataTable);
-        }
-    }
-    for (const auto RuleSet : RuleSets)
-    {
-        if (IsValid(RuleSet))
-        {
-            RuleSet->CollectDataTables(RowStructure, OutDataTables);
-        }
-    }
-}
-
-void URuleRangerConfig::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+void URuleRangerExclusionSet::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
     Super::PostEditChangeProperty(PropertyChangedEvent);
 
     if (PropertyChangedEvent.Property)
     {
-        // ReSharper disable once CppTooWideScopeInitStatement
         const auto PropertyName = PropertyChangedEvent.Property->GetFName();
-
         if ((GET_MEMBER_NAME_CHECKED(ThisClass, Exclusions)) == PropertyName)
         {
             UpdateExclusionsEditorFriendlyTitles();
@@ -73,54 +41,30 @@ void URuleRangerConfig::PostEditChangeProperty(FPropertyChangedEvent& PropertyCh
     }
 }
 
-void URuleRangerConfig::PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent)
+void URuleRangerExclusionSet::PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent)
 {
     Super::PostEditChangeChainProperty(PropertyChangedEvent);
 
-    // ReSharper disable once CppTooWideScopeInitStatement
     const auto PropertyName = PropertyChangedEvent.PropertyChain.GetActiveMemberNode()->GetValue()->GetFName();
-
     if ((GET_MEMBER_NAME_CHECKED(ThisClass, Exclusions)) == PropertyName)
     {
         UpdateExclusionsEditorFriendlyTitles();
     }
 }
 
-void URuleRangerConfig::PostLoad()
+void URuleRangerExclusionSet::UpdateExclusionsEditorFriendlyTitles()
 {
-    Super::PostLoad();
-    UpdateExclusionsEditorFriendlyTitles();
-}
-
-void URuleRangerConfig::UpdateExclusionsEditorFriendlyTitles()
-{
+#if WITH_EDITORONLY_DATA
     for (auto& Exclusion : Exclusions)
     {
         Exclusion.InitEditorFriendlyTitleProperty();
     }
+#endif
 }
 
-void URuleRangerConfig::PreSave(const FObjectPreSaveContext SaveContext)
+void URuleRangerExclusionSet::PreSave(const FObjectPreSaveContext SaveContext)
 {
     using namespace RuleRanger::SortUtils;
-
-    // Sort config-level directories
-    SortDirsByPath(Dirs);
-
-    // Ensure config-level directory paths end with '/'
-    for (auto& Dir : Dirs)
-    {
-        if (!Dir.Path.IsEmpty() && !Dir.Path.EndsWith(TEXT("/")))
-        {
-            Dir.Path.Append(TEXT("/"));
-        }
-    }
-
-    // Clean and sort data tables
-    RemoveNullsAndSortByName(DataTables);
-
-    // Clean and sort exclusion sets
-    RemoveNullsAndSortByName(ExclusionSets);
 
     // Clean and sort exclusions' arrays
     for (auto& Exclusion : Exclusions)
@@ -144,9 +88,25 @@ void URuleRangerConfig::PreSave(const FObjectPreSaveContext SaveContext)
 }
 
 #if WITH_EDITOR
-EDataValidationResult URuleRangerConfig::IsDataValid(FDataValidationContext& Context) const
+EDataValidationResult URuleRangerExclusionSet::IsDataValid(FDataValidationContext& Context) const
 {
     auto Result = CombineDataValidationResults(Super::IsDataValid(Context), EDataValidationResult::Valid);
+
+    if (Description.IsEmptyOrWhitespace())
+    {
+        Context.AddError(NSLOCTEXT("RuleRanger",
+                                   "ExclusionSetMissingDescription",
+                                   "RuleRangerExclusionSet requires a Description."));
+        Result = EDataValidationResult::Invalid;
+    }
+
+    if (Exclusions.IsEmpty())
+    {
+        Context.AddError(NSLOCTEXT("RuleRanger",
+                                   "ExclusionSetEmptyExclusions",
+                                   "RuleRangerExclusionSet must contain at least one exclusion."));
+        Result = EDataValidationResult::Invalid;
+    }
 
     // Validate each exclusion has both a rule specifier and a target specifier
     int32 Index{ 0 };

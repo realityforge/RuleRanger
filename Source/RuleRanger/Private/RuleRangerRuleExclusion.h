@@ -16,6 +16,7 @@
 #include "RuleRangerRuleExclusion.generated.h"
 
 class URuleRangerConfig;
+class URuleRangerExclusionSet;
 class URuleRangerRule;
 class URuleRangerRuleSet;
 
@@ -57,6 +58,7 @@ struct FRuleRangerRuleExclusion final
 
 #if WITH_EDITORONLY_DATA
     friend URuleRangerConfig;
+    friend URuleRangerExclusionSet;
 
     /** The transient title property to use in the editor. */
     UPROPERTY(VisibleDefaultsOnly, Transient, meta = (EditCondition = false, EditConditionHides))
@@ -69,5 +71,10 @@ private:
     void InitEditorFriendlyTitleProperty();
 
     FString DeriveSuffix() const;
+#endif
+#if WITH_EDITOR
+    // Data Validation method that has the same signature as validator framework IsDataValid
+    // but is just a utility method called by other IsDataValid invocations.
+    EDataValidationResult IsDataValid(const FString& Label, FDataValidationContext& Context) const;
 #endif
 };

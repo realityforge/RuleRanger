@@ -25,7 +25,6 @@ Shorthand notes of where to go next with this experiment:
 
 * Name `GameplayCues` assets with a name based on the tag with optional prefix. i.e. GCN_GameplayCue.Fire.Burst`. See `UAbilitySystemGlobals::DeriveGameplayCueTagFromAssetName` to understand the motivation for this naming convention.
 * Retargeters should be named as RTG_\[Source\]_To_\[Target\]
-* Add project action/rule that errors on directories in Content dir without assets
 * Add tool to record licenses for assets in MetaData
     * A DataTable that indicates the source (Marketplace project name? Some other project tag), description and license
     * Add metadata to assets to link to this table

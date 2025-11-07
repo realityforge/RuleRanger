@@ -1,5 +1,5 @@
 ---,ObjectType,Prefix,Suffix,Description
-MaterialInstance,"/Script/Engine.MaterialInstanceConstant","","_Inst",""
+MaterialInstance,"/Script/Engine.MaterialInstanceConstant","M_","_Inst","Pattern created in editor"
 Skeleton,"/Script/Engine.Skeleton","SK_","_Skeleton",""
 Blueprint,"/Script/Engine.Blueprint","","_Blueprint",""
 SoundCue,"/Script/Engine.SoundCue","","_Cue",""

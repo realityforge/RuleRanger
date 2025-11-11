@@ -14,7 +14,7 @@
 #include "RuleRanger.h"
 #include "Logging/StructuredLog.h"
 #include "RuleRanger/UI/ContentBrowserExtension/RuleRangerContentBrowserExtensions.h"
-#include "RuleRangerCommands.h"
+#include "RuleRanger/UI/RuleRangerCommands.h"
 #include "RuleRanger/UI/RuleRangerStyle.h"
 #include "RuleRangerDefaultEvents.h"
 #include "RuleRangerLogging.h"

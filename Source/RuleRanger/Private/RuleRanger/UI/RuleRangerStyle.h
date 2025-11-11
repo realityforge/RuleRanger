@@ -32,8 +32,16 @@ public:
 
     static FName GetStyleSetName();
 
+    static FSlateIcon GetSettingsIcon();
     static FSlateIcon GetScanIcon();
     static FSlateIcon GetScanAndFixIcon();
+    static FSlateIcon GetEditAssetIcon();
+    static FSlateIcon GetFindInContentBrowserIcon();
+    static FSlateIcon GetCopyMessageIcon();
+
+    static const FSlateBrush* GetNoteMessageBrush();
+    static const FSlateBrush* GetWarningMessageBrush();
+    static const FSlateBrush* GetErrorMessageBrush();
 
 private:
     static TSharedRef<FSlateStyleSet> Create();

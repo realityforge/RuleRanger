@@ -53,6 +53,11 @@ FName FRuleRangerStyle::GetStyleSetName()
     return StyleSetName;
 }
 
+FSlateIcon FRuleRangerStyle::GetSettingsIcon()
+{
+    return FSlateIcon(FAppStyle::GetAppStyleSetName(), "Icons.Toolbar.Settings");
+}
+
 FSlateIcon FRuleRangerStyle::GetScanIcon()
 {
     return FSlateIcon(FAppStyle::GetAppStyleSetName(), "Symbols.SearchGlass");
@@ -61,6 +66,36 @@ FSlateIcon FRuleRangerStyle::GetScanIcon()
 FSlateIcon FRuleRangerStyle::GetScanAndFixIcon()
 {
     return FSlateIcon(FAppStyle::GetAppStyleSetName(), "MessageLog.Fix");
+}
+
+FSlateIcon FRuleRangerStyle::GetEditAssetIcon()
+{
+    return FSlateIcon(FAppStyle::GetAppStyleSetName(), "ContentBrowser.AssetActions.Edit");
+}
+
+FSlateIcon FRuleRangerStyle::GetFindInContentBrowserIcon()
+{
+    return FSlateIcon(FAppStyle::GetAppStyleSetName(), "SystemWideCommands.FindInContentBrowser");
+}
+
+FSlateIcon FRuleRangerStyle::GetCopyMessageIcon()
+{
+    return FSlateIcon(FAppStyle::GetAppStyleSetName(), "GenericCommands.Copy");
+}
+
+const FSlateBrush* FRuleRangerStyle::GetNoteMessageBrush()
+{
+    return FAppStyle::Get().GetBrush("MessageLog.Note");
+}
+
+const FSlateBrush* FRuleRangerStyle::GetWarningMessageBrush()
+{
+    return FAppStyle::Get().GetBrush("MessageLog.Warning");
+}
+
+const FSlateBrush* FRuleRangerStyle::GetErrorMessageBrush()
+{
+    return FAppStyle::Get().GetBrush("MessageLog.Error");
 }
 
 TSharedRef<FSlateStyleSet> FRuleRangerStyle::Create()

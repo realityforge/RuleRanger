@@ -16,19 +16,21 @@
 #include "Editor.h"
 #include "Logging/StructuredLog.h"
 #include "Misc/ScopedSlowTask.h"
-#include "Misc/UObjectToken.h"
 #include "RuleRangerActionContext.h"
 #include "RuleRangerConfig.h"
+#include "RuleRangerDefaultProjectResultHandler.h"
 #include "RuleRangerDefaultResultHandler.h"
 #include "RuleRangerDeveloperSettings.h"
 #include "RuleRangerExclusionSet.h"
 #include "RuleRangerLogging.h"
 #include "RuleRangerMessageLog.h"
 #include "RuleRangerProjectActionContext.h"
+#include "RuleRangerProjectResultHandler.h"
 #include "RuleRangerProjectRule.h"
 #include "RuleRangerRule.h"
 #include "RuleRangerRuleExclusion.h"
 #include "RuleRangerRuleSet.h"
+#include "RuleRangerTools.h"
 #include "Subsystems/EditorAssetSubsystem.h"
 #include "Subsystems/ImportSubsystem.h"
 
@@ -45,6 +47,8 @@ void URuleRangerEditorSubsystem::Initialize(FSubsystemCollectionBase& Collection
     }
     DefaultResultHandler =
         NewObject<URuleRangerDefaultResultHandler>(this, URuleRangerDefaultResultHandler::StaticClass());
+    DefaultProjectResultHandler =
+        NewObject<URuleRangerDefaultProjectResultHandler>(this, URuleRangerDefaultProjectResultHandler::StaticClass());
 }
 
 void URuleRangerEditorSubsystem::Deinitialize()
@@ -450,35 +454,6 @@ void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerR
     }
 }
 
-static void EmitProjectMessages(const URuleRangerProjectActionContext* ProjectContext)
-{
-    auto Log = FMessageLog(FRuleRangerMessageLog::GetMessageLogName());
-
-    const auto Add = [&](const auto& InMessages, const auto Severity) {
-        for (const auto& Msg : InMessages)
-        {
-            auto Message = FTokenizedMessage::Create(Severity);
-            if (const auto RuleSet = ProjectContext->GetRuleSet())
-            {
-                Message->AddToken(FTextToken::Create(NSLOCTEXT("RuleRanger", "RuleSetPrefix", "RuleSet: ")));
-                Message->AddToken(FUObjectToken::Create(RuleSet));
-            }
-            if (const auto Rule = ProjectContext->GetRule())
-            {
-                Message->AddToken(FTextToken::Create(NSLOCTEXT("RuleRanger", "RulePrefix", "  Rule: ")));
-                Message->AddToken(FUObjectToken::Create(Rule));
-            }
-            Message->AddToken(FTextToken::Create(Msg));
-            Log.AddMessage(Message);
-        }
-    };
-
-    Add(ProjectContext->GetInfoMessages(), EMessageSeverity::Info);
-    Add(ProjectContext->GetWarningMessages(), EMessageSeverity::Warning);
-    Add(ProjectContext->GetErrorMessages(), EMessageSeverity::Error);
-    Add(ProjectContext->GetFatalMessages(), EMessageSeverity::Error);
-}
-
 bool URuleRangerEditorSubsystem::ProcessOnAssetValidateRule(URuleRangerConfig* const Config,
                                                             URuleRangerRuleSet* const RuleSet,
                                                             URuleRangerRule* Rule,
@@ -881,7 +856,8 @@ bool URuleRangerEditorSubsystem::ProcessProjectRuleSet(URuleRangerConfig* const 
 
 bool URuleRangerEditorSubsystem::ProcessProjectDemandScan(URuleRangerConfig* const Config,
                                                           URuleRangerRuleSet* const RuleSet,
-                                                          URuleRangerProjectRule* Rule) const
+                                                          URuleRangerProjectRule* Rule,
+                                                          IRuleRangerProjectResultHandler* Handler) const
 {
     check(ProjectActionContext);
 
@@ -895,7 +871,10 @@ bool URuleRangerEditorSubsystem::ProcessProjectDemandScan(URuleRangerConfig* con
 
         Rule->Apply(ProjectActionContext);
 
-        EmitProjectMessages(ProjectActionContext);
+        if (const auto EffectiveHandler = Handler ? Handler : DefaultProjectResultHandler.GetInterface())
+        {
+            EffectiveHandler->OnProjectRuleApplied(ProjectActionContext);
+        }
 
         const auto State = ProjectActionContext->GetState();
         ProjectActionContext->ClearContext();
@@ -926,7 +905,8 @@ bool URuleRangerEditorSubsystem::ProcessProjectDemandScan(URuleRangerConfig* con
 
 bool URuleRangerEditorSubsystem::ProcessProjectDemandScanAndFix(URuleRangerConfig* const Config,
                                                                 URuleRangerRuleSet* const RuleSet,
-                                                                URuleRangerProjectRule* Rule) const
+                                                                URuleRangerProjectRule* Rule,
+                                                                IRuleRangerProjectResultHandler* Handler) const
 {
     check(ProjectActionContext);
 
@@ -940,7 +920,10 @@ bool URuleRangerEditorSubsystem::ProcessProjectDemandScanAndFix(URuleRangerConfi
 
         Rule->Apply(ProjectActionContext);
 
-        EmitProjectMessages(ProjectActionContext);
+        if (const auto EffectiveHandler = Handler ? Handler : DefaultProjectResultHandler.GetInterface())
+        {
+            EffectiveHandler->OnProjectRuleApplied(ProjectActionContext);
+        }
 
         const auto State = ProjectActionContext->GetState();
         ProjectActionContext->ClearContext();
@@ -976,6 +959,14 @@ bool URuleRangerEditorSubsystem::ProcessProjectDemandScanAndFix(URuleRangerConfi
                   Rule->GetName());
         return true;
     }
+}
+
+void URuleRangerEditorSubsystem::RunProjectScan(const bool bFix, IRuleRangerProjectResultHandler* ProjectHandler)
+{
+    ProcessProjectRules([&](auto Config, auto RuleSet, auto Rule) {
+        return bFix ? ProcessProjectDemandScanAndFix(Config, RuleSet, Rule, ProjectHandler)
+                    : ProcessProjectDemandScan(Config, RuleSet, Rule, ProjectHandler);
+    });
 }
 
 int32 URuleRangerEditorSubsystem::CountProjectRulesInRuleSet(const URuleRangerRuleSet* RuleSet,

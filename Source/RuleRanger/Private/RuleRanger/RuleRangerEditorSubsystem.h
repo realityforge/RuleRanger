@@ -31,6 +31,7 @@ class URuleRangerContentBrowserExtensions;
 class URuleRangerRuleSet;
 class URuleRangerProjectRule;
 class URuleRangerProjectActionContext;
+class IRuleRangerProjectResultHandler;
 
 // Shape of function called to check whether rule will run or actually execute rule.
 // The actual function is determined by where it is used.
@@ -88,6 +89,9 @@ public:
 
     // Execute and fix project-level rules across all configured RuleRangerConfigs
     void OnFixProject();
+
+    // Run project-level rules and report to a custom handler (tool-only path)
+    void RunProjectScan(bool bFix, IRuleRangerProjectResultHandler* ProjectHandler);
 
     // Returns true if any project rules are discoverable via configured RuleSets
     bool HasAnyProjectRules() const;
@@ -218,11 +222,17 @@ private:
 
     bool ProcessProjectDemandScan(URuleRangerConfig* const Config,
                                   URuleRangerRuleSet* const RuleSet,
-                                  URuleRangerProjectRule* Rule) const;
+                                  URuleRangerProjectRule* Rule,
+                                  IRuleRangerProjectResultHandler* Handler = nullptr) const;
 
     bool ProcessProjectDemandScanAndFix(URuleRangerConfig* const Config,
                                         URuleRangerRuleSet* const RuleSet,
-                                        URuleRangerProjectRule* Rule) const;
+                                        URuleRangerProjectRule* Rule,
+                                        IRuleRangerProjectResultHandler* Handler = nullptr) const;
+
+    // Default project result handler used when no explicit handler supplied
+    UPROPERTY(Transient)
+    TScriptInterface<IRuleRangerProjectResultHandler> DefaultProjectResultHandler{ nullptr };
 
     // Utility used by Tools menu actions to count rules for progress UI
     static int32 CountProjectRulesInRuleSet(const URuleRangerRuleSet* RuleSet,

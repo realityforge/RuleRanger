@@ -16,141 +16,23 @@
 #include "ContentBrowserModule.h"
 #include "Logging/StructuredLog.h"
 #include "RuleRanger/RuleRangerEditorSubsystem.h"
-#include "RuleRangerCommands.h"
-#include "RuleRangerConfig.h"
-#include "RuleRangerDeveloperSettings.h"
+#include "RuleRanger/UI/RuleRangerCommands.h"
+#include "RuleRanger/UI/RuleRangerStyle.h"
 #include "RuleRangerLogging.h"
-#include "RuleRangerStyle.h"
-
-static void OnScanSelectedAssets(const TArray<FAssetData>& Assets)
-{
-    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
-    {
-        Subsystem->OnScanSelectedAssets(Assets);
-    }
-}
-
-static void OnFixSelectedAssets(const TArray<FAssetData>& Assets)
-{
-    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
-    {
-        Subsystem->OnFixSelectedAssets(Assets);
-    }
-}
-
-static void OnScanSelectedPaths(const TArray<FString>& AssetPaths)
-{
-    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
-    {
-        Subsystem->OnScanSelectedPaths(AssetPaths);
-    }
-}
-
-static void OnFixSelectedPaths(const TArray<FString>& AssetPaths)
-{
-    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
-    {
-        Subsystem->OnFixSelectedPaths(AssetPaths);
-    }
-}
-
-static bool HasAnyConfiguredDirs()
-{
-    const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>();
-    return Subsystem ? Subsystem->HasAnyConfiguredDirs() : false;
-}
-
-static bool SelectionIntersectsConfiguredDirs(const TArray<FString>& Paths)
-{
-    const auto DevSettings = GetDefault<URuleRangerDeveloperSettings>();
-    if (IsValid(DevSettings))
-    {
-        TArray<FString> DirPaths;
-        for (const auto& SoftConfig : DevSettings->Configs)
-        {
-            if (const auto Config = SoftConfig.LoadSynchronous())
-            {
-                for (const auto& Dir : Config->Dirs)
-                {
-                    if (!Dir.Path.IsEmpty())
-                    {
-                        DirPaths.Add(Dir.Path);
-                    }
-                }
-            }
-        }
-        for (auto P : Paths)
-        {
-            if (!P.IsEmpty() && !P.EndsWith(TEXT("/")))
-            {
-                P.Append(TEXT("/"));
-            }
-            for (const auto& D : DirPaths)
-            {
-                if (P.StartsWith(D, ESearchCase::CaseSensitive) || D.StartsWith(P, ESearchCase::CaseSensitive))
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-static bool SelectionIntersectsConfiguredDirs(const TArray<FAssetData>& Assets)
-{
-    const auto DevSettings = GetDefault<URuleRangerDeveloperSettings>();
-    if (IsValid(DevSettings))
-    {
-        TArray<FString> DirPaths;
-        for (const auto& SoftConfig : DevSettings->Configs)
-        {
-            if (const auto Config = SoftConfig.LoadSynchronous())
-            {
-                for (const auto& Dir : Config->Dirs)
-                {
-                    if (!Dir.Path.IsEmpty())
-                    {
-                        DirPaths.Add(Dir.Path);
-                    }
-                }
-            }
-        }
-        for (const auto& A : Assets)
-        {
-            const auto PathStr = A.GetSoftObjectPath().ToString();
-            for (const auto& D : DirPaths)
-            {
-                if (PathStr.StartsWith(D, ESearchCase::CaseSensitive))
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    else
-    {
-        return false;
-    }
-}
+#include "RuleRangerTools.h"
 
 static TSharedRef<FExtender> OnExtendSelectedPathsMenu(const TArray<FString>& Paths)
 {
     UE_LOGFMT(LogRuleRanger, VeryVerbose, "OnExtendSelectedPathsMenu() invoked.");
 
     const TSharedPtr<FUICommandList> CommandList = MakeShareable(new FUICommandList);
-    const bool bHasDirs = HasAnyConfiguredDirs();
-    const bool bIntersects = bHasDirs && SelectionIntersectsConfiguredDirs(Paths);
+    const bool bHasDirs = FRuleRangerTools::HasAnyConfiguredDirs();
+    const bool bIntersects = bHasDirs && FRuleRangerTools::PathSelectionIntersectsConfiguredDirs(Paths);
     CommandList->MapAction(FRuleRangerCommands::Get().ScanSelectedPaths,
-                           FExecuteAction::CreateLambda([Paths] { OnScanSelectedPaths(Paths); }),
+                           FExecuteAction::CreateLambda([Paths] { FRuleRangerTools::OnScanSelectedPaths(Paths); }),
                            FCanExecuteAction::CreateLambda([bIntersects] { return bIntersects; }));
     CommandList->MapAction(FRuleRangerCommands::Get().FixSelectedPaths,
-                           FExecuteAction::CreateLambda([Paths] { OnFixSelectedPaths(Paths); }),
+                           FExecuteAction::CreateLambda([Paths] { FRuleRangerTools::OnFixSelectedPaths(Paths); }),
                            FCanExecuteAction::CreateLambda([bIntersects] { return bIntersects; }));
     auto Extender = MakeShared<FExtender>();
     FText ScanTip;
@@ -199,13 +81,13 @@ static TSharedRef<FExtender> OnExtendForSelectedAssetsMenu(const TArray<FAssetDa
     UE_LOGFMT(LogRuleRanger, VeryVerbose, "OnExtendForSelectedAssetsMenu() invoked.");
 
     const TSharedPtr<FUICommandList> CommandList = MakeShareable(new FUICommandList);
-    const bool bHasDirs = HasAnyConfiguredDirs();
-    const bool bIntersects = bHasDirs && SelectionIntersectsConfiguredDirs(Assets);
+    const bool bHasDirs = FRuleRangerTools::HasAnyConfiguredDirs();
+    const bool bIntersects = bHasDirs && FRuleRangerTools::AssetSelectionIntersectsConfiguredDirs(Assets);
     CommandList->MapAction(FRuleRangerCommands::Get().ScanSelectedAssets,
-                           FExecuteAction::CreateLambda([Assets] { OnScanSelectedAssets(Assets); }),
+                           FExecuteAction::CreateLambda([Assets] { FRuleRangerTools::OnScanSelectedAssets(Assets); }),
                            FCanExecuteAction::CreateLambda([bIntersects] { return bIntersects; }));
     CommandList->MapAction(FRuleRangerCommands::Get().FixSelectedAssets,
-                           FExecuteAction::CreateLambda([Assets] { OnFixSelectedAssets(Assets); }),
+                           FExecuteAction::CreateLambda([Assets] { FRuleRangerTools::OnFixSelectedAssets(Assets); }),
                            FCanExecuteAction::CreateLambda([bIntersects] { return bIntersects; }));
 
     TSharedRef<FExtender> Extender = MakeShared<FExtender>();

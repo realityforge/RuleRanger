@@ -16,10 +16,10 @@
 #include "RuleRanger/UI/ContentBrowserExtension/RuleRangerContentBrowserExtensions.h"
 #include "RuleRanger/UI/RuleRangerCommands.h"
 #include "RuleRanger/UI/RuleRangerStyle.h"
+#include "RuleRanger/UI/ToolsMenu/RuleRangerToolsMenu.h"
 #include "RuleRangerDefaultEvents.h"
 #include "RuleRangerLogging.h"
 #include "RuleRangerMessageLog.h"
-#include "RuleRangerToolsMenu.h"
 
 const FName FRuleRangerModule::ModuleName{ TEXT("RuleRanger") };
 

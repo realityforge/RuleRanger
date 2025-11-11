@@ -14,12 +14,9 @@
 
 #include "RuleRangerToolsMenu.h"
 #include "Editor.h"
-#include "Framework/Docking/TabManager.h"
-#include "ISettingsModule.h"
 #include "Modules/ModuleManager.h"
-#include "RuleRanger/RuleRangerEditorSubsystem.h"
-#include "RuleRangerDeveloperSettings.h"
-#include "RuleRangerStyle.h"
+#include "RuleRanger/UI/RuleRangerStyle.h"
+#include "RuleRangerTools.h"
 #include "ToolMenus.h"
 #include "Widgets/Text/STextBlock.h"
 
@@ -67,24 +64,12 @@ void FRuleRangerToolsMenu::RegisterMenus()
     }
 }
 
-bool FRuleRangerToolsMenu::HasAnyConfiguredDirs()
-{
-    const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>();
-    return Subsystem ? Subsystem->HasAnyConfiguredDirs() : false;
-}
-
-bool FRuleRangerToolsMenu::HasAnyProjectRules()
-{
-    const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>();
-    return Subsystem ? Subsystem->HasAnyProjectRules() : false;
-}
-
 void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
 {
     auto& SubSection =
         Menu->AddSection("RuleRangerToolsSubSection", NSLOCTEXT("RuleRanger", "RuleRangerSection", "Actions"));
 
-    if (!HasAnyConfiguredDirs())
+    if (!FRuleRangerTools::HasAnyConfiguredDirs())
     {
         const auto InfoText =
             NSLOCTEXT("RuleRanger",
@@ -105,12 +90,22 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
     {
         auto Entry = FToolMenuEntry::InitMenuEntry(
             TEXT("RuleRanger.OpenProjectSettings"),
-            NSLOCTEXT("RuleRanger", "OpenProjectSettings", "Open RuleRanger Settings…"),
+            NSLOCTEXT("RuleRanger", "OpenProjectSettings", "Open Rule Ranger Settings…"),
             NSLOCTEXT("RuleRanger",
                       "OpenProjectSettings_Tooltip",
                       "Open Project Settings to the Editor → Rule Ranger page"),
-            FSlateIcon(),
-            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnOpenProjectSettings)));
+            FRuleRangerStyle::GetSettingsIcon(),
+            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerTools::OnOpenProjectSettings)));
+        SubSection.AddEntry(MoveTemp(Entry));
+    }
+
+    {
+        auto Entry = FToolMenuEntry::InitMenuEntry(
+            TEXT("RuleRanger.OpenTool"),
+            NSLOCTEXT("RuleRanger", "OpenTool", "Open Rule Ranger Window…"),
+            NSLOCTEXT("RuleRanger", "OpenTool_Tooltip", "Open the dockable RuleRanger Tool window"),
+            FRuleRangerStyle::GetScanIcon(),
+            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerTools::OnOpenTool)));
         SubSection.AddEntry(MoveTemp(Entry));
     }
 
@@ -125,8 +120,8 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                       "ScanAll_Tooltip",
                       "Run both project-level rule scans and content scans in configured directories"),
             FRuleRangerStyle::GetScanIcon(),
-            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnScanAll),
-                      FCanExecuteAction::CreateLambda([] { return HasAnyProjectRules() || HasAnyConfiguredDirs(); })));
+            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerTools::OnScanAll),
+                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::HasAnyRunnableRules(); })));
         SubSection.AddEntry(MoveTemp(Entry));
     }
 
@@ -138,8 +133,8 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                       "FixAll_Tooltip",
                       "Run both project-level rules and content scans and apply fixes where supported"),
             FRuleRangerStyle::GetScanAndFixIcon(),
-            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnFixAll),
-                      FCanExecuteAction::CreateLambda([] { return HasAnyProjectRules() || HasAnyConfiguredDirs(); })));
+            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerTools::OnFixAll),
+                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::HasAnyRunnableRules(); })));
         SubSection.AddEntry(MoveTemp(Entry));
     }
 
@@ -155,8 +150,8 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                       "Execute project-level rules defined in configured RuleRanger rule sets\n"
                       "(Disabled if no project rules exist)"),
             FRuleRangerStyle::GetScanIcon(),
-            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnScanProject),
-                      FCanExecuteAction::CreateLambda([] { return HasAnyProjectRules(); })));
+            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerTools::OnScanProject),
+                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::HasAnyProjectRules(); })));
         SubSection.AddEntry(MoveTemp(Entry));
     }
 
@@ -169,8 +164,8 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                       "Execute project-level rules and apply fixes where supported\n"
                       "(Disabled if no project rules exist)"),
             FRuleRangerStyle::GetScanAndFixIcon(),
-            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnFixProject),
-                      FCanExecuteAction::CreateLambda([] { return HasAnyProjectRules(); })));
+            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerTools::OnFixProject),
+                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::HasAnyProjectRules(); })));
         SubSection.AddEntry(MoveTemp(Entry));
     }
 
@@ -187,8 +182,8 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                 "Scan content in configured directories (configure under Project Settings → Editor → Rule Ranger)\n"
                 "(Disabled if no directories are configured)"),
             FRuleRangerStyle::GetScanIcon(),
-            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnScanConfiguredContent),
-                      FCanExecuteAction::CreateLambda([] { return HasAnyConfiguredDirs(); })));
+            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerTools::OnScanContent),
+                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::HasAnyConfiguredDirs(); })));
         SubSection.AddEntry(MoveTemp(Entry));
     }
 
@@ -202,76 +197,8 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                 "Scan and apply fixes in configured directories (configure under Project Settings → Editor → Rule Ranger)\n"
                 "(Disabled if no directories are configured)"),
             FRuleRangerStyle::GetScanAndFixIcon(),
-            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerToolsMenu::OnFixConfiguredContent),
-                      FCanExecuteAction::CreateLambda([] { return HasAnyConfiguredDirs(); })));
+            FUIAction(FExecuteAction::CreateStatic(&FRuleRangerTools::OnFixContent),
+                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::HasAnyConfiguredDirs(); })));
         SubSection.AddEntry(MoveTemp(Entry));
-    }
-}
-
-void FRuleRangerToolsMenu::OnScanConfiguredContent()
-{
-    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
-    {
-        Subsystem->OnScanConfiguredContent();
-    }
-}
-
-void FRuleRangerToolsMenu::OnFixConfiguredContent()
-{
-    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
-    {
-        Subsystem->OnFixConfiguredContent();
-    }
-}
-
-void FRuleRangerToolsMenu::OnScanProject()
-{
-    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
-    {
-        Subsystem->OnScanProject();
-    }
-}
-
-void FRuleRangerToolsMenu::OnFixProject()
-{
-    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
-    {
-        Subsystem->OnFixProject();
-    }
-}
-
-void FRuleRangerToolsMenu::OnScanAll()
-{
-    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
-    {
-        Subsystem->OnScanProject();
-        Subsystem->OnScanConfiguredContent();
-    }
-}
-
-void FRuleRangerToolsMenu::OnFixAll()
-{
-    if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
-    {
-        Subsystem->OnFixProject();
-        Subsystem->OnFixConfiguredContent();
-    }
-}
-
-void FRuleRangerToolsMenu::OnOpenProjectSettings()
-{
-    if (const auto SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>(TEXT("Settings")))
-    {
-        if (const auto Settings = GetDefault<URuleRangerDeveloperSettings>())
-        {
-            const auto Container = Settings->GetContainerName();
-            const auto Category = Settings->GetCategoryName();
-            const auto Section = Settings->GetSectionName();
-            SettingsModule->ShowViewer(Container, Category, Section);
-        }
-    }
-    else
-    {
-        FGlobalTabmanager::Get()->TryInvokeTab(FName(TEXT("ProjectSettings")));
     }
 }

@@ -27,22 +27,9 @@ public:
     static void Shutdown();
 
 private:
-    static void RegisterMenus();
-    static bool HasAnyConfiguredDirs();
-    static bool HasAnyProjectRules();
-    static void FillRuleRangerSubMenu(UToolMenu* Menu);
-
-    static void OnScanConfiguredContent();
-    static void OnFixConfiguredContent();
-
-    static void OnScanProject();
-    static void OnFixProject();
-
-    static void OnScanAll();
-    static void OnFixAll();
-
-    static void OnOpenProjectSettings();
-
     static FDelegateHandle RegisterHandle;
     static int32 OwnerToken;
+
+    static void RegisterMenus();
+    static void FillRuleRangerSubMenu(UToolMenu* Menu);
 };

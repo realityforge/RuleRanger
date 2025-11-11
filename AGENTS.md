@@ -66,6 +66,15 @@ reserved for runtime assets that ship with the plugin.
   generation.
 - Match existing code style when not covered by the above rules.
 
+## Unreal Live Reload Notes
+
+- Avoid defining helper functions as `static` inside anonymous namespaces in `.cpp` files. Unreal's Live Coding/Live Reload can load multiple copies of a module during iteration; anonymous-namespace `static` functions produce multiple distinct internal symbols on reload and can lead to ODR-like issues and confusing behavior.
+- Prefer one of the following patterns instead:
+  - Wrap helpers in an internal `namespace RuleRanger::Tool` (or similar) with non-`static` functions.
+  - Use `static` member functions on a small internal class/struct in the same `.cpp` if encapsulation is needed.
+  - Place shared helpers in a `.h`/`.cpp` pair with proper linkage and include where needed.
+- When in doubt, favor explicit namespaces and normal linkage over anonymous namespaces for code that may be touched during Live Coding.
+
 ## Testing Guidelines
 
 - Automation coverage is aspirational. Capture edge cases in unit-style specs once a testing harness lands under

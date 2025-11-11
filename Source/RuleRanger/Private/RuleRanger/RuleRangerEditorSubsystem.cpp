@@ -1195,11 +1195,8 @@ void URuleRangerEditorSubsystem::CollectConfiguredPaths(TArray<FString>& OutPath
 // ReSharper disable once CppMemberFunctionMayBeStatic
 void URuleRangerEditorSubsystem::OnScanContent()
 {
-    TArray<FString> AssetPaths;
-    CollectConfiguredPaths(AssetPaths);
-
     TArray<FAssetData> Assets;
-    CollectAssetsFromPaths(AssetPaths, Assets);
+    FRuleRangerTools::CollectAllConfiguredAssets(Assets);
 
     ProcessAssetsCommon(
         Assets,
@@ -1219,11 +1216,8 @@ void URuleRangerEditorSubsystem::OnScanContent()
 // ReSharper disable once CppMemberFunctionMayBeStatic
 void URuleRangerEditorSubsystem::OnFixContent()
 {
-    TArray<FString> AssetPaths;
-    CollectConfiguredPaths(AssetPaths);
-
     TArray<FAssetData> Assets;
-    CollectAssetsFromPaths(AssetPaths, Assets);
+    FRuleRangerTools::CollectAllConfiguredAssets(Assets);
 
     ProcessAssetsCommon(
         Assets,

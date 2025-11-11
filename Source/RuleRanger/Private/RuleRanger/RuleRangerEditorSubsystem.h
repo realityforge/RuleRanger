@@ -76,13 +76,17 @@ public:
 
     void OnFixSelectedAssets(const TArray<FAssetData>& Assets);
 
-    void OnScanSelectedPaths(const TArray<FString>& AssetPaths);
+    void OnScanSelectedPaths(const TArray<FString>& Paths);
 
-    void OnFixSelectedPaths(const TArray<FString>& AssetPaths);
+    void CollectConfiguredPaths(TArray<FString>& OutPaths) const;
 
-    void OnScanConfiguredContent();
+    void CollectAssetsFromPaths(const TArray<FString>& AssetPaths, TArray<FAssetData>& Assets);
 
-    void OnFixConfiguredContent();
+    void OnFixSelectedPaths(const TArray<FString>& Paths);
+
+    void OnScanContent();
+
+    void OnFixContent();
 
     // Execute project-level rules across all configured RuleRangerConfigs
     void OnScanProject();

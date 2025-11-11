@@ -1030,7 +1030,7 @@ void URuleRangerEditorSubsystem::ProcessAssetsCommon(const TArray<FAssetData>& A
 
     TSet<FSoftObjectPath> Seen;
 
-    for (const auto& AssetData : Assets)
+    for (const auto& Asset : Assets)
     {
         if (SlowTask.ShouldCancel())
         {
@@ -1040,9 +1040,9 @@ void URuleRangerEditorSubsystem::ProcessAssetsCommon(const TArray<FAssetData>& A
             return;
         }
 
-        if (const auto Object = AssetData.GetAsset())
+        if (const auto Object = Asset.GetAsset())
         {
-            const FSoftObjectPath ObjPath = AssetData.GetSoftObjectPath();
+            const FSoftObjectPath ObjPath = Asset.GetSoftObjectPath();
             if (Seen.Contains(ObjPath))
             {
                 TickTask(SlowTask);
@@ -1099,20 +1099,21 @@ void URuleRangerEditorSubsystem::OnFixSelectedAssets(const TArray<FAssetData>& A
         true);
 }
 
-static void CollectAssetsFromPaths(const TArray<FString>& AssetPaths, TArray<FAssetData>& Assets)
+// ReSharper disable once CppMemberFunctionMayBeStatic
+void URuleRangerEditorSubsystem::CollectAssetsFromPaths(const TArray<FString>& AssetPaths, TArray<FAssetData>& Assets)
 {
     const auto& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
     for (const auto& AssetPath : AssetPaths)
     {
         // ReSharper disable once CppTooWideScopeInitStatement
-        const auto& AssetData = AssetRegistry.GetAssetByObjectPath(AssetPath);
-        if (AssetData.IsRedirector())
+        const auto& Asset = AssetRegistry.GetAssetByObjectPath(AssetPath);
+        if (Asset.IsRedirector())
         {
             // Ignore
         }
-        else if (EName::None != AssetData.AssetName)
+        else if (EName::None != Asset.AssetName)
         {
-            Assets.Add(AssetData);
+            Assets.Add(Asset);
         }
         else
         {
@@ -1129,10 +1130,10 @@ static void CollectAssetsFromPaths(const TArray<FString>& AssetPaths, TArray<FAs
     }
 }
 
-void URuleRangerEditorSubsystem::OnScanSelectedPaths(const TArray<FString>& AssetPaths)
+void URuleRangerEditorSubsystem::OnScanSelectedPaths(const TArray<FString>& Paths)
 {
     TArray<FAssetData> Assets;
-    CollectAssetsFromPaths(AssetPaths, Assets);
+    CollectAssetsFromPaths(Paths, Assets);
     ProcessAssetsCommon(Assets,
                         NSLOCTEXT("RuleRanger", "ScanSelectedPathsStarting", "Rule Ranger: Scan the selected paths"),
                         NSLOCTEXT("RuleRanger",
@@ -1147,10 +1148,10 @@ void URuleRangerEditorSubsystem::OnScanSelectedPaths(const TArray<FString>& Asse
                         false);
 }
 
-void URuleRangerEditorSubsystem::OnFixSelectedPaths(const TArray<FString>& AssetPaths)
+void URuleRangerEditorSubsystem::OnFixSelectedPaths(const TArray<FString>& Paths)
 {
     TArray<FAssetData> Assets;
-    CollectAssetsFromPaths(AssetPaths, Assets);
+    CollectAssetsFromPaths(Paths, Assets);
     ProcessAssetsCommon(
         Assets,
         NSLOCTEXT("RuleRanger", "ScanAndFixSelectedPathsStarting", "Rule Ranger: Scan and fix the selected paths"),
@@ -1166,7 +1167,8 @@ void URuleRangerEditorSubsystem::OnFixSelectedPaths(const TArray<FString>& Asset
         true);
 }
 
-static void CollectConfiguredPaths(TArray<FString>& OutPaths)
+// ReSharper disable once CppMemberFunctionMayBeStatic
+void URuleRangerEditorSubsystem::CollectConfiguredPaths(TArray<FString>& OutPaths) const
 {
     TSet<FString> UniquePaths;
     const auto DevSettings = GetDefault<URuleRangerDeveloperSettings>();
@@ -1194,7 +1196,7 @@ static void CollectConfiguredPaths(TArray<FString>& OutPaths)
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-void URuleRangerEditorSubsystem::OnScanConfiguredContent()
+void URuleRangerEditorSubsystem::OnScanContent()
 {
     TArray<FString> AssetPaths;
     CollectConfiguredPaths(AssetPaths);
@@ -1206,19 +1208,19 @@ void URuleRangerEditorSubsystem::OnScanConfiguredContent()
         Assets,
         NSLOCTEXT("RuleRanger", "ScanConfiguredPathsStarting", "Rule Ranger: Scan configured content"),
         NSLOCTEXT("RuleRanger",
-                  "ScanConfiguredContentStartingAt",
+                  "ScanContentStartingAt",
                   "Rule Ranger has started scanning the configured content at {0}"),
         NSLOCTEXT("RuleRanger",
-                  "CancelScanConfiguredContent",
+                  "CancelScanContent",
                   "User requested that Rule Ranger cancel the scanning of the configured content at {0}"),
         NSLOCTEXT("RuleRanger",
-                  "ScanConfiguredContentCompleted",
+                  "ScanContentCompleted",
                   "Rule Ranger has completed scanning of the configured content at {0}"),
         false);
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-void URuleRangerEditorSubsystem::OnFixConfiguredContent()
+void URuleRangerEditorSubsystem::OnFixContent()
 {
     TArray<FString> AssetPaths;
     CollectConfiguredPaths(AssetPaths);
@@ -1230,13 +1232,13 @@ void URuleRangerEditorSubsystem::OnFixConfiguredContent()
         Assets,
         NSLOCTEXT("RuleRanger", "ScanAndFixConfiguredPathsStarting", "Rule Ranger: Scan and fix configured content"),
         NSLOCTEXT("RuleRanger",
-                  "ScanAndFixConfiguredContentStartingAt",
+                  "ScanAndFixContentStartingAt",
                   "Rule Ranger has started scanning and fixing of the configured content at {0}"),
         NSLOCTEXT("RuleRanger",
-                  "CancelScanAndFixConfiguredContent",
+                  "CancelScanAndFixContent",
                   "User requested that Rule Ranger cancel the scanning and fixing of the configured content at {0}"),
         NSLOCTEXT("RuleRanger",
-                  "ScanAndFixConfiguredContentCompleted",
+                  "ScanAndFixContentCompleted",
                   "Rule Ranger has completed scanning and fixing of the configured content at {0}"),
         true);
 }

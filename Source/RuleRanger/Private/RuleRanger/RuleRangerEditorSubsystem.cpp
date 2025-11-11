@@ -1171,19 +1171,16 @@ void URuleRangerEditorSubsystem::OnFixSelectedPaths(const TArray<FString>& Paths
 void URuleRangerEditorSubsystem::CollectConfiguredPaths(TArray<FString>& OutPaths) const
 {
     TSet<FString> UniquePaths;
-    const auto DevSettings = GetDefault<URuleRangerDeveloperSettings>();
-    if (IsValid(DevSettings))
+
+    for (const auto ConfigPtr : GetCachedRuleSetConfigs())
     {
-        for (const auto& SoftConfig : DevSettings->Configs)
+        if (const auto Config = ConfigPtr.Get())
         {
-            if (const auto Config = SoftConfig.LoadSynchronous())
+            for (const auto& Dir : Config->Dirs)
             {
-                for (const auto& Dir : Config->Dirs)
+                if (!Dir.Path.IsEmpty())
                 {
-                    if (!Dir.Path.IsEmpty())
-                    {
-                        UniquePaths.Add(Dir.Path);
-                    }
+                    UniquePaths.Add(Dir.Path);
                 }
             }
         }
@@ -1246,19 +1243,15 @@ void URuleRangerEditorSubsystem::OnFixContent()
 // ReSharper disable once CppMemberFunctionMayBeStatic
 bool URuleRangerEditorSubsystem::HasAnyConfiguredDirs() const
 {
-    const auto DevSettings = GetDefault<URuleRangerDeveloperSettings>();
-    if (IsValid(DevSettings))
+    for (const auto ConfigPtr : GetCachedRuleSetConfigs())
     {
-        for (const auto& SoftConfig : DevSettings->Configs)
+        if (const auto Config = ConfigPtr.Get())
         {
-            if (const auto Config = SoftConfig.LoadSynchronous())
+            for (const auto& Dir : Config->Dirs)
             {
-                for (const auto& Dir : Config->Dirs)
+                if (!Dir.Path.IsEmpty())
                 {
-                    if (!Dir.Path.IsEmpty())
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
         }

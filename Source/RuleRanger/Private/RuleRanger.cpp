@@ -16,6 +16,7 @@
 #include "RuleRanger/UI/ContentBrowserExtension/RuleRangerContentBrowserExtensions.h"
 #include "RuleRanger/UI/RuleRangerCommands.h"
 #include "RuleRanger/UI/RuleRangerStyle.h"
+#include "RuleRanger/UI/ToolTab/RuleRangerToolTab.h"
 #include "RuleRanger/UI/ToolsMenu/RuleRangerToolsMenu.h"
 #include "RuleRangerDefaultEvents.h"
 #include "RuleRangerLogging.h"
@@ -41,6 +42,7 @@ void FRuleRangerModule::StartupModule()
         FRuleRangerContentBrowserExtensions::Initialize();
         FRuleRangerDefaultEvents::Initialize(this);
         FRuleRangerToolsMenu::Initialize();
+        FRuleRangerToolTab::Initialize();
     }
     else
     {
@@ -57,6 +59,7 @@ void FRuleRangerModule::ShutdownModule()
         // Remove integrations of RuleRanger into Editor UI
         FRuleRangerDefaultEvents::Shutdown(this);
         FRuleRangerToolsMenu::Shutdown();
+        FRuleRangerToolTab::Shutdown();
         FRuleRangerContentBrowserExtensions::Shutdown();
         FRuleRangerCommands::Unregister();
         FRuleRangerStyle::Shutdown();

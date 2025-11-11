@@ -22,25 +22,14 @@ public class RuleRanger : ModuleRules
         PublicDependencyModuleNames.AddRange(new[] { "ContentBrowser", "Core" });
 
         PrivateDependencyModuleNames.AddRange(new[] {
-            "AssetRegistry",
-            "AnimGraph",
-            "AssetTools",
-            "CoreUObject",
-            "BlueprintGraph",
-            "DataValidation",
-            "DeveloperSettings",
-            "EditorSubsystem",
-            "Engine",
-            "Json",
-            "Kismet",
-            "Projects",
-            "MessageLog",
-            "Slate",
-            "SlateCore",
-            "Settings",
-            "ToolMenus",
+            "AssetRegistry",     "AnimGraph",  "AssetTools",      "CoreUObject", "BlueprintGraph", "DataValidation",
+            "DeveloperSettings", "InputCore",  "EditorSubsystem", "Engine",      "Json",           "Kismet",
+            "Projects",          "MessageLog", "Slate",           "SlateCore",   "Settings",       "ToolMenus",
             "UnrealEd",
         });
+
+        // Clipboard (FPlatformApplicationMisc) lives in ApplicationCore
+        PrivateDependencyModuleNames.Add("ApplicationCore");
 
         PrivateIncludePathModuleNames.Add("MessageLog");
     }

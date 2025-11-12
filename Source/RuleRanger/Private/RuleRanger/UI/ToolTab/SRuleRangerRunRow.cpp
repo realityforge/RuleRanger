@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 #include "RuleRanger/UI/ToolTab/SRuleRangerRunRow.h"
+#include "HAL/PlatformApplicationMisc.h"
 #include "InputCoreTypes.h"
 #include "RuleRanger/UI/RuleRangerStyle.h"
 #include "RuleRanger/UI/ToolTab/SRuleRangerToolPanel.h"
@@ -69,6 +70,60 @@ FReply SRuleRangerRunRow::OnMouseButtonDown(const FGeometry& MyGeometry, const F
     return SMultiColumnTableRow::OnMouseButtonDown(MyGeometry, MouseEvent);
 }
 
+FReply SRuleRangerRunRow::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
+{
+    const auto Key = InKeyEvent.GetKey();
+    if (EKeys::Enter == Key || EKeys::Virtual_Accept == Key)
+    {
+        if (const auto Pinned = OwnerListView.Pin())
+        {
+            for (const auto& Row : Pinned->GetSelectedItems())
+            {
+                if (Row.IsValid())
+                {
+                    if (const auto Object = Row->Asset.IsValid() ? const_cast<UObject*>(Row->Asset.Get()) : nullptr)
+                    {
+                        if (const auto Subsystem = GEditor->GetEditorSubsystem<UAssetEditorSubsystem>())
+                        {
+                            TArray<UObject*> ToOpen;
+                            ToOpen.Add(Object);
+                            Subsystem->OpenEditorForAssets(ToOpen);
+                        }
+                        return FReply::Handled();
+                    }
+                }
+            }
+        }
+    }
+    else if (EKeys::C == Key && InKeyEvent.IsControlDown())
+    {
+        if (const auto Pinned = OwnerListView.Pin())
+        {
+            FString Combined;
+            bool bFirst = true;
+            for (const auto& Row : Pinned->GetSelectedItems())
+            {
+                if (Row.IsValid())
+                {
+                    if (!bFirst)
+                    {
+                        Combined.AppendChar(TEXT('\n'));
+                    }
+                    bFirst = false;
+                    Combined.Append(Row->Text.ToString());
+                }
+            }
+            if (!Combined.IsEmpty())
+            {
+                FPlatformApplicationMisc::ClipboardCopy(*Combined);
+                return FReply::Handled();
+            }
+        }
+    }
+
+    return SMultiColumnTableRow::OnKeyDown(MyGeometry, InKeyEvent);
+}
+
 TSharedRef<SWidget> SRuleRangerRunRow::GenerateWidgetForColumn(const FName& ColumnName)
 {
     if (TEXT("Severity") == ColumnName)
@@ -82,19 +137,21 @@ TSharedRef<SWidget> SRuleRangerRunRow::GenerateWidgetForColumn(const FName& Colu
     else if (TEXT("Asset") == ColumnName)
     {
         const auto Name = Item->Asset.IsValid() ? FText::FromString(Item->Asset->GetName()) : FText::GetEmpty();
+        const auto ToolTip =
+            Item->Asset.IsValid() ? FText::FromString(Item->Asset.Get()->GetPathName()) : FText::GetEmpty();
         if (!Item->Asset.IsValid())
         {
-            return SNew(STextBlock).Text(Name);
+            return SNew(STextBlock).Text(Name).ToolTipText(ToolTip);
         }
         else
         {
-            return SNew(SHyperlink).Text(Name).OnNavigate_Lambda([Weak = Item->Asset] {
-                if (const auto* Obj = Weak.Get())
+            return SNew(SHyperlink).Text(Name).ToolTipText(ToolTip).OnNavigate_Lambda([Weak = Item->Asset] {
+                if (const auto Object = Weak.Get())
                 {
-                    if (auto* Subsystem = GEditor->GetEditorSubsystem<UAssetEditorSubsystem>())
+                    if (const auto Subsystem = GEditor->GetEditorSubsystem<UAssetEditorSubsystem>())
                     {
                         TArray<UObject*> Open;
-                        Open.Add(const_cast<UObject*>(Obj));
+                        Open.Add(const_cast<UObject*>(Object));
                         Subsystem->OpenEditorForAssets(Open);
                     }
                 }
@@ -106,27 +163,31 @@ TSharedRef<SWidget> SRuleRangerRunRow::GenerateWidgetForColumn(const FName& Colu
         const auto bHasRule = Item->Rule.IsValid();
         const auto bHasProjectRule = Item->ProjectRule.IsValid();
         FText Name;
+        FText ToolTip;
         if (bHasRule)
         {
             Name = FText::FromString(Item->Rule->GetName());
+            ToolTip = FText::FromString(Item->Rule.Get()->GetPathName());
         }
         else if (bHasProjectRule)
         {
             Name = FText::FromString(Item->ProjectRule->GetName());
+            ToolTip = FText::FromString(Item->ProjectRule.Get()->GetPathName());
         }
         else
         {
             Name = FText::GetEmpty();
+            ToolTip = FText::GetEmpty();
         }
         if (!bHasRule && !bHasProjectRule)
         {
-            return SNew(STextBlock).Text(Name);
+            return SNew(STextBlock).Text(Name).ToolTipText(ToolTip);
         }
         else
         {
             const auto RuleWeak = Item->Rule;
             const auto ProjectRuleWeak = Item->ProjectRule;
-            return SNew(SHyperlink).Text(Name).OnNavigate_Lambda([RuleWeak, ProjectRuleWeak] {
+            return SNew(SHyperlink).Text(Name).ToolTipText(ToolTip).OnNavigate_Lambda([RuleWeak, ProjectRuleWeak] {
                 const auto Rule = RuleWeak.IsValid() ? static_cast<const UObject*>(RuleWeak.Get())
                     : ProjectRuleWeak.IsValid()      ? ProjectRuleWeak.Get()
                                                      : nullptr;
@@ -145,13 +206,15 @@ TSharedRef<SWidget> SRuleRangerRunRow::GenerateWidgetForColumn(const FName& Colu
     else if (TEXT("RuleSet") == ColumnName)
     {
         const auto Name = Item->RuleSet.IsValid() ? FText::FromString(Item->RuleSet->GetName()) : FText::GetEmpty();
+        const auto ToolTip =
+            Item->RuleSet.IsValid() ? FText::FromString(Item->RuleSet.Get()->GetPathName()) : FText::GetEmpty();
         if (!Item->RuleSet.IsValid())
         {
-            return SNew(STextBlock).Text(Name);
+            return SNew(STextBlock).Text(Name).ToolTipText(ToolTip);
         }
         else
         {
-            return SNew(SHyperlink).Text(Name).OnNavigate_Lambda([RuleSetRef = Item->RuleSet] {
+            return SNew(SHyperlink).Text(Name).ToolTipText(ToolTip).OnNavigate_Lambda([RuleSetRef = Item->RuleSet] {
                 if (const auto RuleSet = RuleSetRef.Get())
                 {
                     if (const auto Subsystem = GEditor->GetEditorSubsystem<UAssetEditorSubsystem>())

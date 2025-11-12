@@ -36,6 +36,7 @@ private:
 
     virtual TSharedRef<SWidget> GenerateWidgetForColumn(const FName& ColumnName) override;
     virtual FReply OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+    virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
 
     static const FSlateBrush* GetSeverityBrush(ERuleRangerToolSeverity Severity);
 };

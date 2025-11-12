@@ -420,9 +420,10 @@ void SRuleRangerToolPanel::RunProjectScan(const TSharedPtr<FRuleRangerRun>& Run,
     {
         if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
         {
-            const auto ProjectHandler = NewObject<URuleRangerToolProjectResultHandler>();
+            // Need to use TStrongObjectPtr to avoid the garbage collector, collecting handler during run
+            const TStrongObjectPtr ProjectHandler(NewObject<URuleRangerToolProjectResultHandler>(Subsystem));
             ProjectHandler->Init(Run);
-            Subsystem->RunProjectScan(bFix, ProjectHandler);
+            Subsystem->RunProjectScan(bFix, ProjectHandler.Get());
         }
     }
 }
@@ -456,7 +457,8 @@ void SRuleRangerToolPanel::RunAssetScan(const TSharedPtr<FRuleRangerRun>& Run,
 {
     if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
     {
-        const auto Handler = NewObject<URuleRangerToolResultHandler>();
+        // Need to use TStrongObjectPtr to avoid the garbage collector, collecting handler during run
+        const TStrongObjectPtr Handler(NewObject<URuleRangerToolResultHandler>(Subsystem));
         Handler->Init(Run);
 
         for (const auto& Asset : Assets)
@@ -465,11 +467,11 @@ void SRuleRangerToolPanel::RunAssetScan(const TSharedPtr<FRuleRangerRun>& Run,
             {
                 if (bFix)
                 {
-                    Subsystem->ScanAndFixObject(Object, Handler);
+                    Subsystem->ScanAndFixObject(Object, Handler.Get());
                 }
                 else
                 {
-                    Subsystem->ScanObject(Object, Handler);
+                    Subsystem->ScanObject(Object, Handler.Get());
                 }
             }
         }

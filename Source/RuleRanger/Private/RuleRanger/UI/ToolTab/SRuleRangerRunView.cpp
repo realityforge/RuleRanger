@@ -15,7 +15,9 @@
 #include "ContentBrowserModule.h"
 #include "Editor.h"
 #include "HAL/PlatformApplicationMisc.h"
+#include "HAL/PlatformMisc.h"
 #include "IContentBrowserSingleton.h"
+#include "Misc/ConfigCacheIni.h"
 #include "Modules/ModuleManager.h"
 #include "RuleRanger/UI/ToolTab/SRuleRangerRunRow.h"
 #include "RuleRanger/UI/ToolTab/SRuleRangerToolPanel.h"
@@ -37,6 +39,8 @@ void SRuleRangerRunView::Construct(const FArguments& InArgs)
 {
     Run = InArgs._Run;
 
+    // Load persisted preferences before building the view
+    LoadPreferences();
     RebuildFiltered();
 
     ListView = SNew(SListView<TSharedPtr<FRuleRangerMessageRow>>)
@@ -214,6 +218,53 @@ void SRuleRangerRunView::SortFiltered()
     {
         ListView->RequestListRefresh();
     }
+}
+
+void SRuleRangerRunView::LoadPreferences()
+{
+    static const TCHAR* Section = TEXT("RuleRanger.Tool.RunView");
+
+    auto bValue{ false };
+    if (GConfig->GetBool(Section, TEXT("ShowInfo"), bValue, GEditorPerProjectIni))
+    {
+        bShowInfo = bValue;
+    }
+    if (GConfig->GetBool(Section, TEXT("ShowWarning"), bValue, GEditorPerProjectIni))
+    {
+        bShowWarning = bValue;
+    }
+    if (GConfig->GetBool(Section, TEXT("ShowError"), bValue, GEditorPerProjectIni))
+    {
+        bShowError = bValue;
+    }
+
+    FString SortId;
+    if (GConfig->GetString(Section, TEXT("SortColumnId"), SortId, GEditorPerProjectIni) && !SortId.IsEmpty())
+    {
+        SortColumnId = FName(*SortId);
+    }
+    int32 SortModeInt = static_cast<int32>(SortMode);
+    if (GConfig->GetInt(Section, TEXT("SortMode"), SortModeInt, GEditorPerProjectIni))
+    {
+        SortMode = static_cast<EColumnSortMode::Type>(SortModeInt);
+        // Validate against expected values
+        if (SortMode != EColumnSortMode::Ascending && SortMode != EColumnSortMode::Descending)
+        {
+            SortMode = EColumnSortMode::Descending;
+        }
+    }
+}
+
+void SRuleRangerRunView::SavePreferences() const
+{
+    static const TCHAR* Section = TEXT("RuleRanger.Tool.RunView");
+
+    GConfig->SetBool(Section, TEXT("ShowInfo"), bShowInfo, GEditorPerProjectIni);
+    GConfig->SetBool(Section, TEXT("ShowWarning"), bShowWarning, GEditorPerProjectIni);
+    GConfig->SetBool(Section, TEXT("ShowError"), bShowError, GEditorPerProjectIni);
+    GConfig->SetString(Section, TEXT("SortColumnId"), *SortColumnId.ToString(), GEditorPerProjectIni);
+    GConfig->SetInt(Section, TEXT("SortMode"), SortMode, GEditorPerProjectIni);
+    GConfig->Flush(false, GEditorPerProjectIni);
 }
 
 TSharedPtr<SWidget> SRuleRangerRunView::OnContextMenuOpening()

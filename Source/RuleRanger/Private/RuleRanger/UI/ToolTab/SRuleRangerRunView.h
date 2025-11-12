@@ -33,6 +33,10 @@ public:
     void Construct(const FArguments& InArgs);
 
 private:
+    // Preferences (persisted between sessions)
+    void LoadPreferences();
+    void SavePreferences() const;
+
     TSharedPtr<FRuleRangerRun> Run;
     TSharedPtr<SListView<TSharedPtr<FRuleRangerMessageRow>>> ListView;
     TArray<TSharedPtr<FRuleRangerMessageRow>> FilteredItems;
@@ -65,6 +69,7 @@ private:
         SortColumnId = Column;
         SortMode = NewMode;
         SortFiltered();
+        SavePreferences();
     }
     ECheckBoxState GetInfoState() const { return bShowInfo ? ECheckBoxState::Checked : ECheckBoxState::Unchecked; }
     ECheckBoxState GetWarningState() const
@@ -77,16 +82,19 @@ private:
     {
         bShowInfo = ECheckBoxState::Checked == State;
         RebuildFiltered();
+        SavePreferences();
     }
     void OnToggleWarning(const ECheckBoxState State)
     {
         bShowWarning = ECheckBoxState::Checked == State;
         RebuildFiltered();
+        SavePreferences();
     }
     void OnToggleError(const ECheckBoxState State)
     {
         bShowError = ECheckBoxState::Checked == State;
         RebuildFiltered();
+        SavePreferences();
     }
 
     // Context menu support

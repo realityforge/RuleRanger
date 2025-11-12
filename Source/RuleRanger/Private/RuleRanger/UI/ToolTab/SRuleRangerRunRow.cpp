@@ -29,7 +29,33 @@ void SRuleRangerRunRow::Construct(const FArguments& InArgs, const TSharedRef<STa
 {
     Item = InArgs._Item;
     OwnerListView = InArgs._ListView;
-    SMultiColumnTableRow::Construct(FSuperRowType::FArguments(), InOwnerTable);
+    SMultiColumnTableRow::Construct(FSuperRowType::FArguments().Padding(FMargin(0.f, 2.f)), InOwnerTable);
+}
+
+FText SRuleRangerRunRow::GetSeverityText(const ERuleRangerToolSeverity Severity)
+{
+    switch (Severity)
+    {
+        case ERuleRangerToolSeverity::Error:
+            return NSLOCTEXT("RuleRanger", "SeverityError", "Error");
+        case ERuleRangerToolSeverity::Warning:
+            return NSLOCTEXT("RuleRanger", "SeverityWarning", "Warning");
+        default:
+            return NSLOCTEXT("RuleRanger", "SeverityInfo", "Info");
+    }
+}
+
+FSlateColor SRuleRangerRunRow::GetSeverityTextColor(const ERuleRangerToolSeverity Severity)
+{
+    switch (Severity)
+    {
+        case ERuleRangerToolSeverity::Error:
+            return FSlateColor(FLinearColor(0.92f, 0.34f, 0.34f));
+        case ERuleRangerToolSeverity::Warning:
+            return FSlateColor(FLinearColor(0.98f, 0.78f, 0.25f));
+        default:
+            return FSlateColor(FLinearColor(0.90f, 0.90f, 0.90f));
+    }
 }
 
 const FSlateBrush* SRuleRangerRunRow::GetSeverityBrush(const ERuleRangerToolSeverity Severity)
@@ -128,11 +154,17 @@ TSharedRef<SWidget> SRuleRangerRunRow::GenerateWidgetForColumn(const FName& Colu
 {
     if (TEXT("Severity") == ColumnName)
     {
-        return SNew(SImage).Image(GetSeverityBrush(Item->Severity));
+        return SNew(SBox)
+            .HAlign(HAlign_Center)
+            .VAlign(VAlign_Center)
+            .WidthOverride(20.f)
+            .HeightOverride(20.f)
+                [SNew(SImage).ToolTipText(GetSeverityText(Item->Severity)).Image(GetSeverityBrush(Item->Severity))];
     }
     else if (TEXT("Message") == ColumnName)
     {
-        return SNew(STextBlock).Text(Item->Text).WrapTextAt(600.f);
+        return SNew(SBox).Padding(FMargin(6.f, 6.f))
+            [SNew(STextBlock).Text(Item->Text).ColorAndOpacity(GetSeverityTextColor(Item->Severity)).WrapTextAt(600.f)];
     }
     else if (TEXT("Asset") == ColumnName)
     {
@@ -141,11 +173,13 @@ TSharedRef<SWidget> SRuleRangerRunRow::GenerateWidgetForColumn(const FName& Colu
             Item->Asset.IsValid() ? FText::FromString(Item->Asset.Get()->GetPathName()) : FText::GetEmpty();
         if (!Item->Asset.IsValid())
         {
-            return SNew(STextBlock).Text(Name).ToolTipText(ToolTip);
+            return SNew(SBox).Padding(FMargin(6.f, 3.f))[SNew(STextBlock).Text(Name).ToolTipText(ToolTip)];
         }
         else
         {
-            return SNew(SHyperlink).Text(Name).ToolTipText(ToolTip).OnNavigate_Lambda([Weak = Item->Asset] {
+            return SNew(SBox).Padding(
+                FMargin(6.f,
+                        3.f))[SNew(SHyperlink).Text(Name).ToolTipText(ToolTip).OnNavigate_Lambda([Weak = Item->Asset] {
                 if (const auto Object = Weak.Get())
                 {
                     if (const auto Subsystem = GEditor->GetEditorSubsystem<UAssetEditorSubsystem>())
@@ -155,7 +189,7 @@ TSharedRef<SWidget> SRuleRangerRunRow::GenerateWidgetForColumn(const FName& Colu
                         Subsystem->OpenEditorForAssets(Open);
                     }
                 }
-            });
+            })];
         }
     }
     else if (TEXT("Rule") == ColumnName)
@@ -181,13 +215,15 @@ TSharedRef<SWidget> SRuleRangerRunRow::GenerateWidgetForColumn(const FName& Colu
         }
         if (!bHasRule && !bHasProjectRule)
         {
-            return SNew(STextBlock).Text(Name).ToolTipText(ToolTip);
+            return SNew(SBox).Padding(FMargin(6.f, 3.f))[SNew(STextBlock).Text(Name).ToolTipText(ToolTip)];
         }
         else
         {
             const auto RuleWeak = Item->Rule;
             const auto ProjectRuleWeak = Item->ProjectRule;
-            return SNew(SHyperlink).Text(Name).ToolTipText(ToolTip).OnNavigate_Lambda([RuleWeak, ProjectRuleWeak] {
+            return SNew(SBox).Padding(FMargin(
+                6.f,
+                3.f))[SNew(SHyperlink).Text(Name).ToolTipText(ToolTip).OnNavigate_Lambda([RuleWeak, ProjectRuleWeak] {
                 const auto Rule = RuleWeak.IsValid() ? static_cast<const UObject*>(RuleWeak.Get())
                     : ProjectRuleWeak.IsValid()      ? ProjectRuleWeak.Get()
                                                      : nullptr;
@@ -200,7 +236,7 @@ TSharedRef<SWidget> SRuleRangerRunRow::GenerateWidgetForColumn(const FName& Colu
                         Subsystem->OpenEditorForAssets(Open);
                     }
                 }
-            });
+            })];
         }
     }
     else if (TEXT("RuleSet") == ColumnName)
@@ -210,11 +246,13 @@ TSharedRef<SWidget> SRuleRangerRunRow::GenerateWidgetForColumn(const FName& Colu
             Item->RuleSet.IsValid() ? FText::FromString(Item->RuleSet.Get()->GetPathName()) : FText::GetEmpty();
         if (!Item->RuleSet.IsValid())
         {
-            return SNew(STextBlock).Text(Name).ToolTipText(ToolTip);
+            return SNew(SBox).Padding(FMargin(6.f, 3.f))[SNew(STextBlock).Text(Name).ToolTipText(ToolTip)];
         }
         else
         {
-            return SNew(SHyperlink).Text(Name).ToolTipText(ToolTip).OnNavigate_Lambda([RuleSetRef = Item->RuleSet] {
+            return SNew(SBox).Padding(FMargin(
+                6.f,
+                3.f))[SNew(SHyperlink).Text(Name).ToolTipText(ToolTip).OnNavigate_Lambda([RuleSetRef = Item->RuleSet] {
                 if (const auto RuleSet = RuleSetRef.Get())
                 {
                     if (const auto Subsystem = GEditor->GetEditorSubsystem<UAssetEditorSubsystem>())
@@ -224,7 +262,7 @@ TSharedRef<SWidget> SRuleRangerRunRow::GenerateWidgetForColumn(const FName& Colu
                         Subsystem->OpenEditorForAssets(Open);
                     }
                 }
-            });
+            })];
         }
     }
     else

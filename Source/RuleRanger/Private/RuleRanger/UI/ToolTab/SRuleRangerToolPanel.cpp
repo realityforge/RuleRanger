@@ -16,7 +16,7 @@
 #include "AssetRegistry/AssetData.h"
 #include "Editor.h"
 #include "Modules/ModuleManager.h"
-#include "RuleRanger/RuleRangerEditorSubsystem.h"
+#include "RuleRanger/UI/RuleRangerEditorSubsystem.h"
 #include "RuleRanger/UI/RuleRangerStyle.h"
 #include "RuleRanger/UI/RuleRangerTools.h"
 #include "RuleRanger/UI/RuleRangerUIHelpers.h"

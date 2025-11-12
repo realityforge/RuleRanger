@@ -20,7 +20,7 @@
 #include "IContentBrowserSingleton.h"
 #include "ISettingsModule.h"
 #include "Modules/ModuleManager.h"
-#include "RuleRanger/RuleRangerEditorSubsystem.h"
+#include "RuleRanger/UI/RuleRangerEditorSubsystem.h"
 #include "RuleRanger/UI/ToolTab/RuleRangerToolTab.h"
 #include "RuleRangerDeveloperSettings.h"
 

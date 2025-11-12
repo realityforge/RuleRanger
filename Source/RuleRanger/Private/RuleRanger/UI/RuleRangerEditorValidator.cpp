@@ -11,10 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "RuleRanger/RuleRangerEditorValidator.h"
+#include "RuleRanger/UI/RuleRangerEditorValidator.h"
 #include "Logging/StructuredLog.h"
 #include "Misc/DataValidation.h"
-#include "RuleRanger/RuleRangerEditorSubsystem.h"
+#include "RuleRanger/UI/RuleRangerEditorSubsystem.h"
 #include "RuleRangerActionContext.h"
 #include "RuleRangerLogging.h"
 #include "RuleRangerRule.h"

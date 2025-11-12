@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 #include "RuleRangerDeveloperSettings.h"
-#include "RuleRanger/RuleRangerEditorSubsystem.h"
+#include "RuleRanger/UI/RuleRangerEditorSubsystem.h"
 
 void URuleRangerDeveloperSettings::PostEditChangeProperty(FPropertyChangedEvent& Event)
 {

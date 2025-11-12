@@ -11,11 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "RuleRanger/RuleRangerEditorSubsystem.h"
+#include "RuleRanger/UI/RuleRangerEditorSubsystem.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Editor.h"
 #include "Logging/StructuredLog.h"
 #include "Misc/ScopedSlowTask.h"
+#include "RuleRanger/UI/RuleRangerTools.h"
 #include "RuleRangerActionContext.h"
 #include "RuleRangerConfig.h"
 #include "RuleRangerDefaultProjectResultHandler.h"
@@ -32,7 +33,6 @@
 #include "RuleRangerRuleSet.h"
 #include "Subsystems/EditorAssetSubsystem.h"
 #include "Subsystems/ImportSubsystem.h"
-#include "UI/RuleRangerTools.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerEditorSubsystem)
 

@@ -23,6 +23,7 @@
 #include "RuleRanger/UI/ToolTab/SRuleRangerToolPanel.h"
 // ReSharper disable 3 CppUnusedIncludeDirective
 #include "RuleRanger/UI/RuleRangerStyle.h"
+#include "RuleRanger/UI/RuleRangerUIHelpers.h"
 #include "RuleRangerProjectRule.h"
 #include "RuleRangerRule.h"
 #include "RuleRangerRuleSet.h"
@@ -101,15 +102,9 @@ void SRuleRangerRunView::Construct(const FArguments& InArgs)
                                    [SNew(SCheckBox)
                                         .IsChecked(this, &SRuleRangerRunView::GetErrorState)
                                         .OnCheckStateChanged(this, &SRuleRangerRunView::OnToggleError)
-                                            [SNew(SHorizontalBox)
-                                             + SHorizontalBox::Slot()
-                                                   .AutoWidth()
-                                                   .VAlign(VAlign_Center)
-                                                   .Padding(FMargin(0, 2, 6, 2))[SNew(SImage).Image(
-                                                       FRuleRangerStyle::GetErrorMessageBrush())]
-                                             + SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
-                                                   [SNew(STextBlock)
-                                                        .Text(NSLOCTEXT("RuleRanger", "FilterError", "Errors"))]]]
+                                            [RuleRangerUI::MakeIconLabelFromBrush(
+                                                FRuleRangerStyle::GetErrorMessageBrush(),
+                                                NSLOCTEXT("RuleRanger", "FilterError", "Errors"))]]
                          + SHorizontalBox::Slot()
                                .AutoWidth()
                                .VAlign(VAlign_Center)
@@ -117,27 +112,16 @@ void SRuleRangerRunView::Construct(const FArguments& InArgs)
                                    [SNew(SCheckBox)
                                         .IsChecked(this, &SRuleRangerRunView::GetWarningState)
                                         .OnCheckStateChanged(this, &SRuleRangerRunView::OnToggleWarning)
-                                            [SNew(SHorizontalBox)
-                                             + SHorizontalBox::Slot()
-                                                   .AutoWidth()
-                                                   .VAlign(VAlign_Center)
-                                                   .Padding(FMargin(0, 2, 6, 2))[SNew(SImage).Image(
-                                                       FRuleRangerStyle::GetWarningMessageBrush())]
-                                             + SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
-                                                   [SNew(STextBlock)
-                                                        .Text(NSLOCTEXT("RuleRanger", "FilterWarning", "Warnings"))]]]
-                         + SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
-                               [SNew(SCheckBox)
-                                    .IsChecked(this, &SRuleRangerRunView::GetInfoState)
-                                    .OnCheckStateChanged(this, &SRuleRangerRunView::OnToggleInfo)
-                                        [SNew(SHorizontalBox)
-                                         + SHorizontalBox::Slot()
-                                               .AutoWidth()
-                                               .VAlign(VAlign_Center)
-                                               .Padding(FMargin(0, 2, 6, 2))[SNew(SImage).Image(
-                                                   FRuleRangerStyle::GetNoteMessageBrush())]
-                                         + SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
-                                               [SNew(STextBlock).Text(NSLOCTEXT("RuleRanger", "FilterInfo", "Info"))]]]
+                                            [RuleRangerUI::MakeIconLabelFromBrush(
+                                                FRuleRangerStyle::GetWarningMessageBrush(),
+                                                NSLOCTEXT("RuleRanger", "FilterWarning", "Warnings"))]]
+                         + SHorizontalBox::Slot().AutoWidth().VAlign(
+                             VAlign_Center)[SNew(SCheckBox)
+                                                .IsChecked(this, &SRuleRangerRunView::GetInfoState)
+                                                .OnCheckStateChanged(this, &SRuleRangerRunView::OnToggleInfo)
+                                                    [RuleRangerUI::MakeIconLabelFromBrush(
+                                                        FRuleRangerStyle::GetNoteMessageBrush(),
+                                                        NSLOCTEXT("RuleRanger", "FilterInfo", "Info"))]]
                          + SHorizontalBox::Slot().FillWidth(1.f).VAlign(VAlign_Center)
                                [SNew(SSearchBox)
                                     .HintText(
@@ -373,44 +357,47 @@ TSharedPtr<SWidget> SRuleRangerRunView::OnContextMenuOpening()
 
         MenuBuilder.BeginSection("RuleRanger.RowActions", NSLOCTEXT("RuleRanger", "RRRowActions", "Actions"));
         {
-            MenuBuilder.AddMenuEntry(
+            RuleRangerUI::AddMenuEntry(
+                MenuBuilder,
                 NSLOCTEXT("RuleRanger", "OpenSelected", "Edit Asset…"),
                 NSLOCTEXT("RuleRanger", "OpenSelected_Tooltip", "Open the selected asset(s) in the editor"),
                 FRuleRangerStyle::GetEditAssetIcon(),
-                FUIAction(FExecuteAction::CreateSP(this, &SRuleRangerRunView::ExecuteOpenSelected),
-                          FCanExecuteAction::CreateLambda(
-                              [HasAnySelection, bHasAsset] { return HasAnySelection && bHasAsset; })));
+                FExecuteAction::CreateSP(this, &SRuleRangerRunView::ExecuteOpenSelected),
+                FCanExecuteAction::CreateLambda([HasAnySelection, bHasAsset] { return HasAnySelection && bHasAsset; }));
 
-            MenuBuilder.AddMenuEntry(
+            RuleRangerUI::AddMenuEntry(
+                MenuBuilder,
                 NSLOCTEXT("RuleRanger", "OpenRuleSet", "Edit RuleSet…"),
                 NSLOCTEXT("RuleRanger", "OpenRuleSet_Tooltip", "Open the selected ruleset(s) in the editor"),
                 FRuleRangerStyle::GetEditAssetIcon(),
-                FUIAction(FExecuteAction::CreateSP(this, &SRuleRangerRunView::ExecuteOpenRuleSet),
-                          FCanExecuteAction::CreateLambda(
-                              [HasAnySelection, bHasRuleSet] { return HasAnySelection && bHasRuleSet; })));
+                FExecuteAction::CreateSP(this, &SRuleRangerRunView::ExecuteOpenRuleSet),
+                FCanExecuteAction::CreateLambda(
+                    [HasAnySelection, bHasRuleSet] { return HasAnySelection && bHasRuleSet; }));
 
-            MenuBuilder.AddMenuEntry(
+            RuleRangerUI::AddMenuEntry(
+                MenuBuilder,
                 NSLOCTEXT("RuleRanger", "OpenRule", "Edit Rule…"),
                 NSLOCTEXT("RuleRanger", "OpenRule_Tooltip", "Open the selected rule(s) in the editor"),
                 FRuleRangerStyle::GetEditAssetIcon(),
-                FUIAction(FExecuteAction::CreateSP(this, &SRuleRangerRunView::ExecuteOpenRule),
-                          FCanExecuteAction::CreateLambda(
-                              [HasAnySelection, bHasRule] { return HasAnySelection && bHasRule; })));
+                FExecuteAction::CreateSP(this, &SRuleRangerRunView::ExecuteOpenRule),
+                FCanExecuteAction::CreateLambda([HasAnySelection, bHasRule] { return HasAnySelection && bHasRule; }));
 
-            MenuBuilder.AddMenuEntry(
+            RuleRangerUI::AddMenuEntry(
+                MenuBuilder,
                 NSLOCTEXT("RuleRanger", "ShowInCB", "Show Asset in Content Browser"),
                 NSLOCTEXT("RuleRanger", "ShowInCB_Tooltip", "Show the selected assets(s) in the Content Browser"),
                 FRuleRangerStyle::GetFindInContentBrowserIcon(),
-                FUIAction(FExecuteAction::CreateSP(this, &SRuleRangerRunView::ExecuteShowInContentBrowser),
-                          FCanExecuteAction::CreateLambda(
-                              [HasAnySelection, bHasAnyAssetLike] { return HasAnySelection && bHasAnyAssetLike; })));
+                FExecuteAction::CreateSP(this, &SRuleRangerRunView::ExecuteShowInContentBrowser),
+                FCanExecuteAction::CreateLambda(
+                    [HasAnySelection, bHasAnyAssetLike] { return HasAnySelection && bHasAnyAssetLike; }));
 
-            MenuBuilder.AddMenuEntry(
+            RuleRangerUI::AddMenuEntry(
+                MenuBuilder,
                 NSLOCTEXT("RuleRanger", "CopyMessage", "Copy Message"),
                 NSLOCTEXT("RuleRanger", "CopyMessage_Tooltip", "Copy the selected message text to the clipboard"),
                 FRuleRangerStyle::GetCopyMessageIcon(),
-                FUIAction(FExecuteAction::CreateSP(this, &SRuleRangerRunView::ExecuteCopyMessage),
-                          FCanExecuteAction::CreateLambda([HasAnySelection] { return HasAnySelection; })));
+                FExecuteAction::CreateSP(this, &SRuleRangerRunView::ExecuteCopyMessage),
+                FCanExecuteAction::CreateLambda([HasAnySelection] { return HasAnySelection; }));
         }
         MenuBuilder.EndSection();
 

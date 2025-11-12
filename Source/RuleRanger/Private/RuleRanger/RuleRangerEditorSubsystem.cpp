@@ -30,9 +30,9 @@
 #include "RuleRangerRule.h"
 #include "RuleRangerRuleExclusion.h"
 #include "RuleRangerRuleSet.h"
-#include "RuleRangerTools.h"
 #include "Subsystems/EditorAssetSubsystem.h"
 #include "Subsystems/ImportSubsystem.h"
+#include "UI/RuleRangerTools.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerEditorSubsystem)
 

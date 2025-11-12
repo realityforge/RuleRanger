@@ -16,7 +16,7 @@
 #include "Editor.h"
 #include "Modules/ModuleManager.h"
 #include "RuleRanger/UI/RuleRangerStyle.h"
-#include "RuleRangerTools.h"
+#include "RuleRanger/UI/RuleRangerTools.h"
 #include "ToolMenus.h"
 #include "Widgets/Text/STextBlock.h"
 

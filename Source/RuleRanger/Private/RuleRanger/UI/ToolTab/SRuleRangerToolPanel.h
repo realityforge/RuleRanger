@@ -71,6 +71,7 @@ private:
     void CloseRunAt(int32 Index);
     void ClearAllRuns();
 
+    void RunProjectScan(const TSharedPtr<FRuleRangerRun>& Run, bool bFix);
     void RunContentScan(const TSharedPtr<FRuleRangerRun>& Run, bool bFix);
     void RunSelectedScan(const TSharedPtr<FRuleRangerRun>& Run, bool bFix);
 

@@ -18,10 +18,11 @@
 #include "Modules/ModuleManager.h"
 #include "RuleRanger/RuleRangerEditorSubsystem.h"
 #include "RuleRanger/UI/RuleRangerStyle.h"
+#include "RuleRanger/UI/RuleRangerTools.h"
+#include "RuleRanger/UI/RuleRangerUIHelpers.h"
 #include "RuleRanger/UI/ToolTab/RuleRangerToolProjectResultHandler.h"
 #include "RuleRanger/UI/ToolTab/RuleRangerToolResultHandler.h"
 #include "RuleRanger/UI/ToolTab/SRuleRangerRunView.h"
-#include "RuleRangerTools.h"
 #include "Styling/AppStyle.h"
 #include "Widgets/Images/SImage.h"
 #include "Widgets/Input/SButton.h"
@@ -42,16 +43,8 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
     const auto OnScanAll = [this] {
         StartRun(NSLOCTEXT("RuleRanger", "Run_ScanAll", "Scan All"));
         const auto Run = Runs.IsValidIndex(ActiveRunIndex) ? Runs[ActiveRunIndex] : nullptr;
-        if (Run.IsValid())
-        {
-            if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
-            {
-                auto* ProjectHandler = NewObject<URuleRangerToolProjectResultHandler>();
-                ProjectHandler->Init(Run);
-                Subsystem->RunProjectScan(false, ProjectHandler);
-            }
-            RunContentScan(Run, /*bFix*/ false);
-        }
+        RunProjectScan(Run, /*bFix*/ false);
+        RunContentScan(Run, /*bFix*/ false);
         RebuildRunContents();
         RebuildRunsUI();
         return FReply::Handled();
@@ -59,16 +52,8 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
     const auto OnFixAll = [this] {
         StartRun(NSLOCTEXT("RuleRanger", "Run_FixAll", "Fix All"));
         const auto Run = Runs.IsValidIndex(ActiveRunIndex) ? Runs[ActiveRunIndex] : nullptr;
-        if (Run.IsValid())
-        {
-            if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
-            {
-                auto* ProjectHandler = NewObject<URuleRangerToolProjectResultHandler>();
-                ProjectHandler->Init(Run);
-                Subsystem->RunProjectScan(true, ProjectHandler);
-            }
-            RunContentScan(Run, /*bFix*/ true);
-        }
+        RunProjectScan(Run, /*bFix*/ true);
+        RunContentScan(Run, /*bFix*/ true);
         RebuildRunContents();
         RebuildRunsUI();
         return FReply::Handled();
@@ -76,15 +61,7 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
     const auto OnScanProject = [this] {
         StartRun(NSLOCTEXT("RuleRanger", "Run_ScanProject", "Scan Project"));
         const auto Run = Runs.IsValidIndex(ActiveRunIndex) ? Runs[ActiveRunIndex] : nullptr;
-        if (Run.IsValid())
-        {
-            if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
-            {
-                auto* ProjectHandler = NewObject<URuleRangerToolProjectResultHandler>();
-                ProjectHandler->Init(Run);
-                Subsystem->RunProjectScan(false, ProjectHandler);
-            }
-        }
+        RunProjectScan(Run, /*bFix*/ false);
         RebuildRunContents();
         RebuildRunsUI();
         return FReply::Handled();
@@ -92,15 +69,7 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
     const auto OnFixProject = [this] {
         StartRun(NSLOCTEXT("RuleRanger", "Run_FixProject", "Fix Project"));
         const auto Run = Runs.IsValidIndex(ActiveRunIndex) ? Runs[ActiveRunIndex] : nullptr;
-        if (Run.IsValid())
-        {
-            if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
-            {
-                auto* ProjectHandler = NewObject<URuleRangerToolProjectResultHandler>();
-                ProjectHandler->Init(Run);
-                Subsystem->RunProjectScan(true, ProjectHandler);
-            }
-        }
+        RunProjectScan(Run, /*bFix*/ true);
         RebuildRunContents();
         RebuildRunsUI();
         return FReply::Handled();
@@ -169,15 +138,10 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
                                          .ToolTipText(NSLOCTEXT("RuleRanger",
                                                                 "ToolTip_ScanAll",
                                                                 "Run project and content scans"))
-                                             [SNew(SHorizontalBox)
-                                              + SHorizontalBox::Slot()
-                                                    .AutoWidth()
-                                                    .VAlign(VAlign_Center)
-                                                    .Padding(FMargin(0, 2, 8, 2))[SNew(SImage).Image(
-                                                        FRuleRangerStyle::GetScanIcon().GetIcon())]
-                                              + SHorizontalBox::Slot().VAlign(VAlign_Center)
-                                                    [SNew(STextBlock)
-                                                         .Text(NSLOCTEXT("RuleRanger", "ScanAll_Label", "Scan All"))]]]]
+                                             [RuleRangerUI::MakeIconLabel(
+                                                 FRuleRangerStyle::GetScanIcon(),
+                                                 NSLOCTEXT("RuleRanger", "ScanAll_Label", "Scan All"))]]]
+
                           + SHorizontalBox::Slot().AutoWidth().Padding(
                               FMargin(0.f, 2.f, 8.f, 2.f))[SNew(SBox).WidthOverride(
                               140.f)[SNew(SButton)
@@ -186,15 +150,10 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
                                          .ToolTipText(NSLOCTEXT("RuleRanger",
                                                                 "ToolTip_FixAll",
                                                                 "Run project and content scans, applying fixes"))
-                                             [SNew(SHorizontalBox)
-                                              + SHorizontalBox::Slot()
-                                                    .AutoWidth()
-                                                    .VAlign(VAlign_Center)
-                                                    .Padding(FMargin(0, 2, 8, 2))[SNew(SImage).Image(
-                                                        FRuleRangerStyle::GetScanAndFixIcon().GetIcon())]
-                                              + SHorizontalBox::Slot().VAlign(VAlign_Center)
-                                                    [SNew(STextBlock)
-                                                         .Text(NSLOCTEXT("RuleRanger", "FixAll_Label", "Fix All"))]]]]
+                                             [RuleRangerUI::MakeIconLabel(
+                                                 FRuleRangerStyle::GetScanAndFixIcon(),
+                                                 NSLOCTEXT("RuleRanger", "FixAll_Label", "Fix All"))]]]
+
                           + SHorizontalBox::Slot().AutoWidth().Padding(
                               FMargin(0.f, 2.f, 8.f, 2.f))[SNew(SBox).WidthOverride(
                               140.f)[SNew(SButton)
@@ -203,17 +162,10 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
                                          .ToolTipText(NSLOCTEXT("RuleRanger",
                                                                 "ToolTip_ScanProject",
                                                                 "Execute project-level rules"))
-                                             [SNew(SHorizontalBox)
-                                              + SHorizontalBox::Slot()
-                                                    .AutoWidth()
-                                                    .VAlign(VAlign_Center)
-                                                    .Padding(FMargin(0, 2, 8, 2))[SNew(SImage).Image(
-                                                        FRuleRangerStyle::GetScanIcon().GetIcon())]
-                                              + SHorizontalBox::Slot().VAlign(
-                                                  VAlign_Center)[SNew(STextBlock)
-                                                                     .Text(NSLOCTEXT("RuleRanger",
-                                                                                     "ScanProject_Label",
-                                                                                     "Scan Project"))]]]]
+                                             [RuleRangerUI::MakeIconLabel(
+                                                 FRuleRangerStyle::GetScanIcon(),
+                                                 NSLOCTEXT("RuleRanger", "ScanProject_Label", "Scan Project"))]]]
+
                           + SHorizontalBox::Slot().AutoWidth().Padding(
                               FMargin(0.f, 2.f, 8.f, 2.f))[SNew(SBox).WidthOverride(
                               140.f)[SNew(SButton)
@@ -222,17 +174,10 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
                                          .ToolTipText(NSLOCTEXT("RuleRanger",
                                                                 "ToolTip_FixProject",
                                                                 "Execute project-level rules and apply fixes"))
-                                             [SNew(SHorizontalBox)
-                                              + SHorizontalBox::Slot()
-                                                    .AutoWidth()
-                                                    .VAlign(VAlign_Center)
-                                                    .Padding(FMargin(0, 2, 8, 2))[SNew(SImage).Image(
-                                                        FRuleRangerStyle::GetScanAndFixIcon().GetIcon())]
-                                              + SHorizontalBox::Slot().VAlign(
-                                                  VAlign_Center)[SNew(STextBlock)
-                                                                     .Text(NSLOCTEXT("RuleRanger",
-                                                                                     "FixProject_Label",
-                                                                                     "Fix Project"))]]]]
+                                             [RuleRangerUI::MakeIconLabel(
+                                                 FRuleRangerStyle::GetScanAndFixIcon(),
+                                                 NSLOCTEXT("RuleRanger", "FixProject_Label", "Fix Project"))]]]
+
                           + SHorizontalBox::Slot().AutoWidth().Padding(
                               FMargin(0.f, 2.f, 8.f, 2.f))[SNew(SBox).WidthOverride(
                               140.f)[SNew(SButton)
@@ -241,17 +186,10 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
                                          .ToolTipText(NSLOCTEXT("RuleRanger",
                                                                 "ToolTip_ScanAllContent",
                                                                 "Scan all configured content"))
-                                             [SNew(SHorizontalBox)
-                                              + SHorizontalBox::Slot()
-                                                    .AutoWidth()
-                                                    .VAlign(VAlign_Center)
-                                                    .Padding(FMargin(0, 2, 8, 2))[SNew(SImage).Image(
-                                                        FRuleRangerStyle::GetScanIcon().GetIcon())]
-                                              + SHorizontalBox::Slot().VAlign(
-                                                  VAlign_Center)[SNew(STextBlock)
-                                                                     .Text(NSLOCTEXT("RuleRanger",
-                                                                                     "ScanAllContent_Label",
-                                                                                     "Scan Content"))]]]]
+                                             [RuleRangerUI::MakeIconLabel(
+                                                 FRuleRangerStyle::GetScanIcon(),
+                                                 NSLOCTEXT("RuleRanger", "ScanAllContent_Label", "Scan Content"))]]]
+
                           + SHorizontalBox::Slot().AutoWidth().Padding(
                               FMargin(0.f, 2.f, 8.f, 2.f))[SNew(SBox).WidthOverride(
                               140.f)[SNew(SButton)
@@ -260,17 +198,10 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
                                          .ToolTipText(NSLOCTEXT("RuleRanger",
                                                                 "ToolTip_FixAllContent",
                                                                 "Scan all configured content and apply fixes"))
-                                             [SNew(SHorizontalBox)
-                                              + SHorizontalBox::Slot()
-                                                    .AutoWidth()
-                                                    .VAlign(VAlign_Center)
-                                                    .Padding(FMargin(0, 2, 8, 2))[SNew(SImage).Image(
-                                                        FRuleRangerStyle::GetScanAndFixIcon().GetIcon())]
-                                              + SHorizontalBox::Slot().VAlign(
-                                                  VAlign_Center)[SNew(STextBlock)
-                                                                     .Text(NSLOCTEXT("RuleRanger",
-                                                                                     "FixAllContent_Label",
-                                                                                     "Fix Content"))]]]]
+                                             [RuleRangerUI::MakeIconLabel(
+                                                 FRuleRangerStyle::GetScanAndFixIcon(),
+                                                 NSLOCTEXT("RuleRanger", "FixAllContent_Label", "Fix Content"))]]]
+
                           + SHorizontalBox::Slot().AutoWidth().Padding(
                               FMargin(0.f, 2.f, 8.f, 2.f))[SNew(SBox).WidthOverride(
                               140.f)[SNew(SButton)
@@ -279,17 +210,10 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
                                          .ToolTipText(NSLOCTEXT("RuleRanger",
                                                                 "ToolTip_ScanSelected",
                                                                 "Scan selected assets/paths within configured content"))
-                                             [SNew(SHorizontalBox)
-                                              + SHorizontalBox::Slot()
-                                                    .AutoWidth()
-                                                    .VAlign(VAlign_Center)
-                                                    .Padding(FMargin(0, 2, 8, 2))[SNew(SImage).Image(
-                                                        FRuleRangerStyle::GetScanIcon().GetIcon())]
-                                              + SHorizontalBox::Slot().VAlign(
-                                                  VAlign_Center)[SNew(STextBlock)
-                                                                     .Text(NSLOCTEXT("RuleRanger",
-                                                                                     "ScanSelected_Label",
-                                                                                     "Scan Selected"))]]]]
+                                             [RuleRangerUI::MakeIconLabel(
+                                                 FRuleRangerStyle::GetScanIcon(),
+                                                 NSLOCTEXT("RuleRanger", "ScanSelected_Label", "Scan Selected"))]]]
+
                           + SHorizontalBox::Slot().AutoWidth().Padding(
                               FMargin(0.f, 2.f, 8.f, 2.f))[SNew(SBox).WidthOverride(
                               140.f)[SNew(SButton)
@@ -299,17 +223,9 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
                                              NSLOCTEXT("RuleRanger",
                                                        "ToolTip_FixSelected",
                                                        "Scan and fix selected assets/paths within configured content"))
-                                             [SNew(SHorizontalBox)
-                                              + SHorizontalBox::Slot()
-                                                    .AutoWidth()
-                                                    .VAlign(VAlign_Center)
-                                                    .Padding(FMargin(0, 2, 8, 2))[SNew(SImage).Image(
-                                                        FRuleRangerStyle::GetScanAndFixIcon().GetIcon())]
-                                              + SHorizontalBox::Slot().VAlign(
-                                                  VAlign_Center)[SNew(STextBlock)
-                                                                     .Text(NSLOCTEXT("RuleRanger",
-                                                                                     "FixSelected_Label",
-                                                                                     "Fix Selected"))]]]]]]
+                                             [RuleRangerUI::MakeIconLabel(
+                                                 FRuleRangerStyle::GetScanAndFixIcon(),
+                                                 NSLOCTEXT("RuleRanger", "FixSelected_Label", "Fix Selected"))]]]]]
 
               + SVerticalBox::Slot().AutoHeight().Padding(FMargin(0.f, 4.f, 0.f, 4.f))[SNew(SSeparator)]
 
@@ -495,6 +411,20 @@ void SRuleRangerToolPanel::ClearAllRuns()
     RunPageWidgets.Reset();
     RebuildRunsUI();
     RebuildRunContents();
+}
+
+// ReSharper disable once CppMemberFunctionMayBeStatic
+void SRuleRangerToolPanel::RunProjectScan(const TSharedPtr<FRuleRangerRun>& Run, const bool bFix)
+{
+    if (Run.IsValid())
+    {
+        if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
+        {
+            const auto ProjectHandler = NewObject<URuleRangerToolProjectResultHandler>();
+            ProjectHandler->Init(Run);
+            Subsystem->RunProjectScan(bFix, ProjectHandler);
+        }
+    }
 }
 
 void SRuleRangerToolPanel::RunContentScan(const TSharedPtr<FRuleRangerRun>& Run, const bool bFix)

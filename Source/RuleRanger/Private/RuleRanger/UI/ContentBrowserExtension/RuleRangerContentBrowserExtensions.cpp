@@ -18,8 +18,8 @@
 #include "RuleRanger/RuleRangerEditorSubsystem.h"
 #include "RuleRanger/UI/RuleRangerCommands.h"
 #include "RuleRanger/UI/RuleRangerStyle.h"
+#include "RuleRanger/UI/RuleRangerTools.h"
 #include "RuleRangerLogging.h"
-#include "RuleRangerTools.h"
 
 static TSharedRef<FExtender> OnExtendSelectedPathsMenu(const TArray<FString>& Paths)
 {

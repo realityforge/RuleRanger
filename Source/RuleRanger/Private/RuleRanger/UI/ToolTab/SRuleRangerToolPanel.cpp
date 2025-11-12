@@ -396,19 +396,33 @@ void SRuleRangerToolPanel::RebuildRunsUI()
                 LabelStr += TEXT(" (") + FString::Join(Parts, TEXT(" ")) + TEXT(")");
             }
             const auto Label = FText::FromString(LabelStr);
-            RunTabBar->AddSlot().AutoWidth().Padding(
-                FMargin(0.f, 0.f, 8.f, 0.f))[SNew(SButton)
-                                                 .ButtonStyle(&FAppStyle::Get().GetWidgetStyle<FButtonStyle>(
-                                                     bActive ? TEXT("PrimaryButton") : TEXT("Button")))
-                                                 .OnClicked_Lambda([this, Index] {
-                                                     ActiveRunIndex = Index;
-                                                     if (RunContentSwitcher.IsValid())
-                                                     {
-                                                         RunContentSwitcher->SetActiveWidgetIndex(ActiveRunIndex);
-                                                     }
-                                                     RebuildRunsUI();
-                                                     return FReply::Handled();
-                                                 })[SNew(STextBlock).Text(Label)]];
+            RunTabBar->AddSlot().AutoWidth().Padding(FMargin(0.f, 0.f, 8.f, 0.f))
+                [SNew(SHorizontalBox)
+                 + SHorizontalBox::Slot().AutoWidth()[SNew(SButton)
+                                                          .ButtonStyle(&FAppStyle::Get().GetWidgetStyle<FButtonStyle>(
+                                                              bActive ? TEXT("PrimaryButton") : TEXT("Button")))
+                                                          .OnClicked_Lambda([this, Index] {
+                                                              ActiveRunIndex = Index;
+                                                              if (RunContentSwitcher.IsValid())
+                                                              {
+                                                                  RunContentSwitcher->SetActiveWidgetIndex(
+                                                                      ActiveRunIndex);
+                                                              }
+                                                              RebuildRunsUI();
+                                                              return FReply::Handled();
+                                                          })[SNew(STextBlock).Text(Label)]]
+                 + SHorizontalBox::Slot()
+                       .AutoWidth()
+                       .Padding(FMargin(4.f, 0.f, 0.f, 0.f))
+                       .VAlign(VAlign_Center)[SNew(SButton)
+                                                  .ButtonStyle(&FAppStyle::Get().GetWidgetStyle<FButtonStyle>(
+                                                      TEXT("SimpleButton")))
+                                                  .ContentPadding(FMargin(6.f, 2.f))
+                                                  .ToolTipText(NSLOCTEXT("RuleRanger", "CloseRun", "Close this run"))
+                                                  .OnClicked_Lambda([this, Index] {
+                                                      CloseRunAt(Index);
+                                                      return FReply::Handled();
+                                                  })[SNew(STextBlock).Text(FText::FromString(TEXT("×")))]]];
         }
     }
 }
@@ -432,6 +446,37 @@ void SRuleRangerToolPanel::RebuildRunContents()
         if (Runs.Num() > 0)
         {
             RunContentSwitcher->SetActiveWidgetIndex(FMath::Clamp(ActiveRunIndex, 0, Runs.Num() - 1));
+        }
+    }
+}
+
+void SRuleRangerToolPanel::CloseRunAt(const int32 Index)
+{
+    if (Runs.IsValidIndex(Index))
+    {
+        // Remove the run
+        Runs.RemoveAt(Index);
+
+        // Adjust active index
+        if (Runs.IsEmpty())
+        {
+            ActiveRunIndex = INDEX_NONE;
+        }
+        else if (ActiveRunIndex == Index)
+        {
+            ActiveRunIndex = FMath::Clamp(Index, 0, Runs.Num() - 1);
+        }
+        else if (ActiveRunIndex > Index)
+        {
+            ActiveRunIndex -= 1;
+        }
+
+        // Rebuild UI
+        RebuildRunContents();
+        RebuildRunsUI();
+        if (RunContentSwitcher.IsValid() && INDEX_NONE != ActiveRunIndex)
+        {
+            RunContentSwitcher->SetActiveWidgetIndex(ActiveRunIndex);
         }
     }
 }

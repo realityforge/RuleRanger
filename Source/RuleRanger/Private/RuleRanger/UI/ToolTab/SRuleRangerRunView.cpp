@@ -190,8 +190,12 @@ void SRuleRangerRunView::SortFiltered()
         }
         else if (TEXT("Rule") == SortColumnId)
         {
-            const auto LeftName = Left->Rule.IsValid() ? Left->Rule->GetName() : FString("~");
-            const auto RightName = Right->Rule.IsValid() ? Right->Rule->GetName() : FString("~");
+            const auto LeftName = Left->Rule.IsValid() ? Left->Rule->GetName()
+                : Left->ProjectRule.IsValid()          ? Left->ProjectRule->GetName()
+                                                       : FString("~");
+            const auto RightName = Right->Rule.IsValid() ? Right->Rule->GetName()
+                : Right->ProjectRule.IsValid()           ? Right->ProjectRule->GetName()
+                                                         : FString("~");
             return Less(FCString::Stricmp(*LeftName, *RightName) < 0);
         }
         else if (TEXT("RuleSet") == SortColumnId)

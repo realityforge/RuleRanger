@@ -30,15 +30,25 @@ bool FRuleRangerTools::HasAnyConfiguredDirs()
     return Subsystem ? Subsystem->HasAnyConfiguredDirs() : false;
 }
 
-bool FRuleRangerTools::HasAnyProjectRules()
+bool FRuleRangerTools::CanRunScanAll()
+{
+    return CanRunScanContent() || CanRunScanProject();
+}
+
+bool FRuleRangerTools::CanRunScanProject()
 {
     const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>();
     return Subsystem ? Subsystem->HasAnyProjectRules() : false;
 }
 
-bool FRuleRangerTools::HasAnyRunnableRules()
+bool FRuleRangerTools::CanRunScanContent()
 {
-    return HasAnyConfiguredDirs() || HasAnyProjectRules();
+    return HasAnyConfiguredDirs();
+}
+
+bool FRuleRangerTools::CanRunScanSelected()
+{
+    return AssetSelectionIntersectsConfiguredDirs() || PathSelectionIntersectsConfiguredDirs();
 }
 
 void FRuleRangerTools::OnScanContent()
@@ -228,11 +238,6 @@ bool FRuleRangerTools::PathSelectionIntersectsConfiguredDirs(const TArray<FStrin
         }
     }
     return false;
-}
-
-bool FRuleRangerTools::SelectionIntersectsConfiguredDirs()
-{
-    return AssetSelectionIntersectsConfiguredDirs() || PathSelectionIntersectsConfiguredDirs();
 }
 
 void FRuleRangerTools::CollectAllSelectedAssets(TArray<FAssetData>& OutAssets)

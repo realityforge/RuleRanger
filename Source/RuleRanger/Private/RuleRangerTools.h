@@ -26,9 +26,13 @@ class UToolMenu;
 class FRuleRangerTools
 {
 public:
-    static bool HasAnyRunnableRules();
     static bool HasAnyConfiguredDirs();
-    static bool HasAnyProjectRules();
+
+    // Unified enablement helpers for UI
+    static bool CanRunScanAll();
+    static bool CanRunScanProject();
+    static bool CanRunScanContent();
+    static bool CanRunScanSelected();
 
     static void OnScanContent();
     static void OnFixContent();
@@ -54,8 +58,6 @@ public:
     static void OnFixSelectedPaths(const TArray<FString>& AssetPaths);
 
     static bool PathSelectionIntersectsConfiguredDirs(const TArray<FString>& Paths);
-
-    static bool SelectionIntersectsConfiguredDirs();
 
     static void CollectAllSelectedAssets(TArray<FAssetData>& OutAssets);
     static void CollectAllConfiguredAssets(TArray<FAssetData>& OutAssets);

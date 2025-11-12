@@ -69,7 +69,7 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
     auto& SubSection =
         Menu->AddSection("RuleRangerToolsSubSection", NSLOCTEXT("RuleRanger", "RuleRangerSection", "Actions"));
 
-    if (!FRuleRangerTools::HasAnyConfiguredDirs())
+    if (!FRuleRangerTools::CanRunScanContent())
     {
         const auto InfoText =
             NSLOCTEXT("RuleRanger",
@@ -121,7 +121,7 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                       "Run both project-level rule scans and content scans in configured directories"),
             FRuleRangerStyle::GetScanIcon(),
             FUIAction(FExecuteAction::CreateStatic(&FRuleRangerTools::OnScanAll),
-                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::HasAnyRunnableRules(); })));
+                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::CanRunScanAll(); })));
         SubSection.AddEntry(MoveTemp(Entry));
     }
 
@@ -134,7 +134,7 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                       "Run both project-level rules and content scans and apply fixes where supported"),
             FRuleRangerStyle::GetScanAndFixIcon(),
             FUIAction(FExecuteAction::CreateStatic(&FRuleRangerTools::OnFixAll),
-                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::HasAnyRunnableRules(); })));
+                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::CanRunScanAll(); })));
         SubSection.AddEntry(MoveTemp(Entry));
     }
 
@@ -151,7 +151,7 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                       "(Disabled if no project rules exist)"),
             FRuleRangerStyle::GetScanIcon(),
             FUIAction(FExecuteAction::CreateStatic(&FRuleRangerTools::OnScanProject),
-                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::HasAnyProjectRules(); })));
+                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::CanRunScanProject(); })));
         SubSection.AddEntry(MoveTemp(Entry));
     }
 
@@ -165,7 +165,7 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                       "(Disabled if no project rules exist)"),
             FRuleRangerStyle::GetScanAndFixIcon(),
             FUIAction(FExecuteAction::CreateStatic(&FRuleRangerTools::OnFixProject),
-                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::HasAnyProjectRules(); })));
+                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::CanRunScanProject(); })));
         SubSection.AddEntry(MoveTemp(Entry));
     }
 
@@ -183,7 +183,7 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                 "(Disabled if no directories are configured)"),
             FRuleRangerStyle::GetScanIcon(),
             FUIAction(FExecuteAction::CreateStatic(&FRuleRangerTools::OnScanContent),
-                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::HasAnyConfiguredDirs(); })));
+                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::CanRunScanContent(); })));
         SubSection.AddEntry(MoveTemp(Entry));
     }
 
@@ -198,7 +198,7 @@ void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
                 "(Disabled if no directories are configured)"),
             FRuleRangerStyle::GetScanAndFixIcon(),
             FUIAction(FExecuteAction::CreateStatic(&FRuleRangerTools::OnFixContent),
-                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::HasAnyConfiguredDirs(); })));
+                      FCanExecuteAction::CreateLambda([] { return FRuleRangerTools::CanRunScanContent(); })));
         SubSection.AddEntry(MoveTemp(Entry));
     }
 }

@@ -34,10 +34,10 @@
 
 void SRuleRangerToolPanel::Construct(const FArguments&)
 {
-    const auto ScanAllEnabled = [] { return FRuleRangerTools::HasAnyRunnableRules(); };
-    const auto ScanProjectEnabled = [] { return FRuleRangerTools::HasAnyProjectRules(); };
-    const auto ScanContentEnabled = [] { return FRuleRangerTools::HasAnyConfiguredDirs(); };
-    const auto ScanSelectedEnabled = [] { return FRuleRangerTools::SelectionIntersectsConfiguredDirs(); };
+    const auto ScanAllEnabled = [] { return FRuleRangerTools::CanRunScanAll(); };
+    const auto ScanProjectEnabled = [] { return FRuleRangerTools::CanRunScanProject(); };
+    const auto ScanContentEnabled = [] { return FRuleRangerTools::CanRunScanContent(); };
+    const auto ScanSelectedEnabled = [] { return FRuleRangerTools::CanRunScanSelected(); };
 
     const auto OnScanAll = [this] {
         StartRun(NSLOCTEXT("RuleRanger", "Run_ScanAll", "Scan All"));

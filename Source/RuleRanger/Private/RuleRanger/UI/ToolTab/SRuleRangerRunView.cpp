@@ -431,53 +431,51 @@ void SRuleRangerRunView::ExecuteCopyMessage() const
 
 void SRuleRangerRunView::ExecuteOpenRule() const
 {
-    if (!ListView.IsValid())
+    if (ListView.IsValid())
     {
-        return;
-    }
-    TArray<UObject*> ToOpen;
-    for (const auto& Row : ListView->GetSelectedItems())
-    {
-        if (Row.IsValid())
+        TArray<UObject*> ToOpen;
+        for (const auto& Row : ListView->GetSelectedItems())
         {
-            if (Row->Rule.IsValid())
+            if (Row.IsValid())
             {
-                ToOpen.Add(const_cast<URuleRangerRule*>(Row->Rule.Get()));
-            }
-            else if (Row->ProjectRule.IsValid())
-            {
-                ToOpen.Add(const_cast<URuleRangerProjectRule*>(Row->ProjectRule.Get()));
+                if (Row->Rule.IsValid())
+                {
+                    ToOpen.Add(const_cast<URuleRangerRule*>(Row->Rule.Get()));
+                }
+                else if (Row->ProjectRule.IsValid())
+                {
+                    ToOpen.Add(const_cast<URuleRangerProjectRule*>(Row->ProjectRule.Get()));
+                }
             }
         }
-    }
-    if (ToOpen.Num() > 0)
-    {
-        if (auto* Subsystem = GEditor->GetEditorSubsystem<UAssetEditorSubsystem>())
+        if (ToOpen.Num() > 0)
         {
-            Subsystem->OpenEditorForAssets(ToOpen);
+            if (const auto Subsystem = GEditor->GetEditorSubsystem<UAssetEditorSubsystem>())
+            {
+                Subsystem->OpenEditorForAssets(ToOpen);
+            }
         }
     }
 }
 
 void SRuleRangerRunView::ExecuteOpenRuleSet() const
 {
-    if (!ListView.IsValid())
+    if (ListView.IsValid())
     {
-        return;
-    }
-    TArray<UObject*> ToOpen;
-    for (const auto& Row : ListView->GetSelectedItems())
-    {
-        if (Row.IsValid() && Row->RuleSet.IsValid())
+        TArray<UObject*> ToOpen;
+        for (const auto& Row : ListView->GetSelectedItems())
         {
-            ToOpen.Add(const_cast<URuleRangerRuleSet*>(Row->RuleSet.Get()));
+            if (Row.IsValid() && Row->RuleSet.IsValid())
+            {
+                ToOpen.Add(const_cast<URuleRangerRuleSet*>(Row->RuleSet.Get()));
+            }
         }
-    }
-    if (ToOpen.Num() > 0)
-    {
-        if (auto* Subsystem = GEditor->GetEditorSubsystem<UAssetEditorSubsystem>())
+        if (ToOpen.Num() > 0)
         {
-            Subsystem->OpenEditorForAssets(ToOpen);
+            if (const auto Subsystem = GEditor->GetEditorSubsystem<UAssetEditorSubsystem>())
+            {
+                Subsystem->OpenEditorForAssets(ToOpen);
+            }
         }
     }
 }

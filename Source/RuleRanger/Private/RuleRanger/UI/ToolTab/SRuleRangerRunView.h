@@ -39,11 +39,20 @@ private:
 
     TSharedPtr<FRuleRangerRun> Run;
     TSharedPtr<SListView<TSharedPtr<FRuleRangerMessageRow>>> ListView;
+    TSharedPtr<SHeaderRow> Header;
     TArray<TSharedPtr<FRuleRangerMessageRow>> FilteredItems;
 
     bool bShowInfo{ false };
     bool bShowWarning{ true };
     bool bShowError{ true };
+
+    // Quick column visibility
+    bool bShowAssetColumn{ true };
+    bool bShowRuleColumn{ true };
+    bool bShowRuleSetColumn{ true };
+
+    // Text search filter (case-insensitive substring)
+    FString SearchQuery;
 
     FName SortColumnId{ TEXT("Severity") };
     EColumnSortMode::Type SortMode{ EColumnSortMode::Descending };
@@ -53,6 +62,15 @@ private:
 
     void RebuildFiltered();
     void SortFiltered();
+    void OnSearchChanged(const FText& NewText)
+    {
+        SearchQuery = NewText.ToString();
+        RebuildFiltered();
+    }
+    TSharedRef<SWidget> BuildColumnsMenu();
+    void ToggleAssetColumn(ECheckBoxState State);
+    void ToggleRuleColumn(ECheckBoxState State);
+    void ToggleRuleSetColumn(ECheckBoxState State);
     EColumnSortMode::Type GetColumnSortMode(const FName Column) const
     {
         return SortColumnId == Column ? SortMode : EColumnSortMode::None;

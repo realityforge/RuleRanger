@@ -29,6 +29,7 @@
 #include "Styling/AppStyle.h"
 #include "Subsystems/AssetEditorSubsystem.h"
 #include "Widgets/Input/SCheckBox.h"
+#include "Widgets/Input/SSearchBox.h"
 #include "Widgets/Layout/SBorder.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Text/STextBlock.h"
@@ -48,85 +49,111 @@ void SRuleRangerRunView::Construct(const FArguments& InArgs)
                    .OnGenerateRow(this, &SRuleRangerRunView::OnGenerateRow)
                    .SelectionMode(ESelectionMode::Multi)
                    .OnContextMenuOpening(this, &SRuleRangerRunView::OnContextMenuOpening)
-                   .HeaderRow(SNew(SHeaderRow)
+                   .HeaderRow(SAssignNew(Header, SHeaderRow)
                               + SHeaderRow::Column("Severity")
                                     .DefaultLabel(NSLOCTEXT("RuleRanger", "ColSeverity", ""))
                                     .FixedWidth(28.f)
                                     .SortMode(this, &SRuleRangerRunView::GetSeveritySortMode)
-                                    .OnSort(this, &SRuleRangerRunView::OnColumnSortModeChanged)
-                              + SHeaderRow::Column("Message")
-                                    .DefaultLabel(NSLOCTEXT("RuleRanger", "ColMessage", "Message"))
-                                    .SortMode(this, &SRuleRangerRunView::GetMessageSortMode)
                                     .OnSort(this, &SRuleRangerRunView::OnColumnSortModeChanged)
                               + SHeaderRow::Column("Asset")
                                     .DefaultLabel(NSLOCTEXT("RuleRanger", "ColAsset", "Asset"))
                                     .FixedWidth(180.f)
                                     .SortMode(this, &SRuleRangerRunView::GetAssetSortMode)
                                     .OnSort(this, &SRuleRangerRunView::OnColumnSortModeChanged)
+                              + SHeaderRow::Column("Message")
+                                    .DefaultLabel(NSLOCTEXT("RuleRanger", "ColMessage", "Message"))
+                                    .SortMode(this, &SRuleRangerRunView::GetMessageSortMode)
+                                    .OnSort(this, &SRuleRangerRunView::OnColumnSortModeChanged)
+                              + SHeaderRow::Column("RuleSet")
+                                    .DefaultLabel(NSLOCTEXT("RuleRanger", "ColRuleSet", "Rule Set"))
+                                    .FixedWidth(180.f)
+                                    .SortMode(this, &SRuleRangerRunView::GetRuleSetSortMode)
+                                    .OnSort(this, &SRuleRangerRunView::OnColumnSortModeChanged)
                               + SHeaderRow::Column("Rule")
                                     .DefaultLabel(NSLOCTEXT("RuleRanger", "ColRule", "Rule"))
                                     .FixedWidth(180.f)
                                     .SortMode(this, &SRuleRangerRunView::GetRuleSortMode)
-                                    .OnSort(this, &SRuleRangerRunView::OnColumnSortModeChanged)
-                              + SHeaderRow::Column("RuleSet")
-                                    .DefaultLabel(NSLOCTEXT("RuleRanger", "ColRuleSet", "RuleSet"))
-                                    .FixedWidth(180.f)
-                                    .SortMode(this, &SRuleRangerRunView::GetRuleSetSortMode)
                                     .OnSort(this, &SRuleRangerRunView::OnColumnSortModeChanged));
+
+    // Apply initial column visibility
+    if (Header.IsValid())
+    {
+        Header->SetShowGeneratedColumn(TEXT("Asset"), bShowAssetColumn);
+        Header->SetShowGeneratedColumn(TEXT("Rule"), bShowRuleColumn);
+        Header->SetShowGeneratedColumn(TEXT("RuleSet"), bShowRuleSetColumn);
+    }
 
     ChildSlot[SNew(SBorder).Padding(FMargin(
         4.f))[SNew(SVerticalBox)
-              + SVerticalBox::Slot().AutoHeight()
-                    [SNew(SHorizontalBox)
-                     + SHorizontalBox::Slot()
-                           .AutoWidth()
-                           .VAlign(VAlign_Center)
-                           .Padding(FMargin(0, 0, 12, 0))[SNew(STextBlock)
-                                                              .Text(NSLOCTEXT("RuleRanger", "FilterLabel", "Show: "))]
-                     + SHorizontalBox::Slot()
-                           .AutoWidth()
-                           .VAlign(VAlign_Center)
-                           .Padding(FMargin(0, 0, 12, 0))
+              + SVerticalBox::Slot()
+                    .Padding(FMargin(12, 2, 12, 2))
+                    .AutoHeight()
+                        [SNew(SHorizontalBox)
+                         + SHorizontalBox::Slot()
+                               .AutoWidth()
+                               .VAlign(VAlign_Center)
+                               .Padding(FMargin(0, 0, 12, 0))
+                                   [SNew(STextBlock).Text(NSLOCTEXT("RuleRanger", "FilterLabel", "Show: "))]
+                         + SHorizontalBox::Slot()
+                               .AutoWidth()
+                               .VAlign(VAlign_Center)
+                               .Padding(FMargin(0, 0, 12, 0))
+                                   [SNew(SCheckBox)
+                                        .IsChecked(this, &SRuleRangerRunView::GetErrorState)
+                                        .OnCheckStateChanged(this, &SRuleRangerRunView::OnToggleError)
+                                            [SNew(SHorizontalBox)
+                                             + SHorizontalBox::Slot()
+                                                   .AutoWidth()
+                                                   .VAlign(VAlign_Center)
+                                                   .Padding(FMargin(0, 2, 6, 2))[SNew(SImage).Image(
+                                                       FRuleRangerStyle::GetErrorMessageBrush())]
+                                             + SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
+                                                   [SNew(STextBlock)
+                                                        .Text(NSLOCTEXT("RuleRanger", "FilterError", "Errors"))]]]
+                         + SHorizontalBox::Slot()
+                               .AutoWidth()
+                               .VAlign(VAlign_Center)
+                               .Padding(FMargin(0, 0, 12, 0))
+                                   [SNew(SCheckBox)
+                                        .IsChecked(this, &SRuleRangerRunView::GetWarningState)
+                                        .OnCheckStateChanged(this, &SRuleRangerRunView::OnToggleWarning)
+                                            [SNew(SHorizontalBox)
+                                             + SHorizontalBox::Slot()
+                                                   .AutoWidth()
+                                                   .VAlign(VAlign_Center)
+                                                   .Padding(FMargin(0, 2, 6, 2))[SNew(SImage).Image(
+                                                       FRuleRangerStyle::GetWarningMessageBrush())]
+                                             + SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
+                                                   [SNew(STextBlock)
+                                                        .Text(NSLOCTEXT("RuleRanger", "FilterWarning", "Warnings"))]]]
+                         + SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
                                [SNew(SCheckBox)
-                                    .IsChecked(this, &SRuleRangerRunView::GetErrorState)
-                                    .OnCheckStateChanged(this, &SRuleRangerRunView::OnToggleError)
+                                    .IsChecked(this, &SRuleRangerRunView::GetInfoState)
+                                    .OnCheckStateChanged(this, &SRuleRangerRunView::OnToggleInfo)
                                         [SNew(SHorizontalBox)
                                          + SHorizontalBox::Slot()
                                                .AutoWidth()
                                                .VAlign(VAlign_Center)
                                                .Padding(FMargin(0, 2, 6, 2))[SNew(SImage).Image(
-                                                   FRuleRangerStyle::GetErrorMessageBrush())]
+                                                   FRuleRangerStyle::GetNoteMessageBrush())]
                                          + SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
-                                               [SNew(STextBlock)
-                                                    .Text(NSLOCTEXT("RuleRanger", "FilterError", "Errors"))]]]
-                     + SHorizontalBox::Slot()
-                           .AutoWidth()
-                           .VAlign(VAlign_Center)
-                           .Padding(FMargin(0, 0, 12, 0))
-                               [SNew(SCheckBox)
-                                    .IsChecked(this, &SRuleRangerRunView::GetWarningState)
-                                    .OnCheckStateChanged(this, &SRuleRangerRunView::OnToggleWarning)
-                                        [SNew(SHorizontalBox)
-                                         + SHorizontalBox::Slot()
-                                               .AutoWidth()
-                                               .VAlign(VAlign_Center)
-                                               .Padding(FMargin(0, 2, 6, 2))[SNew(SImage).Image(
-                                                   FRuleRangerStyle::GetWarningMessageBrush())]
-                                         + SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
-                                               [SNew(STextBlock)
-                                                    .Text(NSLOCTEXT("RuleRanger", "FilterWarning", "Warnings"))]]]
-                     + SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
-                           [SNew(SCheckBox)
-                                .IsChecked(this, &SRuleRangerRunView::GetInfoState)
-                                .OnCheckStateChanged(this, &SRuleRangerRunView::OnToggleInfo)
-                                    [SNew(SHorizontalBox)
-                                     + SHorizontalBox::Slot()
-                                           .AutoWidth()
-                                           .VAlign(VAlign_Center)
-                                           .Padding(FMargin(0, 2, 6, 2))[SNew(SImage).Image(
-                                               FRuleRangerStyle::GetNoteMessageBrush())]
-                                     + SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
-                                           [SNew(STextBlock).Text(NSLOCTEXT("RuleRanger", "FilterInfo", "Info"))]]]]
+                                               [SNew(STextBlock).Text(NSLOCTEXT("RuleRanger", "FilterInfo", "Info"))]]]
+                         + SHorizontalBox::Slot().FillWidth(1.f).VAlign(VAlign_Center)
+                               [SNew(SSearchBox)
+                                    .HintText(
+                                        NSLOCTEXT("RuleRanger", "SearchHint", "Search message, asset, rule, ruleset"))
+                                    .OnTextChanged(this, &SRuleRangerRunView::OnSearchChanged)]
+                         + SHorizontalBox::Slot()
+                               .AutoWidth()
+                               .VAlign(VAlign_Center)
+                               .Padding(FMargin(8.f, 0.f, 0.f, 0.f))
+                                   [SNew(SComboButton)
+                                        .ToolTipText(
+                                            NSLOCTEXT("RuleRanger", "ColumnsTooltip", "Toggle visible columns"))
+                                        .HasDownArrow(true)
+                                        .OnGetMenuContent(this, &SRuleRangerRunView::BuildColumnsMenu)
+                                        .ButtonContent()[SNew(STextBlock)
+                                                             .Text(NSLOCTEXT("RuleRanger", "Columns", "Columns"))]]]
               + SVerticalBox::Slot().FillHeight(1.f).Padding(FMargin(0, 4, 0, 0))[ListView.ToSharedRef()]]];
 }
 
@@ -143,13 +170,37 @@ void SRuleRangerRunView::RebuildFiltered()
     FilteredItems.Reset();
     if (Run.IsValid())
     {
+        const bool bHasQuery = !SearchQuery.IsEmpty();
         for (const auto& Message : Run->Messages)
         {
             if (ERuleRangerToolSeverity::Error == Message->Severity && bShowError
                 || ERuleRangerToolSeverity::Warning == Message->Severity && bShowWarning
                 || ERuleRangerToolSeverity::Info == Message->Severity && bShowInfo)
             {
-                FilteredItems.Add(Message);
+                bool bMatches = true;
+                if (bHasQuery)
+                {
+                    bMatches = false;
+                    const FString Q = SearchQuery;
+                    const FString Msg = Message->Text.ToString();
+                    const FString AssetName = Message->Asset.IsValid() ? Message->Asset->GetName() : FString();
+                    const FString RuleName = Message->Rule.IsValid()
+                        ? Message->Rule->GetName()
+                        : (Message->ProjectRule.IsValid() ? Message->ProjectRule->GetName() : FString());
+                    const FString RuleSetName = Message->RuleSet.IsValid() ? Message->RuleSet->GetName() : FString();
+
+                    if (Msg.Contains(Q, ESearchCase::IgnoreCase) || AssetName.Contains(Q, ESearchCase::IgnoreCase)
+                        || RuleName.Contains(Q, ESearchCase::IgnoreCase)
+                        || RuleSetName.Contains(Q, ESearchCase::IgnoreCase))
+                    {
+                        bMatches = true;
+                    }
+                }
+
+                if (bMatches)
+                {
+                    FilteredItems.Add(Message);
+                }
             }
         }
         SortFiltered();
@@ -238,6 +289,19 @@ void SRuleRangerRunView::LoadPreferences()
         bShowError = bValue;
     }
 
+    if (GConfig->GetBool(Section, TEXT("ShowAssetColumn"), bValue, GEditorPerProjectIni))
+    {
+        bShowAssetColumn = bValue;
+    }
+    if (GConfig->GetBool(Section, TEXT("ShowRuleColumn"), bValue, GEditorPerProjectIni))
+    {
+        bShowRuleColumn = bValue;
+    }
+    if (GConfig->GetBool(Section, TEXT("ShowRuleSetColumn"), bValue, GEditorPerProjectIni))
+    {
+        bShowRuleSetColumn = bValue;
+    }
+
     FString SortId;
     if (GConfig->GetString(Section, TEXT("SortColumnId"), SortId, GEditorPerProjectIni) && !SortId.IsEmpty())
     {
@@ -262,6 +326,9 @@ void SRuleRangerRunView::SavePreferences() const
     GConfig->SetBool(Section, TEXT("ShowInfo"), bShowInfo, GEditorPerProjectIni);
     GConfig->SetBool(Section, TEXT("ShowWarning"), bShowWarning, GEditorPerProjectIni);
     GConfig->SetBool(Section, TEXT("ShowError"), bShowError, GEditorPerProjectIni);
+    GConfig->SetBool(Section, TEXT("ShowAssetColumn"), bShowAssetColumn, GEditorPerProjectIni);
+    GConfig->SetBool(Section, TEXT("ShowRuleColumn"), bShowRuleColumn, GEditorPerProjectIni);
+    GConfig->SetBool(Section, TEXT("ShowRuleSetColumn"), bShowRuleSetColumn, GEditorPerProjectIni);
     GConfig->SetString(Section, TEXT("SortColumnId"), *SortColumnId.ToString(), GEditorPerProjectIni);
     GConfig->SetInt(Section, TEXT("SortMode"), SortMode, GEditorPerProjectIni);
     GConfig->Flush(false, GEditorPerProjectIni);
@@ -478,4 +545,61 @@ void SRuleRangerRunView::ExecuteOpenRuleSet() const
             }
         }
     }
+}
+TSharedRef<SWidget> SRuleRangerRunView::BuildColumnsMenu()
+{
+    FMenuBuilder MenuBuilder(true, nullptr);
+    MenuBuilder.BeginSection("RuleRanger.Columns", NSLOCTEXT("RuleRanger", "ColumnsMenu", "Columns"));
+    {
+        MenuBuilder.AddWidget(SNew(SCheckBox)
+                                  .Padding(FMargin(6, 2, 2, 2))
+                                  .IsChecked(bShowAssetColumn ? ECheckBoxState::Checked : ECheckBoxState::Unchecked)
+                                  .OnCheckStateChanged(this, &SRuleRangerRunView::ToggleAssetColumn)
+                                      [SNew(STextBlock).Text(NSLOCTEXT("RuleRanger", "ColAsset", "Asset"))],
+                              FText::GetEmpty());
+        MenuBuilder.AddWidget(SNew(SCheckBox)
+                                  .Padding(FMargin(6, 2, 2, 2))
+                                  .IsChecked(bShowRuleColumn ? ECheckBoxState::Checked : ECheckBoxState::Unchecked)
+                                  .OnCheckStateChanged(this, &SRuleRangerRunView::ToggleRuleColumn)
+                                      [SNew(STextBlock).Text(NSLOCTEXT("RuleRanger", "ColRule", "Rule"))],
+                              FText::GetEmpty());
+        MenuBuilder.AddWidget(SNew(SCheckBox)
+                                  .Padding(FMargin(6, 2, 2, 2))
+                                  .IsChecked(bShowRuleSetColumn ? ECheckBoxState::Checked : ECheckBoxState::Unchecked)
+                                  .OnCheckStateChanged(this, &SRuleRangerRunView::ToggleRuleSetColumn)
+                                      [SNew(STextBlock).Text(NSLOCTEXT("RuleRanger", "ColRuleSet", "Rule Set"))],
+                              FText::GetEmpty());
+    }
+    MenuBuilder.EndSection();
+    return MenuBuilder.MakeWidget();
+}
+
+void SRuleRangerRunView::ToggleAssetColumn(const ECheckBoxState State)
+{
+    bShowAssetColumn = (State == ECheckBoxState::Checked);
+    if (Header.IsValid())
+    {
+        Header->SetShowGeneratedColumn(TEXT("Asset"), bShowAssetColumn);
+    }
+    SavePreferences();
+}
+
+void SRuleRangerRunView::ToggleRuleColumn(const ECheckBoxState State)
+{
+    bShowRuleColumn = (State == ECheckBoxState::Checked);
+    if (Header.IsValid())
+    {
+        Header->SetShowGeneratedColumn(TEXT("Rule"), bShowRuleColumn);
+    }
+    SavePreferences();
+}
+
+void SRuleRangerRunView::ToggleRuleSetColumn(const ECheckBoxState State)
+{
+    bShowRuleSetColumn = (State == ECheckBoxState::Checked);
+    if (Header.IsValid())
+    {
+        Header->SetShowGeneratedColumn(TEXT("RuleSet"), bShowRuleSetColumn);
+    }
+    SavePreferences();
 }

@@ -53,6 +53,7 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
             RunContentScan(Run, /*bFix*/ false);
         }
         RebuildRunContents();
+        RebuildRunsUI();
         return FReply::Handled();
     };
     const auto OnFixAll = [this] {
@@ -69,6 +70,7 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
             RunContentScan(Run, /*bFix*/ true);
         }
         RebuildRunContents();
+        RebuildRunsUI();
         return FReply::Handled();
     };
     const auto OnScanProject = [this] {
@@ -84,6 +86,7 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
             }
         }
         RebuildRunContents();
+        RebuildRunsUI();
         return FReply::Handled();
     };
     const auto OnFixProject = [this] {
@@ -99,6 +102,7 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
             }
         }
         RebuildRunContents();
+        RebuildRunsUI();
         return FReply::Handled();
     };
     const auto OnScanContent = [this] {
@@ -109,6 +113,7 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
             RunContentScan(Run, /*bFix*/ false);
         }
         RebuildRunContents();
+        RebuildRunsUI();
         return FReply::Handled();
     };
     const auto OnFixContent = [this] {
@@ -119,6 +124,7 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
             RunContentScan(Run, /*bFix*/ true);
         }
         RebuildRunContents();
+        RebuildRunsUI();
         return FReply::Handled();
     };
     const auto OnScanSelected = [this] {
@@ -129,6 +135,7 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
             RunSelectedScan(Run, /*bFix*/ false);
         }
         RebuildRunContents();
+        RebuildRunsUI();
         return FReply::Handled();
     };
     const auto OnFixSelected = [this] {
@@ -139,6 +146,7 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
             RunSelectedScan(Run, /*bFix*/ true);
         }
         RebuildRunContents();
+        RebuildRunsUI();
         return FReply::Handled();
     };
 
@@ -350,6 +358,44 @@ void SRuleRangerToolPanel::RebuildRunsUI()
         {
             const auto bActive = ActiveRunIndex == Index;
             const auto Title = Runs[Index]->Title;
+            auto ErrorCount{ 0 };
+            auto WarningCount{ 0 };
+            auto InfoCount{ 0 };
+            for (const auto& Row : Runs[Index]->Messages)
+            {
+                switch (Row->Severity)
+                {
+                    case ERuleRangerToolSeverity::Error:
+                        ++ErrorCount;
+                        break;
+                    case ERuleRangerToolSeverity::Warning:
+                        ++WarningCount;
+                        break;
+                    case ERuleRangerToolSeverity::Info:
+                    default:
+                        ++InfoCount;
+                        break;
+                }
+            }
+            auto LabelStr = Title.ToString();
+            if (ErrorCount + WarningCount + InfoCount > 0)
+            {
+                TArray<FString> Parts;
+                if (ErrorCount > 0)
+                {
+                    Parts.Add(FString::Printf(TEXT("E%d"), ErrorCount));
+                }
+                if (WarningCount > 0)
+                {
+                    Parts.Add(FString::Printf(TEXT("W%d"), WarningCount));
+                }
+                if (InfoCount > 0)
+                {
+                    Parts.Add(FString::Printf(TEXT("I%d"), InfoCount));
+                }
+                LabelStr += TEXT(" (") + FString::Join(Parts, TEXT(" ")) + TEXT(")");
+            }
+            const auto Label = FText::FromString(LabelStr);
             RunTabBar->AddSlot().AutoWidth().Padding(
                 FMargin(0.f, 0.f, 8.f, 0.f))[SNew(SButton)
                                                  .ButtonStyle(&FAppStyle::Get().GetWidgetStyle<FButtonStyle>(
@@ -362,7 +408,7 @@ void SRuleRangerToolPanel::RebuildRunsUI()
                                                      }
                                                      RebuildRunsUI();
                                                      return FReply::Handled();
-                                                 })[SNew(STextBlock).Text(Title)]];
+                                                 })[SNew(STextBlock).Text(Label)]];
         }
     }
 }

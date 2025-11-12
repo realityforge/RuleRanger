@@ -68,6 +68,7 @@ private:
     void StartRun(const FText& Title);
     void RebuildRunsUI();
     void RebuildRunContents();
+    void ClearAllRuns();
 
     void RunContentScan(const TSharedPtr<FRuleRangerRun>& Run, bool bFix);
     void RunSelectedScan(const TSharedPtr<FRuleRangerRun>& Run, bool bFix);

@@ -306,7 +306,24 @@ void SRuleRangerToolPanel::Construct(const FArguments&)
               + SVerticalBox::Slot().AutoHeight().Padding(FMargin(0.f, 4.f, 0.f, 4.f))[SNew(SSeparator)]
 
               + SVerticalBox::Slot().FillHeight(1.f)[SNew(SBorder).Padding(FMargin(
-                  4.f))[SNew(SVerticalBox) + SVerticalBox::Slot().AutoHeight()[SAssignNew(RunTabBar, SHorizontalBox)]
+                  4.f))[SNew(SVerticalBox)
+                        + SVerticalBox::Slot().AutoHeight()
+                              [SNew(SHorizontalBox)
+                               + SHorizontalBox::Slot().FillWidth(1.f)[SAssignNew(RunTabBar, SHorizontalBox)]
+                               + SHorizontalBox::Slot()
+                                     .AutoWidth()
+                                     .VAlign(VAlign_Center)
+                                     .Padding(FMargin(8.f, 0.f, 0.f, 0.f))
+                                         [SNew(SButton)
+                                              .ButtonStyle(&FAppStyle::Get().GetWidgetStyle<FButtonStyle>("Button"))
+                                              .OnClicked_Lambda([this] {
+                                                  ClearAllRuns();
+                                                  return FReply::Handled();
+                                              })
+                                              .IsEnabled_Lambda([this] {
+                                                  return Runs.Num() > 0;
+                                              })[SNew(STextBlock)
+                                                     .Text(NSLOCTEXT("RuleRanger", "ClearRuns", "Clear All Runs"))]]]
                         + SVerticalBox::Slot().AutoHeight().Padding(FMargin(0.f, 4.f, 0.f, 4.f))[SNew(SSeparator)]
                         + SVerticalBox::Slot().FillHeight(1.f)[SAssignNew(RunContentSwitcher, SWidgetSwitcher)]]]]];
 
@@ -371,6 +388,22 @@ void SRuleRangerToolPanel::RebuildRunContents()
             RunContentSwitcher->SetActiveWidgetIndex(FMath::Clamp(ActiveRunIndex, 0, Runs.Num() - 1));
         }
     }
+}
+
+void SRuleRangerToolPanel::ClearAllRuns()
+{
+    Runs.Reset();
+    ActiveRunIndex = INDEX_NONE;
+    if (RunContentSwitcher.IsValid())
+    {
+        for (const auto& Page : RunPageWidgets)
+        {
+            RunContentSwitcher->RemoveSlot(Page);
+        }
+    }
+    RunPageWidgets.Reset();
+    RebuildRunsUI();
+    RebuildRunContents();
 }
 
 void SRuleRangerToolPanel::RunContentScan(const TSharedPtr<FRuleRangerRun>& Run, const bool bFix)

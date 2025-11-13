@@ -31,11 +31,6 @@ class URuleRangerCommandlet final : public UCommandlet, public IRuleRangerResult
     void DeriveAllowlistPaths(const FString& Params, TArray<FString>& AllowlistPaths);
     void ResetState();
     void ExecuteProjectRules(bool bFix);
-    bool ProcessProjectRuleSet(URuleRangerConfig* Config,
-                               URuleRangerRuleSet* RuleSet,
-                               URuleRangerProjectActionContext* ProjectContext,
-                               bool bFix,
-                               TSet<const URuleRangerRuleSet*>& Visited);
 
     FAssetData CurrentAsset;
     int32 NumErrors{ 0 };

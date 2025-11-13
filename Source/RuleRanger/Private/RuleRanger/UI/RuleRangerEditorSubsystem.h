@@ -99,7 +99,7 @@ public:
     // Run project-level rules with cancellation support; ShouldContinue is polled between rules
     void RunProjectScanCancellable(bool bFix,
                                    IRuleRangerProjectResultHandler* ProjectHandler,
-                                   TFunctionRef<bool()> ShouldContinue);
+                                   const TFunctionRef<bool()>& ShouldContinue);
 
     // Returns true if any project rules are discoverable via configured RuleSets
     bool HasAnyProjectRules() const;
@@ -139,7 +139,7 @@ private:
 
     void ResetValidationMatchCache(UObject* InObject);
 
-    void ProcessRule(UObject* Object, FRuleRangerRuleFn ProcessRuleFunction);
+    void ProcessRule(UObject* Object, const FRuleRangerRuleFn& ProcessRuleFunction);
 
     void OnAssetPostImport(UFactory* Factory, UObject* Object);
 
@@ -147,7 +147,7 @@ private:
                                  URuleRangerRuleSet* const RuleSet,
                                  const TArray<FRuleRangerRuleExclusion>& Exclusions,
                                  UObject* Object,
-                                 FRuleRangerRuleFn ProcessRuleFunction,
+                                 const FRuleRangerRuleFn& ProcessRuleFunction,
                                  TSet<const URuleRangerRuleSet*>& Visited);
 
     bool CanValidateObject(const URuleRangerRule* Rule, const UObject* InObject, const bool bIsSave) const;
@@ -221,12 +221,7 @@ private:
                                  IRuleRangerResultHandler* ResultHandler) const;
 
     // Project rule traversal and execution helpers
-    void ProcessProjectRules(FRuleRangerProjectRuleFn ProcessRuleFunction);
-
-    bool ProcessProjectRuleSet(URuleRangerConfig* const Config,
-                               URuleRangerRuleSet* const RuleSet,
-                               FRuleRangerProjectRuleFn ProcessRuleFunction,
-                               TSet<const URuleRangerRuleSet*>& Visited);
+    void ProcessProjectRules(const FRuleRangerProjectRuleFn& ProcessRuleFunction);
 
     bool ProcessProjectDemandScan(URuleRangerConfig* const Config,
                                   URuleRangerRuleSet* const RuleSet,
@@ -241,10 +236,6 @@ private:
     // Default project result handler used when no explicit handler supplied
     UPROPERTY(Transient)
     TScriptInterface<IRuleRangerProjectResultHandler> DefaultProjectResultHandler{ nullptr };
-
-    // Utility used by Tools menu actions to count rules for progress UI
-    static int32 CountProjectRulesInRuleSet(const URuleRangerRuleSet* RuleSet,
-                                            TSet<const URuleRangerRuleSet*>& Visited);
 
     void ProcessAssetsCommon(const TArray<FAssetData>& Assets,
                              const FText& SlowTaskText,

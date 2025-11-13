@@ -16,6 +16,7 @@
 #include "Editor.h"
 #include "Logging/StructuredLog.h"
 #include "Misc/ScopedSlowTask.h"
+#include "RuleRanger/ProjectRuleTraversal.h"
 #include "RuleRanger/UI/RuleRangerTools.h"
 #include "RuleRangerActionContext.h"
 #include "RuleRangerConfig.h"
@@ -237,7 +238,7 @@ bool URuleRangerEditorSubsystem::ProcessRuleSetForObject(URuleRangerConfig* cons
                                                          URuleRangerRuleSet* const RuleSet,
                                                          const TArray<FRuleRangerRuleExclusion>& Exclusions,
                                                          UObject* Object,
-                                                         FRuleRangerRuleFn ProcessRuleFunction,
+                                                         const FRuleRangerRuleFn& ProcessRuleFunction,
                                                          TSet<const URuleRangerRuleSet*>& Visited)
 {
     UE_LOGFMT(LogRuleRanger,
@@ -358,7 +359,7 @@ bool URuleRangerEditorSubsystem::ProcessRuleSetForObject(URuleRangerConfig* cons
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, FRuleRangerRuleFn ProcessRuleFunction)
+void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerRuleFn& ProcessRuleFunction)
 {
     if (IsValid(Object))
     {
@@ -734,7 +735,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerConfig* cons
 }
 
 // Project rules traversal over all configured rule sets (ignores content path matching)
-void URuleRangerEditorSubsystem::ProcessProjectRules(FRuleRangerProjectRuleFn ProcessRuleFunction)
+void URuleRangerEditorSubsystem::ProcessProjectRules(const FRuleRangerProjectRuleFn& ProcessRuleFunction)
 {
     if (!ProjectActionContext)
     {
@@ -744,114 +745,12 @@ void URuleRangerEditorSubsystem::ProcessProjectRules(FRuleRangerProjectRuleFn Pr
     }
 
     const auto Configs = GetCachedRuleSetConfigs();
-    TSet<const URuleRangerRuleSet*> Visited;
-    bool bStop = false;
-    for (const auto ConfigPtr : Configs)
-    {
-        if (bStop)
-        {
-            break;
-        }
-        if (const auto Config = ConfigPtr.Get())
-        {
-            for (const auto& RuleSetPtr : Config->RuleSets)
-            {
-                if (const auto RuleSet = RuleSetPtr.Get())
-                {
-                    if (!ProcessProjectRuleSet(Config, RuleSet, ProcessRuleFunction, Visited))
-                    {
-                        bStop = true;
-                        break;
-                    }
-                }
-                else
-                {
-                    UE_LOGFMT(LogRuleRanger,
-                              Error,
-                              "ProcessProjectRules: Invalid RuleSet skipped when processing project rules "
-                              "for config {Config}",
-                              Config->GetName());
-                }
-            }
-        }
-        else
-        {
-            UE_LOGFMT(LogRuleRanger, Error, "Invalid RuleSetConfig skipped when processing project rules");
-        }
-    }
+    RuleRanger::Traversal::TraverseProjectRulesForConfigs(Configs, ProcessRuleFunction);
 
     if (IsValid(ProjectActionContext))
     {
         ProjectActionContext->ClearContext();
     }
-}
-
-bool URuleRangerEditorSubsystem::ProcessProjectRuleSet(URuleRangerConfig* const Config,
-                                                       URuleRangerRuleSet* const RuleSet,
-                                                       FRuleRangerProjectRuleFn ProcessRuleFunction,
-                                                       TSet<const URuleRangerRuleSet*>& Visited)
-{
-    UE_LOGFMT(LogRuleRanger, VeryVerbose, "ProcessProjectRuleSet: Processing Rule Set {RuleSet}", RuleSet->GetName());
-
-    if (Visited.Contains(RuleSet))
-    {
-        UE_LOGFMT(
-            LogRuleRanger,
-            Error,
-            "ProcessProjectRuleSet: Detected cyclic reference involving Rule Set {RuleSet}. Skipping nested traversal.",
-            RuleSet->GetName());
-        return true;
-    }
-
-    Visited.Add(RuleSet);
-
-    for (const auto& NestedRuleSetPtr : RuleSet->RuleSets)
-    {
-        if (const auto NestedRuleSet = NestedRuleSetPtr.Get())
-        {
-            if (!ProcessProjectRuleSet(Config, NestedRuleSet, ProcessRuleFunction, Visited))
-            {
-                return false;
-            }
-        }
-        else
-        {
-            UE_LOGFMT(
-                LogRuleRanger,
-                Error,
-                "ProcessProjectRuleSet: Invalid Nested RuleSet skipped when processing project rules in {RuleSet}",
-                RuleSet->GetName());
-        }
-    }
-
-    int RuleIndex = 0;
-    for (const auto RulePtr : RuleSet->ProjectRules)
-    {
-        if (const auto Rule = RulePtr.Get(); IsValid(Rule))
-        {
-            if (!ProcessRuleFunction(Config, RuleSet, Rule))
-            {
-                UE_LOGFMT(LogRuleRanger,
-                          VeryVerbose,
-                          "ProcessProjectRuleSet: Rule {Rule} from RuleSet {RuleSet} indicated to stop processing.",
-                          Rule->GetName(),
-                          RuleSet->GetName());
-                ProjectActionContext->ClearContext();
-                return false;
-            }
-        }
-        else
-        {
-            UE_LOGFMT(LogRuleRanger,
-                      Error,
-                      "ProcessProjectRuleSet: Invalid ProjectRule skipped at index {Index} in rule set '{RuleSet}'",
-                      RuleIndex,
-                      RuleSet->GetName());
-        }
-        RuleIndex++;
-    }
-
-    return true;
 }
 
 bool URuleRangerEditorSubsystem::ProcessProjectDemandScan(URuleRangerConfig* const Config,
@@ -971,7 +870,7 @@ void URuleRangerEditorSubsystem::RunProjectScan(const bool bFix, IRuleRangerProj
 
 void URuleRangerEditorSubsystem::RunProjectScanCancellable(const bool bFix,
                                                            IRuleRangerProjectResultHandler* ProjectHandler,
-                                                           TFunctionRef<bool()> ShouldContinue)
+                                                           const TFunctionRef<bool()>& ShouldContinue)
 {
     ProcessProjectRules([&](auto Config, auto RuleSet, auto Rule) {
         if (ShouldContinue())
@@ -987,34 +886,7 @@ void URuleRangerEditorSubsystem::RunProjectScanCancellable(const bool bFix,
     });
 }
 
-int32 URuleRangerEditorSubsystem::CountProjectRulesInRuleSet(const URuleRangerRuleSet* RuleSet,
-                                                             TSet<const URuleRangerRuleSet*>& Visited)
-{
-    if (!IsValid(RuleSet) || Visited.Contains(RuleSet))
-    {
-        return 0;
-    }
-    else
-    {
-        Visited.Add(RuleSet);
-        int32 Count = 0;
-        for (const auto RulePtr : RuleSet->ProjectRules)
-        {
-            if (const auto Rule = RulePtr.Get(); IsValid(Rule))
-            {
-                if (Rule->bApplyOnDemand)
-                {
-                    ++Count;
-                }
-            }
-        }
-        for (const auto NestedPtr : RuleSet->RuleSets)
-        {
-            Count += CountProjectRulesInRuleSet(NestedPtr.Get(), Visited);
-        }
-        return Count;
-    }
-}
+// (Removed) Duplicated project rule counting moved to RuleRanger::Traversal helpers
 
 static void MaybeOpenMessageLog(FMessageLog& MessageLog)
 {
@@ -1273,38 +1145,13 @@ bool URuleRangerEditorSubsystem::HasAnyConfiguredDirs() const
 
 bool URuleRangerEditorSubsystem::HasAnyProjectRules() const
 {
-    TSet<const URuleRangerRuleSet*> Visited;
-    for (const auto ConfigPtr : GetCachedRuleSetConfigs())
-    {
-        if (const auto Config = ConfigPtr.Get())
-        {
-            for (const auto& RuleSetPtr : Config->RuleSets)
-            {
-                if (CountProjectRulesInRuleSet(RuleSetPtr.Get(), Visited) > 0)
-                {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
+    return RuleRanger::Traversal::CountProjectRulesForConfigs(GetCachedRuleSetConfigs()) > 0;
 }
 
 void URuleRangerEditorSubsystem::OnScanProject()
 {
     // Determine total work for a better progress dialog
-    int32 Total = 0;
-    TSet<const URuleRangerRuleSet*> Visited;
-    for (const auto ConfigPtr : GetCachedRuleSetConfigs())
-    {
-        if (const auto Config = ConfigPtr.Get())
-        {
-            for (const auto& RuleSetPtr : Config->RuleSets)
-            {
-                Total += CountProjectRulesInRuleSet(RuleSetPtr.Get(), Visited);
-            }
-        }
-    }
+    const int32 Total = RuleRanger::Traversal::CountProjectRulesForConfigs(GetCachedRuleSetConfigs());
 
     FMessageLog MessageLog(FRuleRangerMessageLog::GetMessageLogName());
     if (0 == Total)
@@ -1350,18 +1197,7 @@ void URuleRangerEditorSubsystem::OnScanProject()
 void URuleRangerEditorSubsystem::OnFixProject()
 {
     // Determine total work for a better progress dialog
-    int32 Total = 0;
-    TSet<const URuleRangerRuleSet*> Visited;
-    for (const auto ConfigPtr : GetCachedRuleSetConfigs())
-    {
-        if (const auto Config = ConfigPtr.Get())
-        {
-            for (const auto& RuleSetPtr : Config->RuleSets)
-            {
-                Total += CountProjectRulesInRuleSet(RuleSetPtr.Get(), Visited);
-            }
-        }
-    }
+    const int32 Total = RuleRanger::Traversal::CountProjectRulesForConfigs(GetCachedRuleSetConfigs());
 
     FScopedSlowTask SlowTask(
         FMath::Max(1, Total),

@@ -17,6 +17,7 @@
 #include "Editor.h"
 #include "Misc/ScopedSlowTask.h"
 #include "Modules/ModuleManager.h"
+#include "RuleRanger/ProjectRuleTraversal.h"
 #include "RuleRanger/UI/RuleRangerDeveloperSettings.h"
 #include "RuleRanger/UI/RuleRangerEditorSubsystem.h"
 #include "RuleRanger/UI/RuleRangerStyle.h"
@@ -25,9 +26,6 @@
 #include "RuleRanger/UI/ToolTab/RuleRangerToolProjectResultHandler.h"
 #include "RuleRanger/UI/ToolTab/RuleRangerToolResultHandler.h"
 #include "RuleRanger/UI/ToolTab/SRuleRangerRunView.h"
-#include "RuleRangerConfig.h"
-#include "RuleRangerProjectRule.h"
-#include "RuleRangerRuleSet.h"
 #include "Styling/AppStyle.h"
 #include "Widgets/Images/SImage.h"
 #include "Widgets/Input/SButton.h"
@@ -429,49 +427,7 @@ void SRuleRangerToolPanel::RunProjectScan(const TSharedPtr<FRuleRangerRun>& Run,
             int32 Total = 0;
             if (const auto DevSettings = GetDefault<URuleRangerDeveloperSettings>())
             {
-                // Local counter to avoid introducing file-scope statics
-                struct FCounter
-                {
-                    static int32 Count(const URuleRangerRuleSet* RuleSet, TSet<const URuleRangerRuleSet*>& Visited)
-                    {
-                        if (!IsValid(RuleSet) || Visited.Contains(RuleSet))
-                        {
-                            return 0;
-                        }
-                        else
-                        {
-                            Visited.Add(RuleSet);
-                            int32 CountRules = 0;
-                            for (const auto RulePtr : RuleSet->ProjectRules)
-                            {
-                                if (const auto Rule = RulePtr.Get(); IsValid(Rule))
-                                {
-                                    if (Rule->bApplyOnDemand)
-                                    {
-                                        ++CountRules;
-                                    }
-                                }
-                            }
-                            for (const auto NestedPtr : RuleSet->RuleSets)
-                            {
-                                CountRules += Count(NestedPtr.Get(), Visited);
-                            }
-                            return CountRules;
-                        }
-                    }
-                };
-
-                TSet<const URuleRangerRuleSet*> Visited;
-                for (const auto& SoftConfig : DevSettings->Configs)
-                {
-                    if (const auto Config = SoftConfig.LoadSynchronous())
-                    {
-                        for (const auto& RuleSetPtr : Config->RuleSets)
-                        {
-                            Total += FCounter::Count(RuleSetPtr.Get(), Visited);
-                        }
-                    }
-                }
+                Total = RuleRanger::Traversal::CountProjectRulesForSoftConfigs(DevSettings->Configs);
             }
 
             FScopedSlowTask SlowTask(FMath::Max(1, Total),

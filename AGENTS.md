@@ -88,3 +88,21 @@ reserved for runtime assets that ship with the plugin.
 - Squash noisy work-in-progress commits locally; each change should stand on its own.
 - Open pull requests with a clear summary, reproduction or test notes, and screenshots or GIFs when changes impact
   in-editor UX.
+
+## Header Includes (IWYU)
+
+- In headers, prefer forward declarations over includes.
+- Include only what you use in headers; avoid heavy engine headers in headers.
+- Always keep `...generated.h` as the last include in a header with UHT macros.
+- Do not forward-declare types used by value in UPROPERTY/UFUNCTION; include their headers in that case. It is safe to forward‑declare for pointers/references/TWeakObjectPtr/TSoftObjectPtr/TSubclassOf.
+- Rely on `CoreMinimal.h` in headers; pull in specific headers from .cpp files.
+
+## CPP Includes
+
+- Implementation files (`.cpp`) must include any heavy headers needed by the definitions:
+
+## UE Types and Facilities
+
+- Prefer UE containers and function wrappers:
+  - Use `TArray`, `TSet`, `TMap` instead of STL equivalents.
+  - Use `TFunctionRef` (or `TUniqueFunction` when ownership/copy is needed) instead of `std::function` in hot paths.

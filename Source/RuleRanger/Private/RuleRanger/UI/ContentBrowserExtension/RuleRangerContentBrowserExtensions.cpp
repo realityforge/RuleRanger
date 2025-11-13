@@ -14,6 +14,7 @@
 
 #include "RuleRangerContentBrowserExtensions.h"
 #include "ContentBrowserModule.h"
+#include "Editor.h"
 #include "Logging/StructuredLog.h"
 #include "RuleRanger/UI/RuleRangerCommands.h"
 #include "RuleRanger/UI/RuleRangerEditorSubsystem.h"
@@ -47,9 +48,39 @@ static TSharedRef<FExtender> OnExtendSelectedPathsMenu(const TArray<FString>& Pa
     }
     else if (!bIntersects)
     {
-        ScanTip =
-            NSLOCTEXT("RuleRanger", "CBNoIntersectScanTip", "Selection is outside configured RuleRanger directories.");
-        FixTip = ScanTip;
+        // Build a detailed tooltip showing selected vs configured paths
+        TArray<FString> DirPaths;
+        if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
+        {
+            Subsystem->CollectConfiguredPaths(DirPaths);
+        }
+        auto Summarize = [](const auto& In, const auto MaxItems) {
+            FString Out;
+            const auto Take = FMath::Min(MaxItems, In.Num());
+            for (int32 i = 0; i < Take; ++i)
+            {
+                if (i > 0)
+                {
+                    Out += TEXT(", ");
+                }
+                Out += In[i];
+            }
+            if (In.Num() > Take)
+            {
+                Out += FString::Printf(TEXT(" +%d more"), In.Num() - Take);
+            }
+            return Out;
+        };
+        const auto SelectedSummary{ Summarize(Paths, 3) };
+        const auto ConfiguredSummary{ Summarize(DirPaths, 3) };
+        const auto Details = FText::Format(
+            NSLOCTEXT("RuleRanger",
+                      "CBNoIntersectScanTipDetailed",
+                      "Selection is outside configured RuleRanger directories.\nSelected: {0}\nConfigured: {1}"),
+            FText::FromString(SelectedSummary),
+            FText::FromString(ConfiguredSummary));
+        ScanTip = Details;
+        FixTip = Details;
     }
     else
     {
@@ -103,9 +134,45 @@ static TSharedRef<FExtender> OnExtendForSelectedAssetsMenu(const TArray<FAssetDa
     }
     else if (!bIntersects)
     {
-        ScanTip =
-            NSLOCTEXT("RuleRanger", "CBNoIntersectScanTipA", "Selection is outside configured RuleRanger directories.");
-        FixTip = ScanTip;
+        // Build a detailed tooltip showing selected vs configured directories
+        TArray<FString> DirPaths;
+        if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
+        {
+            Subsystem->CollectConfiguredPaths(DirPaths);
+        }
+        TArray<FString> SelectedPaths;
+        SelectedPaths.Reserve(Assets.Num());
+        for (const auto& Asset : Assets)
+        {
+            SelectedPaths.Add(Asset.GetObjectPathString());
+        }
+        auto Summarize = [](const auto& In, const auto MaxItems) {
+            FString Out;
+            const auto Take = FMath::Min(MaxItems, In.Num());
+            for (auto i = 0; i < Take; ++i)
+            {
+                if (i > 0)
+                {
+                    Out += TEXT(", ");
+                }
+                Out += In[i];
+            }
+            if (In.Num() > Take)
+            {
+                Out += FString::Printf(TEXT(" +%d more"), In.Num() - Take);
+            }
+            return Out;
+        };
+        const auto SelectedSummary{ Summarize(SelectedPaths, 3) };
+        const auto ConfiguredSummary{ Summarize(DirPaths, 3) };
+        const auto Details = FText::Format(
+            NSLOCTEXT("RuleRanger",
+                      "CBNoIntersectScanTipADetailed",
+                      "Selection is outside configured RuleRanger directories.\nSelected: {0}\nConfigured: {1}"),
+            FText::FromString(SelectedSummary),
+            FText::FromString(ConfiguredSummary));
+        ScanTip = Details;
+        FixTip = Details;
     }
     else
     {

@@ -17,7 +17,6 @@
 #include "EditorSubsystem.h"
 #include "Templates/Function.h"
 #include "UObject/Object.h"
-#include <functional>
 #include "RuleRangerEditorSubsystem.generated.h"
 
 struct FRuleRangerRuleExclusion;
@@ -36,11 +35,11 @@ class IRuleRangerProjectResultHandler;
 
 // Shape of function called to check whether rule will run or actually execute rule.
 // The actual function is determined by where it is used.
-using FRuleRangerRuleFn = std::function<
+using FRuleRangerRuleFn = TFunctionRef<
     bool(URuleRangerConfig* const Config, URuleRangerRuleSet* const RuleSet, URuleRangerRule* Rule, UObject* InObject)>;
 
 // Shape of function called to check whether project rule will run or actually execute project rule.
-using FRuleRangerProjectRuleFn = std::function<
+using FRuleRangerProjectRuleFn = TFunctionRef<
     bool(URuleRangerConfig* const Config, URuleRangerRuleSet* const RuleSet, URuleRangerProjectRule* Rule)>;
 
 /**
@@ -101,7 +100,7 @@ public:
     // Run project-level rules with cancellation support; ShouldContinue is polled between rules
     void RunProjectScanCancellable(bool bFix,
                                    IRuleRangerProjectResultHandler* ProjectHandler,
-                                   const TFunctionRef<bool()>& ShouldContinue);
+                                   TFunctionRef<bool()> ShouldContinue);
 
     // Returns true if any project rules are discoverable via configured RuleSets
     bool HasAnyProjectRules() const;
@@ -141,7 +140,7 @@ private:
 
     void ResetValidationMatchCache(UObject* InObject);
 
-    void ProcessRule(UObject* Object, const FRuleRangerRuleFn& ProcessRuleFunction);
+    void ProcessRule(UObject* Object, FRuleRangerRuleFn ProcessRuleFunction);
 
     void OnAssetPostImport(UFactory* Factory, UObject* Object);
 
@@ -149,7 +148,7 @@ private:
                                  URuleRangerRuleSet* const RuleSet,
                                  const TArray<FRuleRangerRuleExclusion>& Exclusions,
                                  UObject* Object,
-                                 const FRuleRangerRuleFn& ProcessRuleFunction,
+                                 FRuleRangerRuleFn ProcessRuleFunction,
                                  TSet<const URuleRangerRuleSet*>& Visited);
 
     bool CanValidateObject(const URuleRangerRule* Rule, const UObject* InObject, const bool bIsSave) const;
@@ -223,11 +222,11 @@ private:
                                  IRuleRangerResultHandler* ResultHandler) const;
 
     // Project rule traversal and execution helpers
-    void ProcessProjectRules(const FRuleRangerProjectRuleFn& ProcessRuleFunction);
+    void ProcessProjectRules(FRuleRangerProjectRuleFn ProcessRuleFunction);
 
     bool ProcessProjectRuleSet(URuleRangerConfig* const Config,
                                URuleRangerRuleSet* const RuleSet,
-                               const FRuleRangerProjectRuleFn& ProcessRuleFunction,
+                               FRuleRangerProjectRuleFn ProcessRuleFunction,
                                TSet<const URuleRangerRuleSet*>& Visited);
 
     bool ProcessProjectDemandScan(URuleRangerConfig* const Config,

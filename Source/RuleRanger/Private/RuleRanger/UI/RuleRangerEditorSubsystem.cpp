@@ -237,7 +237,7 @@ bool URuleRangerEditorSubsystem::ProcessRuleSetForObject(URuleRangerConfig* cons
                                                          URuleRangerRuleSet* const RuleSet,
                                                          const TArray<FRuleRangerRuleExclusion>& Exclusions,
                                                          UObject* Object,
-                                                         const FRuleRangerRuleFn& ProcessRuleFunction,
+                                                         FRuleRangerRuleFn ProcessRuleFunction,
                                                          TSet<const URuleRangerRuleSet*>& Visited)
 {
     UE_LOGFMT(LogRuleRanger,
@@ -358,7 +358,7 @@ bool URuleRangerEditorSubsystem::ProcessRuleSetForObject(URuleRangerConfig* cons
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, const FRuleRangerRuleFn& ProcessRuleFunction)
+void URuleRangerEditorSubsystem::ProcessRule(UObject* Object, FRuleRangerRuleFn ProcessRuleFunction)
 {
     if (IsValid(Object))
     {
@@ -734,7 +734,7 @@ bool URuleRangerEditorSubsystem::ProcessDemandScanAndFix(URuleRangerConfig* cons
 }
 
 // Project rules traversal over all configured rule sets (ignores content path matching)
-void URuleRangerEditorSubsystem::ProcessProjectRules(const FRuleRangerProjectRuleFn& ProcessRuleFunction)
+void URuleRangerEditorSubsystem::ProcessProjectRules(FRuleRangerProjectRuleFn ProcessRuleFunction)
 {
     if (!ProjectActionContext)
     {
@@ -788,7 +788,7 @@ void URuleRangerEditorSubsystem::ProcessProjectRules(const FRuleRangerProjectRul
 
 bool URuleRangerEditorSubsystem::ProcessProjectRuleSet(URuleRangerConfig* const Config,
                                                        URuleRangerRuleSet* const RuleSet,
-                                                       const FRuleRangerProjectRuleFn& ProcessRuleFunction,
+                                                       FRuleRangerProjectRuleFn ProcessRuleFunction,
                                                        TSet<const URuleRangerRuleSet*>& Visited)
 {
     UE_LOGFMT(LogRuleRanger, VeryVerbose, "ProcessProjectRuleSet: Processing Rule Set {RuleSet}", RuleSet->GetName());
@@ -971,7 +971,7 @@ void URuleRangerEditorSubsystem::RunProjectScan(const bool bFix, IRuleRangerProj
 
 void URuleRangerEditorSubsystem::RunProjectScanCancellable(const bool bFix,
                                                            IRuleRangerProjectResultHandler* ProjectHandler,
-                                                           const TFunctionRef<bool()>& ShouldContinue)
+                                                           TFunctionRef<bool()> ShouldContinue)
 {
     ProcessProjectRules([&](auto Config, auto RuleSet, auto Rule) {
         if (ShouldContinue())

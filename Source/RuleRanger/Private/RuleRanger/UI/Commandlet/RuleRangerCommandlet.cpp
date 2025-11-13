@@ -76,7 +76,13 @@ void URuleRangerCommandlet::CollectAssetsFromAllowlist(const TArray<FString>& Al
     {
         TArray<FAssetData> PathAssets;
         AssetRegistry.Get().GetAssetsByPath(*Path, PathAssets, true);
-        Assets.Append(PathAssets);
+        for (const auto& Asset : PathAssets)
+        {
+            if (Asset.IsTopLevelAsset() && !Asset.IsRedirector())
+            {
+                Assets.Add(Asset);
+            }
+        }
     }
 }
 

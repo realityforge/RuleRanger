@@ -15,7 +15,6 @@
 
 #include "CoreMinimal.h"
 #include "RuleRangerMatcher.h"
-#include "UObject/Object.h"
 #include "ContentDirMatcher.generated.h"
 
 /**

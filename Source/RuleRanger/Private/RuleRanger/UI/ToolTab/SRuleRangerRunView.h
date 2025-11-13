@@ -14,14 +14,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "Widgets/Input/SCheckBox.h"
 #include "Widgets/SCompoundWidget.h"
-#include "Widgets/Views/SHeaderRow.h"
-#include "Widgets/Views/SListView.h"
 
 struct FRuleRangerRun;
 struct FRuleRangerMessageRow;
+
+class SHeaderRow;
+class ITableRow;
+template <typename ItemType>
+class SListView;
 
 class SRuleRangerRunView final : public SCompoundWidget
 {

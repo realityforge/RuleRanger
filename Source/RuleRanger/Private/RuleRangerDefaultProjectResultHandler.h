@@ -15,7 +15,6 @@
 
 #include "CoreMinimal.h"
 #include "RuleRangerProjectResultHandler.h"
-#include "UObject/Object.h"
 #include "RuleRangerDefaultProjectResultHandler.generated.h"
 
 class URuleRangerProjectActionContext;

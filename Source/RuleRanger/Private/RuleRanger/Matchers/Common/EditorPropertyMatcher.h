@@ -15,7 +15,6 @@
 
 #include "CoreMinimal.h"
 #include "EditorPropertyMatcherBase.h"
-#include "UObject/Object.h"
 #include "EditorPropertyMatcher.generated.h"
 
 /**

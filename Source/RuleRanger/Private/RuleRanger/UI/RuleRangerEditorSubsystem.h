@@ -16,7 +16,6 @@
 #include "CoreMinimal.h"
 #include "EditorSubsystem.h"
 #include "Templates/Function.h"
-#include "UObject/Object.h"
 #include "RuleRangerEditorSubsystem.generated.h"
 
 struct FRuleRangerRuleExclusion;

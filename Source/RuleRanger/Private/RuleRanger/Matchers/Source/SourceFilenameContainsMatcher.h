@@ -15,7 +15,6 @@
 
 #include "CoreMinimal.h"
 #include "SourcePathMatcherBase.h"
-#include "UObject/Object.h"
 #include "SourceFilenameContainsMatcher.generated.h"
 
 /**

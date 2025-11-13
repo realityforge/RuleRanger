@@ -15,8 +15,9 @@
 
 #include "CoreMinimal.h"
 #include "RuleRangerObjectBase.h"
-#include "UObject/Object.h"
 #include "RuleRangerMatcher.generated.h"
+
+class UObject;
 
 /**
  * Base class used to match against an object to determine whether a rule should be applied to the object.

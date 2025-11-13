@@ -14,7 +14,6 @@
 #pragma once
 
 #include "TextureResolutionConstraint.h"
-#include "UObject/Object.h"
 #include "RuleRangerTextureConvention.generated.h"
 
 UENUM(BlueprintType)

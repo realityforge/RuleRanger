@@ -15,7 +15,9 @@
 #include "RuleRanger/UI/ToolTab/SRuleRangerToolPanel.h"
 #include "AssetRegistry/AssetData.h"
 #include "Editor.h"
+#include "Misc/ScopedSlowTask.h"
 #include "Modules/ModuleManager.h"
+#include "RuleRanger/UI/RuleRangerDeveloperSettings.h"
 #include "RuleRanger/UI/RuleRangerEditorSubsystem.h"
 #include "RuleRanger/UI/RuleRangerStyle.h"
 #include "RuleRanger/UI/RuleRangerTools.h"
@@ -23,6 +25,9 @@
 #include "RuleRanger/UI/ToolTab/RuleRangerToolProjectResultHandler.h"
 #include "RuleRanger/UI/ToolTab/RuleRangerToolResultHandler.h"
 #include "RuleRanger/UI/ToolTab/SRuleRangerRunView.h"
+#include "RuleRangerConfig.h"
+#include "RuleRangerProjectRule.h"
+#include "RuleRangerRuleSet.h"
 #include "Styling/AppStyle.h"
 #include "Widgets/Images/SImage.h"
 #include "Widgets/Input/SButton.h"
@@ -420,10 +425,68 @@ void SRuleRangerToolPanel::RunProjectScan(const TSharedPtr<FRuleRangerRun>& Run,
     {
         if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
         {
-            // Need to use TStrongObjectPtr to avoid the garbage collector, collecting handler during run
+            // Compute total number of project rules to improve progress reporting
+            int32 Total = 0;
+            if (const auto DevSettings = GetDefault<URuleRangerDeveloperSettings>())
+            {
+                // Local counter to avoid introducing file-scope statics
+                struct FCounter
+                {
+                    static int32 Count(const URuleRangerRuleSet* RuleSet, TSet<const URuleRangerRuleSet*>& Visited)
+                    {
+                        if (!IsValid(RuleSet) || Visited.Contains(RuleSet))
+                        {
+                            return 0;
+                        }
+                        else
+                        {
+                            Visited.Add(RuleSet);
+                            int32 CountRules = 0;
+                            for (const auto RulePtr : RuleSet->ProjectRules)
+                            {
+                                if (const auto Rule = RulePtr.Get(); IsValid(Rule))
+                                {
+                                    if (Rule->bApplyOnDemand)
+                                    {
+                                        ++CountRules;
+                                    }
+                                }
+                            }
+                            for (const auto NestedPtr : RuleSet->RuleSets)
+                            {
+                                CountRules += Count(NestedPtr.Get(), Visited);
+                            }
+                            return CountRules;
+                        }
+                    }
+                };
+
+                TSet<const URuleRangerRuleSet*> Visited;
+                for (const auto& SoftConfig : DevSettings->Configs)
+                {
+                    if (const auto Config = SoftConfig.LoadSynchronous())
+                    {
+                        for (const auto& RuleSetPtr : Config->RuleSets)
+                        {
+                            Total += FCounter::Count(RuleSetPtr.Get(), Visited);
+                        }
+                    }
+                }
+            }
+
+            FScopedSlowTask SlowTask(FMath::Max(1, Total),
+                                     bFix ? NSLOCTEXT("RuleRanger", "ToolFixProject", "Rule Ranger: Scan & Fix Project")
+                                          : NSLOCTEXT("RuleRanger", "ToolScanProject", "Rule Ranger: Scan Project"));
+            SlowTask.MakeDialogDelayed(.5f, true);
+
+            // Use TStrongObjectPtr to ensure handler survives GC during the run
             const TStrongObjectPtr ProjectHandler(NewObject<URuleRangerToolProjectResultHandler>(Subsystem));
             ProjectHandler->Init(Run);
-            Subsystem->RunProjectScan(bFix, ProjectHandler.Get());
+            ProjectHandler->AttachProgress(&SlowTask);
+
+            Subsystem->RunProjectScanCancellable(bFix, ProjectHandler.Get(), [&SlowTask] {
+                return !SlowTask.ShouldCancel();
+            });
         }
     }
 }
@@ -457,22 +520,36 @@ void SRuleRangerToolPanel::RunAssetScan(const TSharedPtr<FRuleRangerRun>& Run,
 {
     if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
     {
-        // Need to use TStrongObjectPtr to avoid the garbage collector, collecting handler during run
+        FScopedSlowTask SlowTask(Assets.Num(),
+                                 bFix ? NSLOCTEXT("RuleRanger", "ToolFixAssets", "Rule Ranger: Scan & Fix Assets")
+                                      : NSLOCTEXT("RuleRanger", "ToolScanAssets", "Rule Ranger: Scan Assets"));
+        SlowTask.MakeDialogDelayed(.5f, true);
+
+        // Use TStrongObjectPtr to avoid GC collecting handler during the run
         const TStrongObjectPtr Handler(NewObject<URuleRangerToolResultHandler>(Subsystem));
         Handler->Init(Run);
 
         for (const auto& Asset : Assets)
         {
-            if (const auto Object = Asset.GetAsset())
+            if (SlowTask.ShouldCancel())
             {
-                if (bFix)
+                break;
+            }
+            else
+            {
+                if (const auto Object = Asset.GetAsset())
                 {
-                    Subsystem->ScanAndFixObject(Object, Handler.Get());
+                    if (bFix)
+                    {
+                        Subsystem->ScanAndFixObject(Object, Handler.Get());
+                    }
+                    else
+                    {
+                        Subsystem->ScanObject(Object, Handler.Get());
+                    }
                 }
-                else
-                {
-                    Subsystem->ScanObject(Object, Handler.Get());
-                }
+                SlowTask.EnterProgressFrame();
+                SlowTask.TickProgress();
             }
         }
     }

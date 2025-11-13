@@ -29,6 +29,10 @@ public:
 
     virtual void OnProjectRuleApplied(URuleRangerProjectActionContext* Context) override;
 
+    // Attach a progress tracker so we can tick progress per rule applied
+    void AttachProgress(struct FScopedSlowTask* InProgress) { Progress = InProgress; }
+
 private:
     TWeakPtr<FRuleRangerRun> Run{ nullptr };
+    FScopedSlowTask* Progress{ nullptr };
 };

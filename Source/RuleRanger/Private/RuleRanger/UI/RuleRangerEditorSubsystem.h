@@ -15,6 +15,7 @@
 
 #include "CoreMinimal.h"
 #include "EditorSubsystem.h"
+#include "Templates/Function.h"
 #include "UObject/Object.h"
 #include <functional>
 #include "RuleRangerEditorSubsystem.generated.h"
@@ -96,6 +97,11 @@ public:
 
     // Run project-level rules and report to a custom handler (tool-only path)
     void RunProjectScan(bool bFix, IRuleRangerProjectResultHandler* ProjectHandler);
+
+    // Run project-level rules with cancellation support; ShouldContinue is polled between rules
+    void RunProjectScanCancellable(bool bFix,
+                                   IRuleRangerProjectResultHandler* ProjectHandler,
+                                   const TFunctionRef<bool()>& ShouldContinue);
 
     // Returns true if any project rules are discoverable via configured RuleSets
     bool HasAnyProjectRules() const;

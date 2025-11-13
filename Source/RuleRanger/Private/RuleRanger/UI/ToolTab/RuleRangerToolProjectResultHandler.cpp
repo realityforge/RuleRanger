@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 #include "RuleRanger/UI/ToolTab/RuleRangerToolProjectResultHandler.h"
+#include "Misc/ScopedSlowTask.h"
 #include "RuleRanger/UI/ToolTab/SRuleRangerToolPanel.h"
 #include "RuleRangerProjectActionContext.h"
 #include "RuleRangerProjectRule.h"
@@ -52,5 +53,11 @@ void URuleRangerToolProjectResultHandler::OnProjectRuleApplied(URuleRangerProjec
         AppendMessages(RunPtr, RuleSet, Rule, Context->GetWarningMessages(), ERuleRangerToolSeverity::Warning);
         AppendMessages(RunPtr, RuleSet, Rule, Context->GetErrorMessages(), ERuleRangerToolSeverity::Error);
         AppendMessages(RunPtr, RuleSet, Rule, Context->GetFatalMessages(), ERuleRangerToolSeverity::Error);
+    }
+
+    if (Progress)
+    {
+        Progress->EnterProgressFrame();
+        Progress->TickProgress();
     }
 }

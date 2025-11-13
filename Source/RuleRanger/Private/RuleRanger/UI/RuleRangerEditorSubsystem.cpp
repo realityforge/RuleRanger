@@ -969,6 +969,24 @@ void URuleRangerEditorSubsystem::RunProjectScan(const bool bFix, IRuleRangerProj
     });
 }
 
+void URuleRangerEditorSubsystem::RunProjectScanCancellable(const bool bFix,
+                                                           IRuleRangerProjectResultHandler* ProjectHandler,
+                                                           const TFunctionRef<bool()>& ShouldContinue)
+{
+    ProcessProjectRules([&](auto Config, auto RuleSet, auto Rule) {
+        if (ShouldContinue())
+        {
+            const bool bContinue = bFix ? ProcessProjectDemandScanAndFix(Config, RuleSet, Rule, ProjectHandler)
+                                        : ProcessProjectDemandScan(Config, RuleSet, Rule, ProjectHandler);
+            return bContinue && ShouldContinue();
+        }
+        else
+        {
+            return false;
+        }
+    });
+}
+
 int32 URuleRangerEditorSubsystem::CountProjectRulesInRuleSet(const URuleRangerRuleSet* RuleSet,
                                                              TSet<const URuleRangerRuleSet*>& Visited)
 {

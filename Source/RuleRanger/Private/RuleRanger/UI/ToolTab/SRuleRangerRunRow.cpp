@@ -163,8 +163,10 @@ TSharedRef<SWidget> SRuleRangerRunRow::GenerateWidgetForColumn(const FName& Colu
     }
     else if (TEXT("Message") == ColumnName)
     {
-        return SNew(SBox).Padding(FMargin(6.f, 6.f))
-            [SNew(STextBlock).Text(Item->Text).ColorAndOpacity(GetSeverityTextColor(Item->Severity)).WrapTextAt(600.f)];
+        return SNew(SBox).Padding(FMargin(6.f, 6.f))[SNew(STextBlock)
+                                                         .Text(Item->Text)
+                                                         .ColorAndOpacity(GetSeverityTextColor(Item->Severity))
+                                                         .AutoWrapText(true)];
     }
     else if (TEXT("Asset") == ColumnName)
     {

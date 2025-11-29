@@ -7,6 +7,10 @@ Shorthand notes of where to go next with this experiment:
 
 * I would like a ui that shows all the Name conventions in use
 
+* I would like to be able to disable Rules within the RuleSet which will just result in them being skipped
+
+* Make Rules into structs and potentially inline them to simplify
+
 * When assets are renamed they should autosave
 
 * Add rules so that we can enforce constraints about asset referencing.

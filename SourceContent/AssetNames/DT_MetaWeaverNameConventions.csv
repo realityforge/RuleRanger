@@ -1,0 +1,2 @@
+---,ObjectType,Variant,Prefix,Suffix,bStripPrefixFromNonMatchingAssets,bStripSuffixFromNonMatchingAssets,Description
+MetaWeaverMetadataDefinitionSet,"/Script/MetaWeaver.MetaWeaverMetadataDefinitionSet","","MetadataSchema_","","True","True","Name convention for MetaWeaver asset that defines Metapata property schemas"

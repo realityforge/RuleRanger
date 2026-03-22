@@ -169,10 +169,6 @@ void URuleRangerCommandlet::DeriveAllowlistPaths(const FString& Params, TArray<F
     {
         PathsParam.ParseIntoArray(AllowlistPaths, TEXT(","), true);
     }
-    if (0 == AllowlistPaths.Num())
-    {
-        AllowlistPaths.Add(TEXT("/Game"));
-    }
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
@@ -223,6 +219,11 @@ int32 URuleRangerCommandlet::Main(const FString& Params)
             TArray<FString> AllowlistPackages;
             DeriveAllowlistPaths(Params, AllowlistPaths);
             DeriveAllowlistPackages(Params, AllowlistPackages);
+
+            if (AllowlistPaths.IsEmpty() && AllowlistPackages.IsEmpty())
+            {
+                AllowlistPaths.Add(TEXT("/Game"));
+            }
 
             if (!CollectAssetsFromPathAllowlist(AllowlistPaths, Assets)
                 || !CollectAssetsFromPackageAllowlist(AllowlistPackages, Assets))

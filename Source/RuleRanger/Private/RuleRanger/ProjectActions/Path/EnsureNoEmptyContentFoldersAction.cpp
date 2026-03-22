@@ -298,6 +298,7 @@ void UEnsureNoEmptyContentFoldersAction::ProcessContentRoot(URuleRangerProjectAc
     // Leaf-first: process deepest directories first
     Candidates.Sort([](const auto& A, const auto& B) { return A.Depth > B.Depth; });
 
+    FRuleRangerUtilities::EnsureAssetRegistryReady();
     const auto& AssetRegistry =
         FModuleManager::LoadModuleChecked<FAssetRegistryModule>(AssetRegistryConstants::ModuleName).Get();
 

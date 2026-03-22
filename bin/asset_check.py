@@ -64,6 +64,7 @@ try:
     if args.verbose:
         print(f" -> Unreal Engine Editor Cmd: {editor_cmd}")
 
+    asset_packages = []
     asset_paths = []
 
     if args.staged_only:
@@ -81,34 +82,32 @@ try:
             elif file.startswith("Content/") and (
                 file.lower().endswith(".uasset") or file.lower().endswith(".umap")
             ):
-                # Strip "Content/" prefix if present
+                # Convert staged file paths into package names so the commandlet can resolve them precisely.
                 rel_path = file.split("Content/", 1)[-1]
-                # Remove extension
                 rel_path_noext = os.path.splitext(rel_path)[0]
-                # Normalize slashes
                 game_path = "/Game/" + rel_path_noext.replace("\\", "/").replace(
                     "//", "/"
                 )
-                asset_paths.append(game_path)
+                asset_packages.append(game_path)
 
-        if 0 != len(index_files) and 0 == len(asset_paths):
+        if 0 != len(index_files) and 0 == len(asset_packages):
             print("No staged Unreal assets. Skipping RuleRanger validation.")
             sys.exit(0)
 
     if args.asset_path:
         asset_paths.append(args.asset_path)
 
-    if 0 == len(asset_paths):
-        asset_paths.append("/Game")
-
     if args.verbose:
-        print(f" -> Assets {asset_paths}")
+        if 0 != len(asset_packages):
+            print(f" -> Asset Packages {asset_packages}")
+        if 0 != len(asset_paths):
+            print(f" -> Asset Paths {asset_paths}")
 
-    asset_paths_str = ",".join(asset_paths)
-    command_args = [
-        f"-run=RuleRanger",
-        f"-paths={asset_paths_str}",
-    ]
+    command_args = [f"-run=RuleRanger"]
+    if 0 != len(asset_packages):
+        command_args.append(f"-packages={','.join(asset_packages)}")
+    if 0 != len(asset_paths):
+        command_args.append(f"-paths={','.join(asset_paths)}")
 
     if not args.verbose:
         command_args.append("-quiet")

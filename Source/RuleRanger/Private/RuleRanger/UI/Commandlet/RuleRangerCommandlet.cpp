@@ -18,6 +18,7 @@
 #include "Logging/StructuredLog.h"
 #include "Misc/FileHelper.h"
 #include "RuleRanger/ProjectRuleTraversal.h"
+#include "RuleRanger/RuleRangerUtilities.h"
 #include "RuleRanger/UI/RuleRangerDeveloperSettings.h"
 #include "RuleRanger/UI/RuleRangerEditorSubsystem.h"
 #include "RuleRangerActionContext.h"
@@ -47,7 +48,8 @@ static void PrintRuleRangerCommandletUsage()
     Usage.Append(TEXT("  -run=RuleRangerCommandlet [options]\n\n"));
     Usage.Append(TEXT("Options:\n"));
     Usage.Append(TEXT("  -help                       Show this help and exit\n"));
-    Usage.Append(TEXT("  -paths=/Game[,/Game/Foo]    Comma-separated content roots to scan (assets)\n"));
+    Usage.Append(TEXT("  -paths=/Game[,/Game/Foo]    Comma-separated content roots to scan\n"));
+    Usage.Append(TEXT("  -packages=/Game/Foo/Bar     Comma-separated asset/package names to scan\n"));
     Usage.Append(TEXT("  -fix                        Apply autofixes where supported (assets + project)\n"));
     Usage.Append(TEXT("  -report=Path                Write JSON report to the given file\n"));
     Usage.Append(TEXT("  -exitOnWarning              Exit non-zero if warnings are present\n"));
@@ -68,16 +70,85 @@ URuleRangerCommandlet::URuleRangerCommandlet()
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-void URuleRangerCommandlet::CollectAssetsFromAllowlist(const TArray<FString>& AllowlistPaths,
-                                                       TArray<FAssetData>& Assets)
+bool URuleRangerCommandlet::CollectAssetsFromPackageAllowlist(const TArray<FString>& AllowlistPackages,
+                                                              TArray<FAssetData>& Assets)
 {
     FRuleRangerUtilities::EnsureAssetRegistryReady();
 
     const auto& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+    const auto& Registry = AssetRegistry.Get();
+    bool bAllPackagesResolved = true;
+    for (const auto& PackagePath : AllowlistPackages)
+    {
+        TArray<FAssetData> PackageAssets;
+        if (!Registry.GetAssetsByPackageName(*PackagePath, PackageAssets, /*bIncludeOnlyOnDiskAssets=*/true))
+        {
+            UE_LOGFMT(LogRuleRanger, Error, "Unable to resolve staged asset package {PackagePath}", PackagePath);
+            bAllPackagesResolved = false;
+            continue;
+        }
+
+        if (PackageAssets.IsEmpty())
+        {
+            UE_LOGFMT(LogRuleRanger, Error, "No assets were found for staged asset package {PackagePath}", PackagePath);
+            bAllPackagesResolved = false;
+            continue;
+        }
+
+        for (const auto& Asset : PackageAssets)
+        {
+            if (Asset.IsTopLevelAsset() && !Asset.IsRedirector())
+            {
+                Assets.Add(Asset);
+            }
+        }
+    }
+
+    return bAllPackagesResolved;
+}
+
+// ReSharper disable once CppMemberFunctionMayBeStatic
+bool URuleRangerCommandlet::CollectAssetsFromPathAllowlist(const TArray<FString>& AllowlistPaths,
+                                                           TArray<FAssetData>& Assets)
+{
+    FRuleRangerUtilities::EnsureAssetRegistryReady();
+
+    const auto& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+    const auto& Registry = AssetRegistry.Get();
+    bool bAllPathsResolved = true;
     for (const auto& Path : AllowlistPaths)
     {
         TArray<FAssetData> PathAssets;
-        AssetRegistry.Get().GetAssetsByPath(*Path, PathAssets, true);
+        if (!Registry.GetAssetsByPath(*Path, PathAssets, /*bRecursive=*/true))
+        {
+            UE_LOGFMT(LogRuleRanger, Error, "Unable to resolve staged content root {Path}", Path);
+            bAllPathsResolved = false;
+            continue;
+        }
+
+        if (PathAssets.IsEmpty())
+        {
+            const auto FileSystemPath =
+                FPackageName::LongPackageNameToFilename(Path, FPackageName::GetAssetPackageExtension());
+            auto& FileManager = IFileManager::Get();
+            if (FileManager.DirectoryExists(*FPaths::GetPath(FileSystemPath))
+                && FileManager.IterateDirectory(*FPaths::GetPath(FileSystemPath),
+                                                [](const auto, bool) { return true; }))
+            {
+                UE_LOGFMT(LogRuleRanger,
+                          Error,
+                          "Asset registry returned no assets for {Path} even though files exist on disk. "
+                          "This usually means the registry is not fully loaded.",
+                          Path);
+            }
+            else
+            {
+                UE_LOGFMT(LogRuleRanger, Error, "No assets were found for staged content root {Path}", Path);
+            }
+            bAllPathsResolved = false;
+            continue;
+        }
+
         for (const auto& Asset : PathAssets)
         {
             if (Asset.IsTopLevelAsset() && !Asset.IsRedirector())
@@ -86,6 +157,8 @@ void URuleRangerCommandlet::CollectAssetsFromAllowlist(const TArray<FString>& Al
             }
         }
     }
+
+    return bAllPathsResolved;
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
@@ -99,6 +172,16 @@ void URuleRangerCommandlet::DeriveAllowlistPaths(const FString& Params, TArray<F
     if (0 == AllowlistPaths.Num())
     {
         AllowlistPaths.Add(TEXT("/Game"));
+    }
+}
+
+// ReSharper disable once CppMemberFunctionMayBeStatic
+void URuleRangerCommandlet::DeriveAllowlistPackages(const FString& Params, TArray<FString>& AllowlistPackages)
+{
+    FString PackagesParam;
+    if (FParse::Value(*Params, TEXT("packages="), PackagesParam))
+    {
+        PackagesParam.ParseIntoArray(AllowlistPackages, TEXT(","), true);
     }
 }
 
@@ -137,8 +220,16 @@ int32 URuleRangerCommandlet::Main(const FString& Params)
         if (bRunAssets)
         {
             TArray<FString> AllowlistPaths;
+            TArray<FString> AllowlistPackages;
             DeriveAllowlistPaths(Params, AllowlistPaths);
-            CollectAssetsFromAllowlist(AllowlistPaths, Assets);
+            DeriveAllowlistPackages(Params, AllowlistPackages);
+
+            if (!CollectAssetsFromPathAllowlist(AllowlistPaths, Assets)
+                || !CollectAssetsFromPackageAllowlist(AllowlistPackages, Assets))
+            {
+                ResetState();
+                return 1;
+            }
         }
 
         // Reset state

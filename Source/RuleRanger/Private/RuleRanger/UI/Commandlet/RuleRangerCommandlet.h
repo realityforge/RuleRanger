@@ -27,8 +27,10 @@ class URuleRangerCommandlet final : public UCommandlet, public IRuleRangerResult
 {
     GENERATED_BODY()
 
-    void CollectAssetsFromAllowlist(const TArray<FString>& AllowlistPaths, TArray<FAssetData>& Assets);
+    bool CollectAssetsFromPackageAllowlist(const TArray<FString>& AllowlistPackages, TArray<FAssetData>& Assets);
+    bool CollectAssetsFromPathAllowlist(const TArray<FString>& AllowlistPaths, TArray<FAssetData>& Assets);
     void DeriveAllowlistPaths(const FString& Params, TArray<FString>& AllowlistPaths);
+    void DeriveAllowlistPackages(const FString& Params, TArray<FString>& AllowlistPackages);
     void ResetState();
     void ExecuteProjectRules(bool bFix);
 

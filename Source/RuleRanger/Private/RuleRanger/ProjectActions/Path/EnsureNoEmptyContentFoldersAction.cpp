@@ -18,6 +18,7 @@
 #include "HAL/PlatformFile.h"
 #include "Interfaces/IPluginManager.h"
 #include "Misc/Paths.h"
+#include "RuleRanger/RuleRangerUtilities.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureNoEmptyContentFoldersAction)
 
@@ -177,17 +178,29 @@ void UEnsureNoEmptyContentFoldersAction::ProcessDirEntry(URuleRangerProjectActio
 
         if (0 == Assets.Num())
         {
+            const bool bHasFilesOnDisk = HasAnyFilesNonRecursive(Dir.FileSystemPath);
             if (ActionContext->IsDryRun())
             {
-                ActionContext->Error(
-                    FText::Format(NSLOCTEXT("RuleRanger",
-                                            "EmptyContentFolderDetected",
-                                            "Empty content folder detected: {0}. "
-                                            "Folder must contain at least one asset or have subfolders."),
-                                  FText::FromString(Dir.MountPath)));
+                if (bHasFilesOnDisk)
+                {
+                    ActionContext->Error(FText::Format(NSLOCTEXT("RuleRanger",
+                                                                 "ContentFolderHasFilesButNoAssets",
+                                                                 "Content folder {0} has files on disk but no "
+                                                                 "registered assets."),
+                                                       FText::FromString(Dir.MountPath)));
+                }
+                else
+                {
+                    ActionContext->Error(
+                        FText::Format(NSLOCTEXT("RuleRanger",
+                                                "EmptyContentFolderDetected",
+                                                "Empty content folder detected: {0}. "
+                                                "Folder must contain at least one asset or have subfolders."),
+                                      FText::FromString(Dir.MountPath)));
+                }
             }
             // Fix: only remove directory if there are no files present on the filesystem
-            else if (HasAnyFilesNonRecursive(Dir.FileSystemPath))
+            else if (bHasFilesOnDisk)
             {
                 ActionContext->Error(
                     FText::Format(NSLOCTEXT("RuleRanger",

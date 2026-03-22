@@ -20,6 +20,9 @@ class UBlueprint;
 class FRuleRangerUtilities
 {
 public:
+    /** Ensure the asset registry has a complete global view before performing path/package lookups. */
+    RULERANGER_API static void EnsureAssetRegistryReady();
+
     /** Method to perform the rename of an asset. */
     RULERANGER_API static bool RenameAsset(UObject* Object, const FString& NewName);
 

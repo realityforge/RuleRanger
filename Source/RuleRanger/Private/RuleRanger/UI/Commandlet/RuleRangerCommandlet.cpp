@@ -71,6 +71,8 @@ URuleRangerCommandlet::URuleRangerCommandlet()
 void URuleRangerCommandlet::CollectAssetsFromAllowlist(const TArray<FString>& AllowlistPaths,
                                                        TArray<FAssetData>& Assets)
 {
+    FRuleRangerUtilities::EnsureAssetRegistryReady();
+
     const auto& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
     for (const auto& Path : AllowlistPaths)
     {

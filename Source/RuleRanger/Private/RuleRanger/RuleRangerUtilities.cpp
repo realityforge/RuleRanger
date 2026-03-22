@@ -16,8 +16,26 @@
 #include "AssetToolsModule.h"
 #include "IAssetTools.h"
 #include "Materials/MaterialInterface.h"
+#include "Misc/PackageName.h"
 
 static const FName AssetToolsModuleName("AssetTools");
+
+void FRuleRangerUtilities::EnsureAssetRegistryReady()
+{
+    auto& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
+
+    if (AssetRegistry.IsSearchAllAssets())
+    {
+        if (AssetRegistry.IsLoadingAssets())
+        {
+            AssetRegistry.WaitForCompletion();
+        }
+    }
+    else
+    {
+        AssetRegistry.SearchAllAssets(true);
+    }
+}
 
 bool FRuleRangerUtilities::RenameAsset(UObject* Object, const FString& NewName)
 {

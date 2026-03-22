@@ -17,6 +17,7 @@
 #include "Logging/StructuredLog.h"
 #include "Misc/ScopedSlowTask.h"
 #include "RuleRanger/ProjectRuleTraversal.h"
+#include "RuleRanger/RuleRangerUtilities.h"
 #include "RuleRanger/UI/RuleRangerTools.h"
 #include "RuleRangerActionContext.h"
 #include "RuleRangerConfig.h"
@@ -992,6 +993,8 @@ void URuleRangerEditorSubsystem::OnFixSelectedAssets(const TArray<FAssetData>& A
 // ReSharper disable once CppMemberFunctionMayBeStatic
 void URuleRangerEditorSubsystem::CollectAssetsFromPaths(const TArray<FString>& AssetPaths, TArray<FAssetData>& Assets)
 {
+    FRuleRangerUtilities::EnsureAssetRegistryReady();
+
     const auto& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
     for (const auto& AssetPath : AssetPaths)
     {

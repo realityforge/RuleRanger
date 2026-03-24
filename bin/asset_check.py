@@ -33,6 +33,7 @@ parser.add_argument("--asset-path", type=str, help="Additional asset paths to an
 parser.add_argument("files", type=str, nargs="*", help="The files to analyze")
 
 args = parser.parse_args()
+repo_root = Path.cwd().resolve()
 
 if args.verbose:
     print(f"Performing Rule Ranger Asset Checking")
@@ -70,8 +71,17 @@ try:
     if args.staged_only:
         print(f" -> Restricting analysis to staged assets only")
 
+        # Modern git errors if the git directory owner and current user differ unless you pass safe.directory
+        # so this script failed when running under some agents without setting safe.directory
         index_files = subprocess.check_output(
-            ["git", "diff-index", "--cached", "--name-only", "HEAD", *args.files],
+            ["git",
+             "-c",
+             f"safe.directory={repo_root.as_posix()}",
+             "diff-index",
+             "--cached",
+             "--name-only",
+             "HEAD",
+             *args.files],
             universal_newlines=True,
         ).splitlines()
         for file in index_files:

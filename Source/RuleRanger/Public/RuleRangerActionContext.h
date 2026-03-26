@@ -50,6 +50,7 @@ class URuleRangerActionContext final : public URuleRangerCommonContext
     GENERATED_BODY()
     friend class URuleRangerEditorSubsystem;
     friend class URuleRangerEditorValidator;
+    friend class FRuleRangerActionContextTestAccessor;
 
 protected:
     virtual void ClearContext() override;

@@ -56,11 +56,11 @@ void UEnsureAssetImportedFromDataSourceFolderAction::ValidateAssetImportData(
             // Base name of file ala "T_Crypto_N"
             const FString BaseName = FPaths::GetBaseFilename(RelativeFilename);
 
-            LogError(Object,
-                     FString::Printf(TEXT("Object imported from '%s', (relative path = '%s' base name = '%s')"),
-                                     *ImportFilename,
-                                     *RelativePath,
-                                     *BaseName));
+            LogInfo(Object,
+                    FString::Printf(TEXT("Object imported from '%s', (relative path = '%s' base name = '%s')"),
+                                    *ImportFilename,
+                                    *RelativePath,
+                                    *BaseName));
 
             const FString ObjectPathName{ FPaths::GetPath(
                 Object->GetOutermost()->GetPathName().RightChop(6 /* size of '/Game/' */)) };

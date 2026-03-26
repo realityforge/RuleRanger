@@ -79,6 +79,16 @@ reserved for runtime assets that ship with the plugin.
 
 - Automation coverage is aspirational. Capture edge cases in unit-style specs once a testing harness lands under
   `Source/<Module>/Private/Tests/`.
+- When extending RuleRanger automation coverage, prefer reusing and extending
+  `Source/RuleRanger/Private/Tests/RuleRanger/RuleRangerAutomationTestHelpers.h` and
+  `Source/RuleRanger/Private/Tests/RuleRanger/RuleRangerAutomationTestTypes.h` instead of creating per-file harnesses.
+- Place C++ automation tests under `Source/<Module>/Private/Tests/` and mirror the implementation subpath beneath
+  that folder. For example, tests for `Source/RuleRanger/Private/RuleRanger/Matchers/Path/ContentDirMatcher.cpp`
+  belong in `Source/RuleRanger/Private/Tests/RuleRanger/Matchers/Path/ContentDirMatcherTests.cpp`.
+- For low-friction core coverage, prefer transient package fixtures, synthetic import-data fixtures, and reflected
+  test-only UObject types over editor-subsystem writes or asset-mutation dependencies.
+- When tests need temporary editor preference changes, add scoped helpers that restore the original value before the
+  test exits; prefer that over mutating editor settings inline in each test.
 - Until formal suites exist, document manual reproduction steps or sample maps in the pull request so reviewers can
   exercise the change.
 

@@ -30,7 +30,14 @@ bool UEditorPropertyMatcherBase::Test(UObject* Object) const
     if (Name != NAME_None && IsValid(Object))
     {
         TArray<UObject*> Instances;
-        FRuleRangerUtilities::CollectInstanceHierarchy(Object, Instances);
+        if (bTraverseInstanceHierarchy)
+        {
+            FRuleRangerUtilities::CollectInstanceHierarchy(Object, Instances);
+        }
+        else
+        {
+            Instances.Add(Object);
+        }
 
         for (const auto Instance : Instances)
         {

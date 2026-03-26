@@ -13,11 +13,26 @@
  */
 #pragma once
 
+#include "EditorFramework/AssetImportData.h"
 #include "Misc/DataValidation.h"
 #include "RuleRangerAction.h"
 #include "RuleRangerCommonContext.h"
 #include "RuleRangerMatcher.h"
 #include "RuleRangerAutomationTestTypes.generated.h"
+
+UENUM()
+enum class ERuleRangerAutomationDisplayEnum : uint8
+{
+    Disabled UMETA(DisplayName = "Display Disabled"),
+    Enabled UMETA(DisplayName = "Display Enabled"),
+};
+
+UENUM()
+enum ERuleRangerAutomationLegacyEnum
+{
+    LegacyDisabled UMETA(DisplayName = "Legacy Disabled"),
+    LegacyEnabled UMETA(DisplayName = "Legacy Enabled"),
+};
 
 UCLASS(NotBlueprintable)
 class URuleRangerAutomationTestCommonContext final : public URuleRangerCommonContext
@@ -34,7 +49,60 @@ public:
 };
 
 UCLASS(NotBlueprintable)
-class URuleRangerAutomationTestObject final : public UObject
+class URuleRangerAutomationTestObject : public UObject
+{
+    GENERATED_BODY()
+};
+
+UCLASS(NotBlueprintable)
+class URuleRangerAutomationDerivedTestObject final : public URuleRangerAutomationTestObject
+{
+    GENERATED_BODY()
+};
+
+UCLASS(NotBlueprintable)
+class URuleRangerAutomationImportDataObject final : public URuleRangerAutomationTestObject
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere, Instanced)
+    TObjectPtr<UAssetImportData> AssetImportData{ nullptr };
+};
+
+UCLASS(NotBlueprintable)
+class URuleRangerAutomationEditorPropertyObject : public UObject
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere)
+    bool bEditorBool{ false };
+
+    UPROPERTY(EditAnywhere)
+    int32 EditorInteger{ 0 };
+
+    UPROPERTY(EditAnywhere)
+    double EditorNumber{ 0.0 };
+
+    UPROPERTY(EditAnywhere)
+    ERuleRangerAutomationDisplayEnum EditorEnum{ ERuleRangerAutomationDisplayEnum::Disabled };
+
+    UPROPERTY(EditAnywhere)
+    TEnumAsByte<ERuleRangerAutomationLegacyEnum> EditorLegacyEnum{ LegacyDisabled };
+
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<UObject> EditorReference{ nullptr };
+
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<UObject> EditorReferenceArray[2]{ nullptr, nullptr };
+
+    UPROPERTY(EditAnywhere)
+    FString EditorText;
+};
+
+UCLASS(NotBlueprintable)
+class URuleRangerAutomationDerivedEditorPropertyObject final : public URuleRangerAutomationEditorPropertyObject
 {
     GENERATED_BODY()
 };
@@ -167,3 +235,114 @@ public:
 };
 
 #endif
+
+UCLASS(NotBlueprintable)
+class URuleRangerAutomationRequiredLeafObject final : public UObject
+{
+    GENERATED_BODY()
+};
+
+UCLASS(NotBlueprintable)
+class URuleRangerAutomationRequiredObjectOwner final : public UObject
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere, meta = (RuleRangerRequired))
+    TObjectPtr<UObject> RequiredObject{ nullptr };
+};
+
+UCLASS(NotBlueprintable)
+class URuleRangerAutomationRequiredArrayOwner final : public UObject
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere, meta = (RuleRangerRequired))
+    TObjectPtr<UObject> RequiredObjects[2]{ nullptr, nullptr };
+};
+
+UCLASS(NotBlueprintable)
+class URuleRangerAutomationUnsupportedRequiredOwner final : public UObject
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere, meta = (RuleRangerRequired))
+    int32 RequiredValue{ 0 };
+};
+
+UCLASS(NotBlueprintable)
+class URuleRangerAutomationRequiredComponentObject final : public UObject
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<UObject> RequiredObject{ nullptr };
+
+    UPROPERTY(EditAnywhere)
+    int32 RequiredValue{ 0 };
+};
+
+UCLASS(NotBlueprintable, meta = (RuleRangerRequired = "RequiredComponent.RequiredObject"))
+class URuleRangerAutomationRequiredComponentOwner final : public UObject
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<URuleRangerAutomationRequiredComponentObject> RequiredComponent{ nullptr };
+};
+
+UCLASS(NotBlueprintable, meta = (RuleRangerRequired = "MissingComponent.RequiredObject"))
+class URuleRangerAutomationMissingComponentOwner final : public UObject
+{
+    GENERATED_BODY()
+};
+
+UCLASS(NotBlueprintable, meta = (RuleRangerRequired = "RequiredComponent.MissingProperty"))
+class URuleRangerAutomationMissingComponentPropertyOwner final : public UObject
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<URuleRangerAutomationRequiredComponentObject> RequiredComponent{ nullptr };
+};
+
+UCLASS(NotBlueprintable, meta = (RuleRangerRequired = "RequiredComponent.RequiredValue"))
+class URuleRangerAutomationInvalidComponentPropertyOwner final : public UObject
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<URuleRangerAutomationRequiredComponentObject> RequiredComponent{ nullptr };
+};
+
+UCLASS(NotBlueprintable, meta = (RuleRangerRequired = "RequiredComponent.RequiredObject"))
+class URuleRangerAutomationInheritedRequiredBaseOwner : public UObject
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<URuleRangerAutomationRequiredComponentObject> RequiredComponent{ nullptr };
+};
+
+UCLASS(NotBlueprintable)
+class URuleRangerAutomationInheritedRequiredDerivedOwner final : public URuleRangerAutomationInheritedRequiredBaseOwner
+{
+    GENERATED_BODY()
+};
+
+UCLASS(Abstract, NotBlueprintable, meta = (RuleRangerRequired = "RequiredComponent.RequiredObject"))
+class URuleRangerAutomationAbstractRequiredOwner : public UObject
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<URuleRangerAutomationRequiredComponentObject> RequiredComponent{ nullptr };
+};

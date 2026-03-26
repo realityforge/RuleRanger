@@ -17,44 +17,50 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EditorPropertyMatcher)
 
-bool UEditorPropertyMatcher::TestEditorProperty(UObject* Object, UObject* Instance, FProperty* Property) const
+namespace RuleRanger::EditorPropertyMatcher
 {
-    if (const auto BoolProperty = CastField<const FBoolProperty>(Property))
+    bool MatchEnumValue(const UEnum* Enum, const int64 EnumValue, const FString& ExpectedValue)
     {
-        return BoolProperty->GetPropertyValue(Instance) == Value.Equals("true", ESearchCase::IgnoreCase);
-    }
-    else if (const auto EnumProperty = CastField<const FEnumProperty>(Property))
-    {
-        const UEnum* Enum = EnumProperty->GetEnum();
-        const int EnumValue = *EnumProperty->ContainerPtrToValuePtr<uint8>(Instance);
         const int32 EnumIndex = Enum->GetIndexByValue(EnumValue);
         const FName EnumName = Enum->GetNameByIndex(EnumIndex);
         const FString EnumAuthoredName = Enum->GetAuthoredNameStringByIndex(EnumIndex);
         const FText EnumDisplayName = Enum->GetDisplayNameTextByIndex(EnumIndex);
-        return EnumName.ToString().Equals(Value) || EnumAuthoredName.Equals(Value)
-            || EnumDisplayName.ToString().Equals(Value);
+        return EnumName.ToString().Equals(ExpectedValue) || EnumAuthoredName.Equals(ExpectedValue)
+            || EnumDisplayName.ToString().Equals(ExpectedValue);
+    }
+} // namespace RuleRanger::EditorPropertyMatcher
+
+bool UEditorPropertyMatcher::TestEditorProperty(UObject* Object, UObject* Instance, FProperty* Property) const
+{
+    if (const auto BoolProperty = CastField<const FBoolProperty>(Property))
+    {
+        return BoolProperty->GetPropertyValue_InContainer(Instance) == Value.Equals("true", ESearchCase::IgnoreCase);
+    }
+    else if (const auto EnumProperty = CastField<const FEnumProperty>(Property))
+    {
+        const UEnum* Enum = EnumProperty->GetEnum();
+        const void* const EnumValuePtr = EnumProperty->ContainerPtrToValuePtr<void>(Instance);
+        const int64 EnumValue = EnumProperty->GetUnderlyingProperty()->GetSignedIntPropertyValue(EnumValuePtr);
+        return RuleRanger::EditorPropertyMatcher::MatchEnumValue(Enum, EnumValue, Value);
     }
     else if (const auto NumericProperty = CastField<FNumericProperty>(Property))
     {
         if (NumericProperty->IsEnum())
         {
             const UEnum* Enum = NumericProperty->GetIntPropertyEnum();
-            const int EnumValue = *NumericProperty->ContainerPtrToValuePtr<uint8>(Instance);
-            const int32 EnumIndex = Enum->GetIndexByValue(EnumValue);
-            const FName EnumName = Enum->GetNameByIndex(EnumIndex);
-            const FString EnumAuthoredName = Enum->GetAuthoredNameStringByIndex(EnumIndex);
-            const FText EnumDisplayName = Enum->GetDisplayNameTextByIndex(EnumIndex);
-            return EnumName.ToString().Equals(Value) || EnumAuthoredName.Equals(Value)
-                || EnumDisplayName.ToString().Equals(Value);
+            const int64 EnumValue = NumericProperty->GetSignedIntPropertyValue_InContainer(Instance);
+            return RuleRanger::EditorPropertyMatcher::MatchEnumValue(Enum, EnumValue, Value);
         }
         else if (NumericProperty->IsInteger())
         {
-            return NumericProperty->GetSignedIntPropertyValue(Instance)
+            const void* const NumericValue = NumericProperty->ContainerPtrToValuePtr<void>(Instance);
+            return NumericProperty->GetSignedIntPropertyValue(NumericValue)
                 == UKismetStringLibrary::Conv_StringToInt64(Value);
         }
         else if (NumericProperty->IsFloatingPoint())
         {
-            return NumericProperty->GetFloatingPointPropertyValue(Instance)
+            const void* const NumericValue = NumericProperty->ContainerPtrToValuePtr<void>(Instance);
+            return NumericProperty->GetFloatingPointPropertyValue(NumericValue)
                 == UKismetStringLibrary::Conv_StringToDouble(Value);
         }
     }

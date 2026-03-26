@@ -15,6 +15,8 @@
 
 #if WITH_DEV_AUTOMATION_TESTS && WITH_EDITOR
 
+    #include "Editor/EditorPerProjectUserSettings.h"
+    #include "EditorFramework/AssetImportData.h"
     #include "Misc/AutomationTest.h"
     #include "Misc/DataValidation.h"
     #include "RuleRangerActionContext.h"
@@ -23,6 +25,7 @@
     #include "RuleRangerRuleSet.h"
     #include "Tests/RuleRanger/RuleRangerAutomationTestTypes.h"
     #include "UObject/ObjectSaveContext.h"
+    #include "UObject/Package.h"
     #include "UObject/UnrealType.h"
 
 class FRuleRangerActionContextTestAccessor
@@ -59,12 +62,16 @@ namespace RuleRangerTests
     }
 
     template <typename TObject, typename TValue>
-    bool SetPropertyValue(FAutomationTestBase& Test, TObject* Object, const TCHAR* PropertyName, const TValue& Value)
+    bool SetPropertyValue(FAutomationTestBase& Test,
+                          TObject* Object,
+                          const TCHAR* PropertyName,
+                          const TValue& Value,
+                          const int32 ArrayIndex)
     {
         const auto Property = FindFProperty<FProperty>(Object->GetClass(), PropertyName);
         if (Test.TestNotNull(FString::Printf(TEXT("Property %s should exist"), PropertyName), Property))
         {
-            auto ValuePtr = Property->template ContainerPtrToValuePtr<TValue>(Object);
+            auto ValuePtr = Property->template ContainerPtrToValuePtr<TValue>(Object, ArrayIndex);
             if (Test.TestNotNull(FString::Printf(TEXT("Property %s should be writable"), PropertyName), ValuePtr))
             {
                 *ValuePtr = Value;
@@ -73,6 +80,31 @@ namespace RuleRangerTests
         }
 
         return false;
+    }
+
+    template <typename TObject, typename TValue>
+    bool SetPropertyValue(FAutomationTestBase& Test, TObject* Object, const TCHAR* PropertyName, const TValue& Value)
+    {
+        return SetPropertyValue(Test, Object, PropertyName, Value, 0);
+    }
+
+    template <typename TObject>
+    bool SetBoolPropertyValue(FAutomationTestBase& Test,
+                              TObject* Object,
+                              const TCHAR* PropertyName,
+                              const bool Value,
+                              const int32 ArrayIndex = 0)
+    {
+        const auto Property = FindFProperty<FBoolProperty>(Object->GetClass(), PropertyName);
+        if (Test.TestNotNull(FString::Printf(TEXT("Bool property %s should exist"), PropertyName), Property))
+        {
+            Property->SetPropertyValue_InContainer(Object, Value, ArrayIndex);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     inline FDataValidationContext CreateValidationContext()
@@ -135,6 +167,70 @@ namespace RuleRangerTests
             return bResultMatches;
         }
     }
+
+    template <typename TObject>
+    TObject* GetClassDefaultObject()
+    {
+        return TObject::StaticClass()->GetDefaultObject<TObject>();
+    }
+
+    inline UPackage* NewTransientPackage(const TCHAR* const PackageName)
+    {
+        const auto Package = CreatePackage(PackageName);
+        if (Package)
+        {
+            Package->SetFlags(RF_Transient);
+        }
+
+        return Package;
+    }
+
+    template <typename TObject>
+    TObject* NewPackagedObject(const TCHAR* const PackageName, const TCHAR* const ObjectName)
+    {
+        const auto Package = NewTransientPackage(PackageName);
+        return Package ? NewTransientObject<TObject>(Package, FName(ObjectName)) : nullptr;
+    }
+
+    inline bool SetImportFilename(FAutomationTestBase& Test,
+                                  URuleRangerAutomationImportDataObject* Object,
+                                  const TCHAR* const Filename)
+    {
+        const auto ImportData = NewTransientObject<UAssetImportData>(Object, TEXT("AssetImportData"));
+        if (Test.TestNotNull(TEXT("AssetImportData should be created"), ImportData))
+        {
+            ImportData->UpdateFilenameOnly(FString(Filename));
+            return SetPropertyValue(Test, Object, TEXT("AssetImportData"), ImportData);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    struct FScopedDataSourceFolderOverride
+    {
+        UEditorPerProjectUserSettings* Settings{ nullptr };
+        FString OriginalPath;
+
+        explicit FScopedDataSourceFolderOverride(const TCHAR* const NewPath)
+            : Settings(GetMutableDefault<UEditorPerProjectUserSettings>())
+        {
+            if (Settings)
+            {
+                OriginalPath = Settings->DataSourceFolder.Path;
+                Settings->DataSourceFolder.Path = NewPath;
+            }
+        }
+
+        ~FScopedDataSourceFolderOverride()
+        {
+            if (Settings)
+            {
+                Settings->DataSourceFolder.Path = OriginalPath;
+            }
+        }
+    };
 
     struct FPreSaveContextHolder
     {

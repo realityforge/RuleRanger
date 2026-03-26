@@ -26,13 +26,13 @@ bool UEditorPropertyPresentMatcher::TestEditorProperty(UObject* Object, UObject*
         }
         else if (1 == ObjectProperty->ArrayDim)
         {
-            return nullptr != ObjectProperty->LoadObjectPropertyValue_InContainer(Object);
+            return nullptr != ObjectProperty->LoadObjectPropertyValue_InContainer(Instance);
         }
         else
         {
             for (int32 i = 0; i < ObjectProperty->ArrayDim; i++)
             {
-                if (!ObjectProperty->LoadObjectPropertyValue_InContainer(Object))
+                if (!ObjectProperty->LoadObjectPropertyValue_InContainer(Instance, i))
                 {
                     return false;
                 }

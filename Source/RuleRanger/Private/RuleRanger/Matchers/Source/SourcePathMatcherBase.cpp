@@ -24,15 +24,17 @@ bool USourcePathMatcherBase::Test(UObject* Object) const
         const FName AssetImportDataPropName = FName("AssetImportData");
         if (const auto ObjectProp = PropertyAccessUtil::FindPropertyByName(AssetImportDataPropName, Object->GetClass()))
         {
-            const FProperty* Prop{ nullptr };
             void* Value{ nullptr };
             const auto Result =
-                PropertyAccessUtil::GetPropertyValue_Object(ObjectProp, Object, Prop, Value, INDEX_NONE);
+                PropertyAccessUtil::GetPropertyValue_Object(ObjectProp, Object, ObjectProp, &Value, INDEX_NONE);
             if (EPropertyAccessResultFlags::Success == Result)
             {
                 // Should we be matching all filenames?
                 const auto AssetImportData = static_cast<const UAssetImportData*>(Value);
-                return Match(Object, AssetImportData->GetFirstFilename(), bCaseSensitive);
+                if (AssetImportData)
+                {
+                    return Match(Object, AssetImportData->GetFirstFilename(), bCaseSensitive);
+                }
             }
         }
     }

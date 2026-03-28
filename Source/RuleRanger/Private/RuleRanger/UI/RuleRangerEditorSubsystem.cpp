@@ -37,6 +37,9 @@
 #include "Subsystems/ImportSubsystem.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerEditorSubsystem)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerTextureConvention)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(TextureResolutionConstraint)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerDeveloperSettings)
 
 const static FString ImportMarkerValue = FString(TEXT("True"));
 

@@ -18,6 +18,8 @@
 #include "RuleRangerProjectRule.h"
 #include "RuleRangerRuleSet.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerDefaultProjectResultHandler)
+
 void URuleRangerDefaultProjectResultHandler::OnProjectRuleApplied(URuleRangerProjectActionContext* Context)
 {
     auto Log = FMessageLog(FRuleRangerMessageLog::GetMessageLogName());

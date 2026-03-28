@@ -17,12 +17,15 @@
 
     #include "Editor/EditorPerProjectUserSettings.h"
     #include "EditorFramework/AssetImportData.h"
+    #include "Engine/Texture2D.h"
+    #include "Materials/Material.h"
     #include "Misc/AutomationTest.h"
     #include "Misc/DataValidation.h"
     #include "RuleRangerActionContext.h"
     #include "RuleRangerConfig.h"
     #include "RuleRangerRule.h"
     #include "RuleRangerRuleSet.h"
+    #include "Sound/SoundWave.h"
     #include "Tests/RuleRanger/RuleRangerAutomationTestTypes.h"
     #include "UObject/ObjectSaveContext.h"
     #include "UObject/Package.h"
@@ -171,7 +174,7 @@ namespace RuleRangerTests
     template <typename TObject>
     TObject* GetClassDefaultObject()
     {
-        return TObject::StaticClass()->GetDefaultObject<TObject>();
+        return TObject::StaticClass()->template GetDefaultObject<TObject>();
     }
 
     inline UPackage* NewTransientPackage(const TCHAR* const PackageName)
@@ -185,11 +188,89 @@ namespace RuleRangerTests
         return Package;
     }
 
+    inline UPackage* NewTestPackage(const TCHAR* const PackageName)
+    {
+        return CreatePackage(PackageName);
+    }
+
     template <typename TObject>
     TObject* NewPackagedObject(const TCHAR* const PackageName, const TCHAR* const ObjectName)
     {
         const auto Package = NewTransientPackage(PackageName);
         return Package ? NewTransientObject<TObject>(Package, FName(ObjectName)) : nullptr;
+    }
+
+    inline bool ClearPackageDirtyFlag(UObject* const Object)
+    {
+        if (const auto Package = Object ? Object->GetPackage() : nullptr)
+        {
+            Package->ClearDirtyFlag();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    inline bool TestPackageDirtyFlag(FAutomationTestBase& Test,
+                                     UObject* const Object,
+                                     const bool bExpectedDirty,
+                                     const TCHAR* const Description)
+    {
+        const auto Package = Object ? Object->GetPackage() : nullptr;
+        return Test.TestNotNull(TEXT("Object package should exist"), Package)
+            && Test.TestEqual(Description, Package->IsDirty(), bExpectedDirty);
+    }
+
+    inline UTexture2D* NewTransientTexture2D(const int32 SizeX,
+                                             const int32 SizeY,
+                                             const TCHAR* const ObjectName = TEXT("RuleRangerTexture"))
+    {
+        return UTexture2D::CreateTransient(SizeX, SizeY, PF_B8G8R8A8, FName(ObjectName));
+    }
+
+    inline UTexture2D* NewPackagedTexture2D(const TCHAR* const PackageName,
+                                            const TCHAR* const ObjectName,
+                                            const int32 SizeX,
+                                            const int32 SizeY)
+    {
+        const auto Package = NewTestPackage(PackageName);
+        const auto Texture = NewTransientTexture2D(SizeX, SizeY, ObjectName);
+        if (Texture && Package)
+        {
+            Texture->Rename(ObjectName, Package, REN_DontCreateRedirectors);
+            ClearPackageDirtyFlag(Texture);
+        }
+        return Texture;
+    }
+
+    inline UMaterial* NewPackagedMaterial(const TCHAR* const PackageName, const TCHAR* const ObjectName)
+    {
+        const auto Package = NewTestPackage(PackageName);
+        const auto Material = Package ? NewTransientObject<UMaterial>(Package, FName(ObjectName)) : nullptr;
+        if (Material)
+        {
+            ClearPackageDirtyFlag(Material);
+        }
+        return Material;
+    }
+
+    inline USoundWave* NewPackagedSoundWave(const TCHAR* const PackageName, const TCHAR* const ObjectName)
+    {
+        const auto Package = NewTestPackage(PackageName);
+        const auto SoundWave = Package ? NewTransientObject<USoundWave>(Package, FName(ObjectName)) : nullptr;
+        if (SoundWave)
+        {
+            ClearPackageDirtyFlag(SoundWave);
+        }
+        return SoundWave;
+    }
+
+    inline void SetSoundWaveSampleRate(USoundWave* const SoundWave, const int32 SampleRate)
+    {
+        SoundWave->SetSampleRate(static_cast<uint32>(SampleRate), true);
+        SoundWave->SetImportedSampleRate(static_cast<uint32>(SampleRate));
     }
 
     inline bool SetImportFilename(FAutomationTestBase& Test,
@@ -280,6 +361,18 @@ namespace RuleRangerTests
         {
             return false;
         }
+    }
+
+    inline void ResetRuleFixtureObject(FRuleFixture& Fixture,
+                                       UObject* const Object,
+                                       const ERuleRangerActionTrigger Trigger = ERuleRangerActionTrigger::AT_Report)
+    {
+        FRuleRangerActionContextTestAccessor::ResetContext(Fixture.ActionContext,
+                                                           Fixture.Config,
+                                                           Fixture.RuleSet,
+                                                           Fixture.Rule,
+                                                           Object,
+                                                           Trigger);
     }
 } // namespace RuleRangerTests
 

@@ -27,9 +27,15 @@ class UEnsureSoundWaveSampleRateValidAction final : public URuleRangerAction
 {
     GENERATED_BODY()
 
+#if WITH_DEV_AUTOMATION_TESTS
+    friend class FEnsureSoundWaveSampleRateValidActionTestAccessor;
+#endif
+
     /** The set of valid sample rates. */
     UPROPERTY(EditDefaultsOnly)
     TArray<int32> ValidSampleRates;
+
+    void ApplySampleRate(URuleRangerActionContext* ActionContext, float SampleRate) const;
 
 public:
     UEnsureSoundWaveSampleRateValidAction();

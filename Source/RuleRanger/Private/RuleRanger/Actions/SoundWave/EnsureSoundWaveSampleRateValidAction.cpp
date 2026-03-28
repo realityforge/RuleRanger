@@ -20,12 +20,9 @@ UEnsureSoundWaveSampleRateValidAction::UEnsureSoundWaveSampleRateValidAction()
     ValidSampleRates.Add(48000);
 }
 
-void UEnsureSoundWaveSampleRateValidAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
+void UEnsureSoundWaveSampleRateValidAction::ApplySampleRate(URuleRangerActionContext* ActionContext,
+                                                            const float SampleRate) const
 {
-    const auto SoundWave = CastChecked<USoundWave>(Object);
-
-    // ReSharper disable once CppTooWideScopeInitStatement
-    const auto SampleRate = SoundWave->GetSampleRateForCurrentPlatform();
     // Allow small float deviations around expected integer sample rates
     auto bIsValidRate{ false };
     for (const auto ValidRate : ValidSampleRates)
@@ -53,6 +50,12 @@ void UEnsureSoundWaveSampleRateValidAction::Apply(URuleRangerActionContext* Acti
                                                    *ValidValues);
         ActionContext->Error(FText::FromString(ErrorMessage));
     }
+}
+
+void UEnsureSoundWaveSampleRateValidAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
+{
+    const auto SoundWave = CastChecked<USoundWave>(Object);
+    ApplySampleRate(ActionContext, SoundWave->GetSampleRateForCurrentPlatform());
 }
 
 UClass* UEnsureSoundWaveSampleRateValidAction::GetExpectedType() const

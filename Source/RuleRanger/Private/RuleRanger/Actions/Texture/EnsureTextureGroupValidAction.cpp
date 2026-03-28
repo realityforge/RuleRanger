@@ -26,7 +26,7 @@ void UEnsureTextureGroupValidAction::Apply(URuleRangerActionContext* ActionConte
         if (bApplyFix && TextureGroups.Num() > 0)
         {
             FFormatNamedArguments Arguments;
-            Arguments.Add(TEXT("OriginalGroup"), Enum->GetDisplayNameTextByValue(Texture->CompressionSettings));
+            Arguments.Add(TEXT("OriginalGroup"), Enum->GetDisplayNameTextByValue(Texture->LODGroup));
             Arguments.Add(TEXT("NewGroup"), Enum->GetDisplayNameTextByValue(TextureGroups[0]));
             if (ActionContext->IsDryRun())
             {

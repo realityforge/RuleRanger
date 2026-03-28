@@ -176,10 +176,7 @@ bool FRuleRangerEditorPropertyMatcherMatchesLegacyNumericEnumsTest::RunTest(cons
     if (TestNotNull(TEXT("EditorProperty matcher should be created"), Matcher)
         && TestNotNull(TEXT("Editor-property object should be created"), Object))
     {
-        if (RuleRangerTests::SetPropertyValue(*this,
-                                              Object,
-                                              TEXT("EditorLegacyEnum"),
-                                              TEnumAsByte<ERuleRangerAutomationLegacyEnum>(LegacyEnabled))
+        if (RuleRangerTests::SetPropertyValue(*this, Object, TEXT("EditorLegacyEnum"), TEnumAsByte(LegacyEnabled))
             && RuleRangerEditorPropertyMatcherTests::SetName(*this, Matcher, TEXT("EditorLegacyEnum"))
             && RuleRangerEditorPropertyMatcherTests::SetValue(*this, Matcher, TEXT("Legacy Enabled")))
         {

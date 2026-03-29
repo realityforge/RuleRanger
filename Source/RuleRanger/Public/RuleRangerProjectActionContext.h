@@ -40,6 +40,11 @@ UCLASS(MinimalAPI, Transient)
 class URuleRangerProjectActionContext final : public URuleRangerCommonContext
 {
     GENERATED_BODY()
+
+#if WITH_DEV_AUTOMATION_TESTS
+    friend class FRuleRangerProjectActionContextTestAccessor;
+#endif
+
     friend class URuleRangerEditorSubsystem;
     friend class URuleRangerEditorValidator;
     friend class URuleRangerCommandlet;

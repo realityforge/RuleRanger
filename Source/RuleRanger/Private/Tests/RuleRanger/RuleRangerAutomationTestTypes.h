@@ -13,11 +13,16 @@
  */
 #pragma once
 
+#include "EdGraph/EdGraphNode.h"
+#include "EdGraphSchema_K2.h"
 #include "EditorFramework/AssetImportData.h"
 #include "Misc/DataValidation.h"
+#include "RuleRanger/Actions/Texture/Texture2DActionBase.h"
+#include "RuleRanger/Matchers/Common/EditorPropertyMatcherBase.h"
 #include "RuleRangerAction.h"
 #include "RuleRangerCommonContext.h"
 #include "RuleRangerMatcher.h"
+#include "RuleRangerProjectAction.h"
 #include "RuleRangerAutomationTestTypes.generated.h"
 
 UENUM()
@@ -55,9 +60,77 @@ class URuleRangerAutomationTestObject : public UObject
 };
 
 UCLASS(NotBlueprintable)
+class URuleRangerAutomationObjectBaseProbe final : public URuleRangerObjectBase
+{
+    GENERATED_BODY()
+
+public:
+    void EmitInfo(const FString& Message) const { LogInfo(Message); }
+
+    void EmitInfoForObject(const UObject* Object, const FString& Message) const { LogInfo(Object, Message); }
+
+    void EmitError(const FString& Message) const { LogError(Message); }
+
+    void EmitErrorForObject(const UObject* Object, const FString& Message) const { LogError(Object, Message); }
+};
+
+UCLASS(NotBlueprintable)
 class URuleRangerAutomationDerivedTestObject final : public URuleRangerAutomationTestObject
 {
     GENERATED_BODY()
+};
+
+UCLASS(Abstract, NotBlueprintable)
+class URuleRangerAutomationAbstractTestObject : public UObject
+{
+    GENERATED_BODY()
+};
+
+UCLASS(Blueprintable)
+class URuleRangerAutomationBlueprintParentObject : public UObject
+{
+    GENERATED_BODY()
+};
+
+UCLASS(Blueprintable, meta = (RuleRangerDataOnly))
+class URuleRangerAutomationMetaDataOnlyBlueprintParentObject : public UObject
+{
+    GENERATED_BODY()
+};
+
+UCLASS()
+class URuleRangerAutomationExecGraphNode final : public UEdGraphNode
+{
+    GENERATED_BODY()
+
+public:
+    virtual void AllocateDefaultPins() override
+    {
+        CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Execute);
+        CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Then);
+    }
+
+    virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override
+    {
+        return FText::FromString(TEXT("Automation Exec Node"));
+    }
+};
+
+UCLASS()
+class URuleRangerAutomationPureGraphNode final : public UEdGraphNode
+{
+    GENERATED_BODY()
+
+public:
+    virtual void AllocateDefaultPins() override
+    {
+        CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Boolean, TEXT("Value"));
+    }
+
+    virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override
+    {
+        return FText::FromString(TEXT("Automation Pure Node"));
+    }
 };
 
 UCLASS(NotBlueprintable)
@@ -166,6 +239,134 @@ private:
     int32 ApplyCount{ 0 };
 };
 
+UCLASS(NotBlueprintable, DisplayName = "Automation Texture2D Action")
+class URuleRangerAutomationTexture2DAction final : public UTexture2DActionBase
+{
+    GENERATED_BODY()
+
+public:
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override {}
+};
+
+UCLASS(NotBlueprintable, DisplayName = "Automation Action Fallback")
+class URuleRangerAutomationActionFallback final : public URuleRangerAction
+{
+    GENERATED_BODY()
+
+public:
+    virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override
+    {
+        Super::Apply(ActionContext, Object);
+    }
+};
+
+UCLASS(NotBlueprintable, DisplayName = "Automation Test Project Action")
+class URuleRangerAutomationTestProjectAction final : public URuleRangerProjectAction
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere)
+    ERuleRangerAutomationTestActionOutcome Outcome{ ERuleRangerAutomationTestActionOutcome::None };
+
+    UPROPERTY(EditAnywhere)
+    FString Message{ TEXT("Automation test project action message") };
+
+    void ResetApplyCount() { ApplyCount = 0; }
+
+    int32 GetApplyCount() const { return ApplyCount; }
+
+    virtual void Apply(URuleRangerProjectActionContext* ActionContext) override
+    {
+        ApplyCount++;
+
+        switch (Outcome)
+        {
+            case ERuleRangerAutomationTestActionOutcome::Info:
+                ActionContext->Info(FText::FromString(Message));
+                break;
+            case ERuleRangerAutomationTestActionOutcome::Warning:
+                ActionContext->Warning(FText::FromString(Message));
+                break;
+            case ERuleRangerAutomationTestActionOutcome::Error:
+                ActionContext->Error(FText::FromString(Message));
+                break;
+            case ERuleRangerAutomationTestActionOutcome::Fatal:
+                ActionContext->Fatal(FText::FromString(Message));
+                break;
+            case ERuleRangerAutomationTestActionOutcome::None:
+            default:
+                break;
+        }
+    }
+
+private:
+    int32 ApplyCount{ 0 };
+};
+
+UCLASS(NotBlueprintable, DisplayName = "Automation Project Action Fallback")
+class URuleRangerAutomationProjectActionFallback final : public URuleRangerProjectAction
+{
+    GENERATED_BODY()
+
+public:
+    virtual void Apply(URuleRangerProjectActionContext* ActionContext) override { Super::Apply(ActionContext); }
+};
+
+UCLASS(NotBlueprintable, DisplayName = "Automation Editor Property Probe Matcher")
+class URuleRangerAutomationEditorPropertyProbeMatcher final : public UEditorPropertyMatcherBase
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere)
+    bool bResult{ true };
+
+    void ResetObservations() const
+    {
+        TestEditorPropertyCallCount = 0;
+        LastMatchedObject = nullptr;
+        LastMatchedInstance = nullptr;
+        LastMatchedPropertyName = NAME_None;
+    }
+
+    int32 GetTestEditorPropertyCallCount() const { return TestEditorPropertyCallCount; }
+
+    const UObject* GetLastMatchedObject() const { return LastMatchedObject; }
+
+    const UObject* GetLastMatchedInstance() const { return LastMatchedInstance; }
+
+    FName GetLastMatchedPropertyName() const { return LastMatchedPropertyName; }
+
+protected:
+    virtual bool TestEditorProperty(UObject* Object, UObject* Instance, FProperty* Property) const override
+    {
+        ++TestEditorPropertyCallCount;
+        LastMatchedObject = Object;
+        LastMatchedInstance = Instance;
+        LastMatchedPropertyName = Property ? Property->GetFName() : NAME_None;
+        return bResult;
+    }
+
+private:
+    mutable int32 TestEditorPropertyCallCount{ 0 };
+    mutable UObject* LastMatchedObject{ nullptr };
+    mutable UObject* LastMatchedInstance{ nullptr };
+    mutable FName LastMatchedPropertyName{ NAME_None };
+};
+
+UCLASS(NotBlueprintable, DisplayName = "Automation Editor Property Fallback Matcher")
+class URuleRangerAutomationEditorPropertyFallbackMatcher final : public UEditorPropertyMatcherBase
+{
+    GENERATED_BODY()
+
+protected:
+    virtual bool TestEditorProperty(UObject* Object, UObject* Instance, FProperty* Property) const override
+    {
+        return Super::TestEditorProperty(Object, Instance, Property);
+    }
+};
+
 UCLASS(NotBlueprintable, DisplayName = "Automation Test Matcher")
 class URuleRangerAutomationTestMatcher final : public URuleRangerMatcher
 {
@@ -187,6 +388,15 @@ public:
 
 private:
     mutable int32 CallCount{ 0 };
+};
+
+UCLASS(NotBlueprintable, DisplayName = "Automation Matcher Fallback")
+class URuleRangerAutomationMatcherFallback final : public URuleRangerMatcher
+{
+    GENERATED_BODY()
+
+public:
+    virtual bool Test(UObject* Object) const override { return Super::Test(Object); }
 };
 
 UCLASS(NotBlueprintable)

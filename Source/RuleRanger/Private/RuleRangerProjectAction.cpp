@@ -18,7 +18,13 @@
 
 void URuleRangerProjectAction::Apply(URuleRangerProjectActionContext* ActionContext)
 {
-    checkf(false,
-           TEXT("Project action either failed to override Apply method or calls Super. "
-                "Neither scenario is supported."));
+    const FString UnsupportedApplyMessage =
+        TEXT("Project action either failed to override Apply method or calls Super. Neither scenario is supported.");
+
+    LogError(UnsupportedApplyMessage);
+
+    if (ActionContext)
+    {
+        ActionContext->Fatal(FText::FromString(UnsupportedApplyMessage));
+    }
 }

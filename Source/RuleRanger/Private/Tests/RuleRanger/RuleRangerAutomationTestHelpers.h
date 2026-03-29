@@ -15,18 +15,36 @@
 
 #if WITH_DEV_AUTOMATION_TESTS && WITH_EDITOR
 
+    #include "AssetRegistry/AssetRegistryModule.h"
+    #include "EdGraph/EdGraph.h"
+    #include "EdGraphSchema_K2.h"
+    #include "Editor.h"
     #include "Editor/EditorPerProjectUserSettings.h"
     #include "EditorFramework/AssetImportData.h"
+    #include "Engine/BlueprintGeneratedClass.h"
+    #include "Engine/DataTable.h"
     #include "Engine/Texture2D.h"
+    #include "HAL/FileManager.h"
+    #include "K2Node_Event.h"
+    #include "K2Node_FunctionEntry.h"
+    #include "K2Node_FunctionResult.h"
+    #include "Kismet2/BlueprintEditorUtils.h"
+    #include "Kismet2/KismetEditorUtilities.h"
     #include "Materials/Material.h"
     #include "Misc/AutomationTest.h"
     #include "Misc/DataValidation.h"
+    #include "Misc/Paths.h"
+    #include "RuleRanger/Actions/Blueprint/EnsureDataOnlyBlueprintAction.h"
     #include "RuleRangerActionContext.h"
     #include "RuleRangerConfig.h"
+    #include "RuleRangerProjectActionContext.h"
+    #include "RuleRangerProjectRule.h"
     #include "RuleRangerRule.h"
     #include "RuleRangerRuleSet.h"
     #include "Sound/SoundWave.h"
+    #include "Subsystems/EditorAssetSubsystem.h"
     #include "Tests/RuleRanger/RuleRangerAutomationTestTypes.h"
+    #include "UObject/MetaData.h"
     #include "UObject/ObjectSaveContext.h"
     #include "UObject/Package.h"
     #include "UObject/UnrealType.h"
@@ -45,6 +63,21 @@ public:
     }
 
     static void ClearContext(URuleRangerActionContext* const Context) { Context->ClearContext(); }
+};
+
+class FRuleRangerProjectActionContextTestAccessor
+{
+public:
+    static void ResetContext(URuleRangerProjectActionContext* const Context,
+                             URuleRangerConfig* const Config,
+                             URuleRangerRuleSet* const RuleSet,
+                             URuleRangerProjectRule* const Rule,
+                             const ERuleRangerProjectActionTrigger Trigger)
+    {
+        Context->ResetContext(Config, RuleSet, Rule, Trigger);
+    }
+
+    static void ClearContext(URuleRangerProjectActionContext* const Context) { Context->ClearContext(); }
 };
 
 namespace RuleRangerTests
@@ -177,8 +210,68 @@ namespace RuleRangerTests
         return TObject::StaticClass()->template GetDefaultObject<TObject>();
     }
 
+    inline FString GetRuleRangerTestContentRoot()
+    {
+        return FPaths::Combine(FPaths::ProjectContentDir(), TEXT("Developers/RuleRangerTests"));
+    }
+
+    inline TArray<FString>& GetCreatedPackageDirectories()
+    {
+        static TArray<FString> Directories;
+        return Directories;
+    }
+
+    inline void CleanupCreatedPackageDirectories()
+    {
+        auto& Directories = GetCreatedPackageDirectories();
+        Directories.Sort([](const FString& Left, const FString& Right) { return Left.Len() > Right.Len(); });
+
+        for (const auto& Directory : Directories)
+        {
+            if (Directory.StartsWith(GetRuleRangerTestContentRoot()))
+            {
+                IFileManager::Get().DeleteDirectory(*Directory, false, true);
+            }
+        }
+
+        IFileManager::Get().DeleteDirectory(*GetRuleRangerTestContentRoot(), false, true);
+        Directories.Reset();
+    }
+
+    struct FCreatedPackageDirectoryCleanupSentinel
+    {
+        ~FCreatedPackageDirectoryCleanupSentinel() { CleanupCreatedPackageDirectories(); }
+    };
+
+    inline FCreatedPackageDirectoryCleanupSentinel& GetPackageDirectoryCleanupSentinel()
+    {
+        static FCreatedPackageDirectoryCleanupSentinel Sentinel;
+        return Sentinel;
+    }
+
+    inline void EnsurePackageDirectoryExists(const TCHAR* const PackageName)
+    {
+        if (nullptr != PackageName)
+        {
+            const FString PackageNameString(PackageName);
+            constexpr TCHAR GameRoot[] = TEXT("/Game/");
+            if (PackageNameString.StartsWith(GameRoot))
+            {
+                const auto RelativePath = PackageNameString.RightChop(UE_ARRAY_COUNT(GameRoot) - 1);
+                const auto DirectoryPath = FPaths::GetPath(FPaths::Combine(FPaths::ProjectContentDir(), RelativePath));
+                if (!DirectoryPath.IsEmpty())
+                {
+                    IFileManager::Get().MakeDirectory(*DirectoryPath, true);
+                    GetCreatedPackageDirectories().AddUnique(DirectoryPath);
+                    static_cast<void>(GetPackageDirectoryCleanupSentinel());
+                }
+            }
+        }
+    }
+
     inline UPackage* NewTransientPackage(const TCHAR* const PackageName)
     {
+        EnsurePackageDirectoryExists(PackageName);
         const auto Package = CreatePackage(PackageName);
         if (Package)
         {
@@ -190,14 +283,16 @@ namespace RuleRangerTests
 
     inline UPackage* NewTestPackage(const TCHAR* const PackageName)
     {
+        EnsurePackageDirectoryExists(PackageName);
         return CreatePackage(PackageName);
     }
 
-    template <typename TObject>
-    TObject* NewPackagedObject(const TCHAR* const PackageName, const TCHAR* const ObjectName)
+    inline void RegisterAsset(UObject* const Object)
     {
-        const auto Package = NewTransientPackage(PackageName);
-        return Package ? NewTransientObject<TObject>(Package, FName(ObjectName)) : nullptr;
+        if (Object)
+        {
+            FAssetRegistryModule::AssetCreated(Object);
+        }
     }
 
     inline bool ClearPackageDirtyFlag(UObject* const Object)
@@ -211,6 +306,27 @@ namespace RuleRangerTests
         {
             return false;
         }
+    }
+
+    template <typename TObject>
+    TObject* NewPackagedObject(const TCHAR* const PackageName, const TCHAR* const ObjectName)
+    {
+        const auto Package = NewTransientPackage(PackageName);
+        return Package ? NewTransientObject<TObject>(Package, FName(ObjectName)) : nullptr;
+    }
+
+    template <typename TObject>
+    TObject* NewRegisteredPackagedAsset(const TCHAR* const PackageName, const TCHAR* const ObjectName)
+    {
+        const auto Package = NewTestPackage(PackageName);
+        const auto Object =
+            Package ? NewObject<TObject>(Package, FName(ObjectName), RF_Public | RF_Standalone) : nullptr;
+        if (Object)
+        {
+            RegisterAsset(Object);
+            ClearPackageDirtyFlag(Object);
+        }
+        return Object;
     }
 
     inline bool TestPackageDirtyFlag(FAutomationTestBase& Test,
@@ -247,19 +363,12 @@ namespace RuleRangerTests
 
     inline UMaterial* NewPackagedMaterial(const TCHAR* const PackageName, const TCHAR* const ObjectName)
     {
-        const auto Package = NewTestPackage(PackageName);
-        const auto Material = Package ? NewTransientObject<UMaterial>(Package, FName(ObjectName)) : nullptr;
-        if (Material)
-        {
-            ClearPackageDirtyFlag(Material);
-        }
-        return Material;
+        return NewRegisteredPackagedAsset<UMaterial>(PackageName, ObjectName);
     }
 
     inline USoundWave* NewPackagedSoundWave(const TCHAR* const PackageName, const TCHAR* const ObjectName)
     {
-        const auto Package = NewTestPackage(PackageName);
-        const auto SoundWave = Package ? NewTransientObject<USoundWave>(Package, FName(ObjectName)) : nullptr;
+        const auto SoundWave = NewRegisteredPackagedAsset<USoundWave>(PackageName, ObjectName);
         if (SoundWave)
         {
             ClearPackageDirtyFlag(SoundWave);
@@ -287,6 +396,330 @@ namespace RuleRangerTests
         {
             return false;
         }
+    }
+
+    inline UBlueprint* NewBlueprint(UClass* const ParentClass,
+                                    const TCHAR* const PackageName,
+                                    const TCHAR* const ObjectName,
+                                    const EBlueprintType BlueprintType = BPTYPE_Normal)
+    {
+        const auto Package = NewTestPackage(PackageName);
+        return Package ? FKismetEditorUtilities::CreateBlueprint(ParentClass,
+                                                                 Package,
+                                                                 FName(ObjectName),
+                                                                 BlueprintType,
+                                                                 UBlueprint::StaticClass(),
+                                                                 UBlueprintGeneratedClass::StaticClass(),
+                                                                 NAME_None)
+                       : nullptr;
+    }
+
+    inline void CompileBlueprint(UBlueprint* const Blueprint)
+    {
+        FKismetEditorUtilities::CompileBlueprint(Blueprint, EBlueprintCompileOptions::SkipGarbageCollection);
+    }
+
+    inline void MarkBlueprintModified(UBlueprint* const Blueprint)
+    {
+        FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(Blueprint);
+    }
+
+    inline UEdGraph* FindEventGraph(UBlueprint* const Blueprint)
+    {
+        return FBlueprintEditorUtils::FindEventGraph(Blueprint);
+    }
+
+    inline UEdGraph* CreateFunctionGraph(UBlueprint* const Blueprint, const FName FunctionName)
+    {
+        const auto Graph = FBlueprintEditorUtils::CreateNewGraph(Blueprint,
+                                                                 FunctionName,
+                                                                 UEdGraph::StaticClass(),
+                                                                 UEdGraphSchema_K2::StaticClass());
+        FBlueprintEditorUtils::AddFunctionGraph<UClass>(Blueprint, Graph, true, nullptr);
+        return Graph;
+    }
+
+    template <typename TNode>
+    TNode* AddGraphNode(UEdGraph* const Graph, const FName Name = NAME_None)
+    {
+        const auto Node = NewObject<TNode>(Graph, Name);
+        Graph->AddNode(Node);
+        Node->CreateNewGuid();
+        Node->PostPlacedNewNode();
+        Node->AllocateDefaultPins();
+        return Node;
+    }
+
+    inline UK2Node_FunctionEntry* GetFunctionEntry(UEdGraph* const Graph)
+    {
+        TArray<UK2Node_FunctionEntry*> EntryNodes;
+        Graph->GetNodesOfClass(EntryNodes);
+        return EntryNodes.Num() > 0 ? EntryNodes[0] : nullptr;
+    }
+
+    inline UK2Node_FunctionResult* AddFunctionResultNode(UEdGraph* const Graph, const FName Name = NAME_None)
+    {
+        return AddGraphNode<UK2Node_FunctionResult>(Graph, Name);
+    }
+
+    inline UK2Node_Event* AddEventNode(UEdGraph* const Graph,
+                                       const FName EventName,
+                                       UClass* const OwnerClass = AActor::StaticClass(),
+                                       const bool bMakeGhost = false)
+    {
+        const auto EventNode = AddGraphNode<UK2Node_Event>(Graph, EventName);
+        EventNode->EventReference.SetExternalMember(EventName, OwnerClass);
+        if (bMakeGhost)
+        {
+            EventNode->MakeAutomaticallyPlacedGhostNode();
+        }
+        return EventNode;
+    }
+
+    inline void LinkPins(UEdGraphPin* const SourcePin, UEdGraphPin* const TargetPin)
+    {
+        if (SourcePin && TargetPin)
+        {
+            SourcePin->MakeLinkTo(TargetPin);
+        }
+    }
+
+    inline bool AddBlueprintVariable(UBlueprint* const Blueprint,
+                                     const FName VariableName,
+                                     const FName PinCategory,
+                                     const FText Category = FText::FromString(TEXT("Default")),
+                                     const TCHAR* const Tooltip = nullptr,
+                                     const uint64 PropertyFlags = CPF_Edit)
+    {
+        FEdGraphPinType PinType;
+        PinType.PinCategory = PinCategory;
+        if (!FBlueprintEditorUtils::AddMemberVariable(Blueprint, VariableName, PinType))
+        {
+            return false;
+        }
+
+        for (auto& Variable : Blueprint->NewVariables)
+        {
+            if (Variable.VarName == VariableName)
+            {
+                Variable.Category = Category;
+                Variable.PropertyFlags = PropertyFlags;
+                if (Tooltip)
+                {
+                    Variable.SetMetaData(FBlueprintMetadata::MD_Tooltip, Tooltip);
+                }
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    inline bool SetBlueprintVariableMetaData(UBlueprint* const Blueprint,
+                                             const FName VariableName,
+                                             const FName Key,
+                                             const TCHAR* const Value)
+    {
+        FBlueprintEditorUtils::SetBlueprintVariableMetaData(Blueprint, VariableName, nullptr, Key, FString(Value));
+        return true;
+    }
+
+    inline bool AddLocalVariable(UK2Node_FunctionEntry* const FunctionEntry,
+                                 const FName VariableName,
+                                 const FName PinCategory,
+                                 const FText Category = FText::FromString(TEXT("Default")),
+                                 const TCHAR* const Tooltip = nullptr,
+                                 const uint64 PropertyFlags = CPF_Edit)
+    {
+        if (!FunctionEntry)
+        {
+            return false;
+        }
+
+        FBPVariableDescription Variable;
+        Variable.VarName = VariableName;
+        Variable.VarGuid = FGuid::NewGuid();
+        Variable.VarType.PinCategory = PinCategory;
+        Variable.FriendlyName = VariableName.ToString();
+        Variable.Category = Category;
+        Variable.PropertyFlags = PropertyFlags;
+        if (Tooltip)
+        {
+            Variable.SetMetaData(FBlueprintMetadata::MD_Tooltip, Tooltip);
+        }
+        FunctionEntry->LocalVariables.Add(Variable);
+        return true;
+    }
+
+    inline bool SetFunctionCategory(UK2Node_FunctionEntry* const FunctionEntry, const TCHAR* const Category)
+    {
+        if (!FunctionEntry)
+        {
+            return false;
+        }
+
+        FunctionEntry->MetaData.Category = FText::FromString(Category);
+        return true;
+    }
+
+    inline bool SetFunctionTooltip(UK2Node_FunctionEntry* const FunctionEntry, const TCHAR* const Tooltip)
+    {
+        if (!FunctionEntry)
+        {
+            return false;
+        }
+
+        FunctionEntry->MetaData.ToolTip = FText::FromString(Tooltip);
+        return true;
+    }
+
+    inline bool SetFunctionFlags(UK2Node_FunctionEntry* const FunctionEntry, const int32 Flags)
+    {
+        if (!FunctionEntry)
+        {
+            return false;
+        }
+
+        FunctionEntry->SetExtraFlags(Flags);
+        return true;
+    }
+
+    inline UDataTable*
+    NewDataTable(const TCHAR* const PackageName, const TCHAR* const ObjectName, UScriptStruct* RowStruct)
+    {
+        const auto DataTable = NewRegisteredPackagedAsset<UDataTable>(PackageName, ObjectName);
+        if (DataTable)
+        {
+            DataTable->RowStruct = RowStruct;
+        }
+        return DataTable;
+    }
+
+    template <typename TRow>
+    bool AddDataTableRow(UDataTable* const DataTable, const FName RowName, const TRow& Row)
+    {
+        if (!DataTable)
+        {
+            return false;
+        }
+
+        DataTable->AddRow(RowName, Row);
+        return true;
+    }
+
+    inline bool SetPackageMetaData(UObject* const Object, const FName Key, const TCHAR* const Value)
+    {
+        if (!Object || Key.IsNone() || Value == nullptr)
+        {
+            return false;
+        }
+
+        if (const auto Package = Object->GetPackage())
+        {
+            Package->GetMetaData().SetValue(Object, Key, Value);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    inline bool SetAssetMetaData(UObject* const Object, const FName Key, const TCHAR* const Value)
+    {
+        if (!Object || Key.IsNone() || Value == nullptr || GEditor == nullptr)
+        {
+            return false;
+        }
+
+        if (auto* Subsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>())
+        {
+            Subsystem->SetMetadataTag(Object, Key, Value);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    inline FString GetAssetMetaData(UObject* const Object, const FName Key)
+    {
+        if (!Object || Key.IsNone() || GEditor == nullptr)
+        {
+            return FString();
+        }
+
+        if (auto* Subsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>())
+        {
+            return Subsystem->GetMetadataTag(Object, Key);
+        }
+        else
+        {
+            return FString();
+        }
+    }
+
+    inline bool DeleteAssetIfExists(const TCHAR* const AssetPath, const TCHAR* const ObjectName = nullptr)
+    {
+        if (AssetPath == nullptr || GEditor == nullptr)
+        {
+            return false;
+        }
+
+        auto* const Subsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>();
+        if (Subsystem == nullptr)
+        {
+            return false;
+        }
+
+        const FString AssetPathString(AssetPath);
+        TArray<FString> CandidateObjectPaths;
+        if (ObjectName != nullptr)
+        {
+            CandidateObjectPaths.Add(FString::Printf(TEXT("%s.%s"), AssetPath, ObjectName));
+        }
+        CandidateObjectPaths.Add(AssetPathString);
+
+        const auto& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
+        for (const auto& CandidateObjectPath : CandidateObjectPaths)
+        {
+            if (CandidateObjectPath.Contains(TEXT(".")))
+            {
+                if (UObject* const LoadedAsset = FindObject<UObject>(nullptr, *CandidateObjectPath))
+                {
+                    return Subsystem->DeleteLoadedAsset(LoadedAsset);
+                }
+            }
+
+            const auto AssetData = AssetRegistry.GetAssetByObjectPath(CandidateObjectPath);
+            if (AssetData.IsValid())
+            {
+                if (UObject* const Asset = Subsystem->LoadAsset(CandidateObjectPath))
+                {
+                    return Subsystem->DeleteLoadedAsset(Asset);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    inline bool AddDataOnlyBlueprintRow(UDataTable* const DataTable, const FName RowName, UClass* const ObjectType)
+    {
+        if (!DataTable || !ObjectType)
+        {
+            return false;
+        }
+
+        FDataOnlyBlueprintEntry Entry;
+        Entry.ObjectType = ObjectType;
+        DataTable->AddRow(RowName, Entry);
+        return true;
     }
 
     struct FScopedDataSourceFolderOverride
@@ -373,6 +806,55 @@ namespace RuleRangerTests
                                                            Fixture.Rule,
                                                            Object,
                                                            Trigger);
+    }
+
+    struct FProjectRuleFixture
+    {
+        TObjectPtr<URuleRangerConfig> Config{ nullptr };
+        TObjectPtr<URuleRangerRuleSet> RuleSet{ nullptr };
+        TObjectPtr<URuleRangerProjectRule> Rule{ nullptr };
+        TObjectPtr<URuleRangerProjectActionContext> ActionContext{ nullptr };
+    };
+
+    inline bool
+    CreateProjectRuleFixture(FAutomationTestBase& Test,
+                             FProjectRuleFixture& OutFixture,
+                             const ERuleRangerProjectActionTrigger Trigger = ERuleRangerProjectActionTrigger::AT_Report)
+    {
+        OutFixture.Config = NewTransientObject<URuleRangerConfig>();
+        OutFixture.RuleSet = NewTransientObject<URuleRangerRuleSet>();
+        OutFixture.Rule = NewTransientObject<URuleRangerProjectRule>();
+        OutFixture.ActionContext = NewTransientObject<URuleRangerProjectActionContext>();
+
+        const auto bCreated = Test.TestNotNull(TEXT("Config should be created"), OutFixture.Config.Get())
+            && Test.TestNotNull(TEXT("RuleSet should be created"), OutFixture.RuleSet.Get())
+            && Test.TestNotNull(TEXT("Project rule should be created"), OutFixture.Rule.Get())
+            && Test.TestNotNull(TEXT("Project action context should be created"), OutFixture.ActionContext.Get());
+
+        if (bCreated)
+        {
+            FRuleRangerProjectActionContextTestAccessor::ResetContext(OutFixture.ActionContext,
+                                                                      OutFixture.Config,
+                                                                      OutFixture.RuleSet,
+                                                                      OutFixture.Rule,
+                                                                      Trigger);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    inline void ResetProjectRuleFixtureContext(
+        FProjectRuleFixture& Fixture,
+        const ERuleRangerProjectActionTrigger Trigger = ERuleRangerProjectActionTrigger::AT_Report)
+    {
+        FRuleRangerProjectActionContextTestAccessor::ResetContext(Fixture.ActionContext,
+                                                                  Fixture.Config,
+                                                                  Fixture.RuleSet,
+                                                                  Fixture.Rule,
+                                                                  Trigger);
     }
 } // namespace RuleRangerTests
 

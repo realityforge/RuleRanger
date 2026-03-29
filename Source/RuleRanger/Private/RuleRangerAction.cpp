@@ -18,9 +18,15 @@
 
 void URuleRangerAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
-    checkf(false,
-           TEXT("Action either failed to override Apply method or calls Super. "
-                "Neither scenario is supported."));
+    const FString UnsupportedApplyMessage =
+        TEXT("Action either failed to override Apply method or calls Super. Neither scenario is supported.");
+
+    LogError(Object, UnsupportedApplyMessage);
+
+    if (ActionContext)
+    {
+        ActionContext->Fatal(FText::FromString(UnsupportedApplyMessage));
+    }
 }
 
 UClass* URuleRangerAction::GetExpectedType() const

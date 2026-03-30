@@ -190,6 +190,10 @@ bool FRuleRangerRemoveNamePrefixActionRenamesInSaveModeTest::RunTest(const FStri
         && RuleRangerRemoveNamePrefixActionTests::SetPrefix(*this, Action, TEXT("pfx_"))
         && RuleRangerRemoveNamePrefixActionTests::SetCaseSensitive(*this, Action, false))
     {
+        AddExpectedMessagePlain(TEXT("package was marked as deleted in editor, but has been modified on disk"),
+                                ELogVerbosity::Warning,
+                                EAutomationExpectedMessageFlags::Contains,
+                                1);
         Action->Apply(Fixture.ActionContext, DataTable);
 
         const auto bResult = TestEqual(TEXT("Save mode should rename the object"),

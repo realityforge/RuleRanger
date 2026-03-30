@@ -109,6 +109,10 @@ bool FRuleRangerEnsureEverySkeletalMeshComponentReferencesASkeletalMeshActionSki
         && TestNotNull(TEXT("Skeletal mesh component should be created"), Component)
         && TestNotNull(TEXT("Skeletal mesh should be created"), SkeletalMesh))
     {
+        AddExpectedMessagePlain(TEXT("has no skeleton"),
+                                ELogVerbosity::Warning,
+                                EAutomationExpectedMessageFlags::Contains,
+                                1);
         Component->SetSkeletalMeshAsset(SkeletalMesh);
         Action->Apply(Fixture.ActionContext, Actor);
 

@@ -54,6 +54,10 @@ bool FRuleRangerDefaultResultHandlerWritesContextMessagesToMessageLogTest::RunTe
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture)
         && TestNotNull(TEXT("Default result handler should be created"), Handler))
     {
+        AddExpectedMessagePlain(TEXT("Action warning message"),
+                                ELogVerbosity::Warning,
+                                EAutomationExpectedMessageFlags::Contains,
+                                1);
         AddExpectedMessagePlain(TEXT("Action error message"),
                                 ELogVerbosity::Error,
                                 EAutomationExpectedMessageFlags::Contains,

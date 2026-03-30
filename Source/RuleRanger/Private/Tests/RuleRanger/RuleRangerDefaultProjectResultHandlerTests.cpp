@@ -54,6 +54,10 @@ bool FRuleRangerDefaultProjectResultHandlerWritesContextMessagesToMessageLogTest
     if (RuleRangerTests::CreateProjectRuleFixture(*this, Fixture)
         && TestNotNull(TEXT("Default project result handler should be created"), Handler))
     {
+        AddExpectedMessagePlain(TEXT("Project warning message"),
+                                ELogVerbosity::Warning,
+                                EAutomationExpectedMessageFlags::Contains,
+                                1);
         AddExpectedMessagePlain(TEXT("Project error message"),
                                 ELogVerbosity::Error,
                                 EAutomationExpectedMessageFlags::Contains,

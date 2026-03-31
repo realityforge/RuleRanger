@@ -24,6 +24,8 @@ namespace RuleRangerEnsureNoEmptyContentFoldersActionTests
 {
     struct FScopedContentFolderSandbox
     {
+        static constexpr TCHAR SandboxScopeName[] = TEXT("EnsureNoEmptyContentFolders");
+
         FString FolderName;
         FString RootFileSystemPath;
         FString RootMountPath;
@@ -31,8 +33,12 @@ namespace RuleRangerEnsureNoEmptyContentFoldersActionTests
         explicit FScopedContentFolderSandbox(const TCHAR* const NameSuffix)
         {
             FolderName = FString::Printf(TEXT("RuleRangerEmptyFolderTests_%s"), NameSuffix);
-            RootFileSystemPath = FPaths::Combine(FPaths::ProjectContentDir(), FolderName);
-            RootMountPath = FString::Printf(TEXT("/Game/%s"), *FolderName);
+            RootFileSystemPath =
+                FPaths::Combine(RuleRangerTests::GetRuleRangerTestContentRoot(), SandboxScopeName, FolderName);
+            RootMountPath = FString::Printf(TEXT("%s/%s/%s"),
+                                            RuleRangerTests::GetRuleRangerTestMountRoot(),
+                                            SandboxScopeName,
+                                            *FolderName);
 
             IFileManager::Get().DeleteDirectory(*RootFileSystemPath, false, true);
             IFileManager::Get().MakeDirectory(*RootFileSystemPath, true);
@@ -82,30 +88,49 @@ namespace RuleRangerEnsureNoEmptyContentFoldersActionTests
         }
     };
 
-    TArray<FString> BuildExcludedTopLevelMounts(const FString& IncludedFolderName)
+    void AppendExcludedSiblingMounts(const FString& RootFileSystemPath,
+                                     const FString& RootMountPath,
+                                     const FString& IncludedDirectoryName,
+                                     TArray<FString>& ExcludedPaths)
     {
         TArray<FString> Directories;
-        IFileManager::Get().FindFiles(Directories,
-                                      *FPaths::Combine(FPaths::ProjectContentDir(), TEXT("*")),
-                                      false,
-                                      true);
+        IFileManager::Get().FindFiles(Directories, *FPaths::Combine(RootFileSystemPath, TEXT("*")), false, true);
 
-        TArray<FString> ExcludedPaths;
         for (const auto& Directory : Directories)
         {
-            if (!Directory.Equals(IncludedFolderName, ESearchCase::CaseSensitive))
+            if (!Directory.Equals(IncludedDirectoryName, ESearchCase::CaseSensitive))
             {
-                ExcludedPaths.Add(FString::Printf(TEXT("/Game/%s"), *Directory));
+                ExcludedPaths.Add(FString::Printf(TEXT("%s/%s"), *RootMountPath, *Directory));
             }
         }
-
-        return ExcludedPaths;
     }
 
     void ConfigureAction(UEnsureNoEmptyContentFoldersAction* const Action, const FScopedContentFolderSandbox& Sandbox)
     {
         Action->bScanPluginContent = false;
-        Action->ExcludedPaths = BuildExcludedTopLevelMounts(Sandbox.FolderName);
+
+        TArray<FString> ExcludedPaths;
+        AppendExcludedSiblingMounts(FPaths::ProjectContentDir(), TEXT("/Game"), TEXT("Developers"), ExcludedPaths);
+        AppendExcludedSiblingMounts(FPaths::Combine(FPaths::ProjectContentDir(), TEXT("Developers")),
+                                    TEXT("/Game/Developers"),
+                                    TEXT("Tests"),
+                                    ExcludedPaths);
+        AppendExcludedSiblingMounts(FPaths::Combine(FPaths::ProjectContentDir(), TEXT("Developers/Tests")),
+                                    TEXT("/Game/Developers/Tests"),
+                                    TEXT("RuleRanger"),
+                                    ExcludedPaths);
+        AppendExcludedSiblingMounts(RuleRangerTests::GetRuleRangerTestContentRoot(),
+                                    RuleRangerTests::GetRuleRangerTestMountRoot(),
+                                    FScopedContentFolderSandbox::SandboxScopeName,
+                                    ExcludedPaths);
+        AppendExcludedSiblingMounts(FPaths::Combine(RuleRangerTests::GetRuleRangerTestContentRoot(),
+                                                    FScopedContentFolderSandbox::SandboxScopeName),
+                                    FString::Printf(TEXT("%s/%s"),
+                                                    RuleRangerTests::GetRuleRangerTestMountRoot(),
+                                                    FScopedContentFolderSandbox::SandboxScopeName),
+                                    Sandbox.FolderName,
+                                    ExcludedPaths);
+        Action->ExcludedPaths = MoveTemp(ExcludedPaths);
     }
 } // namespace RuleRangerEnsureNoEmptyContentFoldersActionTests
 

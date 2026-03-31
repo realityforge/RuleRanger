@@ -34,7 +34,7 @@ bool FRuleRangerEnsureFunctionsHaveCategoriesActionErrorsAboveThresholdTest::Run
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureFunctionsHaveCategoriesAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Function/CategoriesError"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Function/CategoriesError"),
                                       TEXT("BP_FunctionCategoriesError"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -77,7 +77,7 @@ bool FRuleRangerEnsureFunctionsHaveCategoriesActionSkipsBelowThresholdTest::RunT
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureFunctionsHaveCategoriesAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Function/CategoriesSkip"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Function/CategoriesSkip"),
                                       TEXT("BP_FunctionCategoriesSkip"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)

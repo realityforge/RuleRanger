@@ -49,7 +49,7 @@ bool FRuleRangerEnsureBlueprintContainsNoUnlinkedNodesActionErrorsForUnlinkedExe
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureBlueprintContainsNoUnlinkedNodesAction>();
     const auto Blueprint = RuleRangerEnsureBlueprintContainsNoUnlinkedNodesActionTests::CreateBlueprintFixture(
         URuleRangerAutomationBlueprintParentObject::StaticClass(),
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/LooseNodes/Error"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/LooseNodes/Error"),
         TEXT("BP_LooseNodesError"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -90,7 +90,7 @@ bool FRuleRangerEnsureBlueprintContainsNoUnlinkedNodesActionSkipsGhostEventsWhen
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureBlueprintContainsNoUnlinkedNodesAction>();
     const auto Blueprint = RuleRangerEnsureBlueprintContainsNoUnlinkedNodesActionTests::CreateBlueprintFixture(
         AActor::StaticClass(),
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/LooseNodes/GhostSkipped"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/LooseNodes/GhostSkipped"),
         TEXT("BP_GhostSkipped"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -127,7 +127,7 @@ bool FRuleRangerEnsureBlueprintContainsNoUnlinkedNodesActionErrorsForGhostEvents
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureBlueprintContainsNoUnlinkedNodesAction>();
     const auto Blueprint = RuleRangerEnsureBlueprintContainsNoUnlinkedNodesActionTests::CreateBlueprintFixture(
         AActor::StaticClass(),
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/LooseNodes/GhostError"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/LooseNodes/GhostError"),
         TEXT("BP_GhostError"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -170,7 +170,7 @@ bool FRuleRangerEnsureBlueprintContainsNoUnlinkedNodesActionAcceptsPureNodesTest
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureBlueprintContainsNoUnlinkedNodesAction>();
     const auto Blueprint = RuleRangerEnsureBlueprintContainsNoUnlinkedNodesActionTests::CreateBlueprintFixture(
         URuleRangerAutomationBlueprintParentObject::StaticClass(),
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/LooseNodes/Pure"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/LooseNodes/Pure"),
         TEXT("BP_PureNode"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)

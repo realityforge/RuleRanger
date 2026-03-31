@@ -61,16 +61,16 @@ bool FRuleRangerEnsureTextureFollowsConventionActionUsesConfigTablesForVariantCh
     RuleRangerTests::FRuleFixture Fixture;
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureTextureFollowsConventionAction>();
     const auto Table = RuleRangerEnsureTextureFollowsConventionActionTests::CreateTextureConventionTable(
-        TEXT("/Game/Developers/RuleRangerTests/Convention/Texture/ConfigTable"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Convention/Texture/ConfigTable"),
         TEXT("TextureConventionConfigTable"),
         TEXT("BaseColor"),
         TEXT("_BC"),
         TEXTUREGROUP_World);
-    const auto Texture =
-        RuleRangerTests::NewPackagedTexture2D(TEXT("/Game/Developers/RuleRangerTests/Convention/Texture/ConfigTexture"),
-                                              TEXT("Stone_BC"),
-                                              128,
-                                              128);
+    const auto Texture = RuleRangerTests::NewPackagedTexture2D(
+        TEXT("/Game/Developers/Tests/RuleRanger/Convention/Texture/ConfigTexture"),
+        TEXT("Stone_BC"),
+        128,
+        128);
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture)
         && TestNotNull(TEXT("EnsureTextureFollowsConventionAction should be created"), Action)
         && TestNotNull(TEXT("Convention table should be created"), Table)
@@ -106,13 +106,13 @@ bool FRuleRangerEnsureTextureFollowsConventionActionRejectsInvalidConfiguredSett
     RuleRangerTests::FRuleFixture Fixture;
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureTextureFollowsConventionAction>();
     const auto Table = RuleRangerEnsureTextureFollowsConventionActionTests::CreateTextureConventionTable(
-        TEXT("/Game/Developers/RuleRangerTests/Convention/Texture/PropertyTable"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Convention/Texture/PropertyTable"),
         TEXT("TextureConventionPropertyTable"),
         TEXT("BaseColor"),
         TEXT("_BC"),
         TEXTUREGROUP_UI);
     const auto Texture = RuleRangerTests::NewPackagedTexture2D(
-        TEXT("/Game/Developers/RuleRangerTests/Convention/Texture/PropertyTexture"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Convention/Texture/PropertyTexture"),
         TEXT("Brick_BC"),
         128,
         128);
@@ -156,18 +156,18 @@ bool FRuleRangerEnsureTextureFollowsConventionActionSupportsRepeatedCachedApplie
     RuleRangerTests::FRuleFixture Fixture;
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureTextureFollowsConventionAction>();
     const auto Table = RuleRangerEnsureTextureFollowsConventionActionTests::CreateTextureConventionTable(
-        TEXT("/Game/Developers/RuleRangerTests/Convention/Texture/CachedTable"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Convention/Texture/CachedTable"),
         TEXT("TextureConventionCachedTable"),
         TEXT("BaseColor"),
         TEXT("_BC"),
         TEXTUREGROUP_World);
     const auto FirstTexture =
-        RuleRangerTests::NewPackagedTexture2D(TEXT("/Game/Developers/RuleRangerTests/Convention/Texture/CachedFirst"),
+        RuleRangerTests::NewPackagedTexture2D(TEXT("/Game/Developers/Tests/RuleRanger/Convention/Texture/CachedFirst"),
                                               TEXT("Rock_BC"),
                                               128,
                                               128);
     const auto SecondTexture =
-        RuleRangerTests::NewPackagedTexture2D(TEXT("/Game/Developers/RuleRangerTests/Convention/Texture/CachedSecond"),
+        RuleRangerTests::NewPackagedTexture2D(TEXT("/Game/Developers/Tests/RuleRanger/Convention/Texture/CachedSecond"),
                                               TEXT("Mud_BC"),
                                               128,
                                               128);

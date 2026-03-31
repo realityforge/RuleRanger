@@ -68,7 +68,7 @@ bool FRuleRangerEnsureTextureMipGenValidActionLogsInfoWhenAlreadyValidTest::RunT
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/MipGenValid"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/MipGenValid"),
         TEXT("TextureMipGenValidTexture"));
     if (TestNotNull(TEXT("EnsureTextureMipGenValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))
@@ -110,7 +110,7 @@ bool FRuleRangerEnsureTextureMipGenValidActionErrorsWhenFixIsDisabledTest::RunTe
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/MipGenError"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/MipGenError"),
         TEXT("TextureMipGenErrorTexture"));
     if (TestNotNull(TEXT("EnsureTextureMipGenValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))
@@ -166,7 +166,7 @@ bool FRuleRangerEnsureTextureMipGenValidActionWarnsInDryRunModeTest::RunTest(con
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Report,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/MipGenDryRun"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/MipGenDryRun"),
         TEXT("TextureMipGenDryRunTexture"));
     if (TestNotNull(TEXT("EnsureTextureMipGenValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))
@@ -227,7 +227,7 @@ bool FRuleRangerEnsureTextureMipGenValidActionAppliesFirstConfiguredFixInSaveMod
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/MipGenFix"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/MipGenFix"),
         TEXT("TextureMipGenFixTexture"));
     if (TestNotNull(TEXT("EnsureTextureMipGenValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))

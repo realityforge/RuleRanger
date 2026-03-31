@@ -132,7 +132,7 @@ bool FRuleRangerEnsureEveryStaticMeshComponentReferencesAStaticMeshActionSkipsAb
         RuleRangerTests::NewTransientObject<UEnsureEveryStaticMeshComponentReferencesAStaticMeshAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(AActor::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Actor/AbstractStaticMeshActor"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Actor/AbstractStaticMeshActor"),
                                       TEXT("AbstractStaticMeshActor"));
     RuleRangerTests::FRuleFixture Fixture;
     if (TestNotNull(TEXT("Action should be created"), Action)

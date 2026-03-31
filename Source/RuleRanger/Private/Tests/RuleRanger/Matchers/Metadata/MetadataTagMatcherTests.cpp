@@ -38,7 +38,7 @@ bool FRuleRangerMetadataTagMatcherMatchesConfiguredTagTest::RunTest(const FStrin
     static const FName VariantKey(TEXT("RuleRanger.Variant"));
 
     const auto Matcher = RuleRangerTests::NewTransientObject<UMetadataTagMatcher>();
-    const auto Material = RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/RuleRangerTests/Metadata/Tag"),
+    const auto Material = RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/Tests/RuleRanger/Metadata/Tag"),
                                                                TEXT("MetadataTagMatchMaterial"));
     if (TestNotNull(TEXT("MetadataTagMatcher should be created"), Matcher)
         && TestNotNull(TEXT("Material should be created"), Material)
@@ -65,7 +65,7 @@ bool FRuleRangerMetadataTagMatcherRejectsMissingOrMismatchedValuesTest::RunTest(
 
     const auto Matcher = RuleRangerTests::NewTransientObject<UMetadataTagMatcher>();
     const auto Material =
-        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/RuleRangerTests/Metadata/TagMismatch"),
+        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/Tests/RuleRanger/Metadata/TagMismatch"),
                                              TEXT("MetadataTagMismatchMaterial"));
     if (TestNotNull(TEXT("MetadataTagMatcher should be created"), Matcher)
         && TestNotNull(TEXT("Material should be created"), Material)
@@ -101,7 +101,7 @@ bool FRuleRangerMetadataTagMatcherRejectsNullObjectsAndNoneKeysTest::RunTest(con
 {
     const auto Matcher = RuleRangerTests::NewTransientObject<UMetadataTagMatcher>();
     const auto Material =
-        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/RuleRangerTests/Metadata/TagInvalid"),
+        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/Tests/RuleRanger/Metadata/TagInvalid"),
                                              TEXT("MetadataTagInvalidMaterial"));
     if (TestNotNull(TEXT("MetadataTagMatcher should be created"), Matcher)
         && TestNotNull(TEXT("Material should be created"), Material)

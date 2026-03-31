@@ -229,7 +229,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRuleRangerProjectRuleTraversalSoftConfigsLoadS
 bool FRuleRangerProjectRuleTraversalSoftConfigsLoadSynchronouslyTest::RunTest(const FString&)
 {
     const auto Config = RuleRangerTests::NewRegisteredPackagedAsset<URuleRangerConfig>(
-        TEXT("/Game/Developers/RuleRangerTests/ProjectTraversal/SoftConfig"),
+        TEXT("/Game/Developers/Tests/RuleRanger/ProjectTraversal/SoftConfig"),
         TEXT("SoftConfig"));
     const auto RuleSet = Config ? NewObject<URuleRangerRuleSet>(Config, TEXT("SoftRuleSet")) : nullptr;
     const auto Rule = RuleSet ? NewObject<URuleRangerProjectRule>(RuleSet, TEXT("SoftRule")) : nullptr;

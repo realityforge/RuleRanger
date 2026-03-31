@@ -21,10 +21,10 @@ namespace RuleRangerRemoveNameSuffixActionTests
 {
     bool CleanupRenamedAsset(FAutomationTestBase& Test)
     {
-        return Test.TestTrue(
-            TEXT("The renamed suffix-save asset should be deleted during test cleanup"),
-            RuleRangerTests::DeleteAssetIfExists(TEXT("/Game/Developers/RuleRangerTests/Mutation/Name/SuffixSaveAsset"),
-                                                 TEXT("SuffixSaveAsset")));
+        return Test.TestTrue(TEXT("The renamed suffix-save asset should be deleted during test cleanup"),
+                             RuleRangerTests::DeleteAssetIfExists(
+                                 TEXT("/Game/Developers/Tests/RuleRanger/Mutation/Name/SuffixSaveAsset"),
+                                 TEXT("SuffixSaveAsset")));
     }
 
     bool SetSuffix(FAutomationTestBase& Test, URemoveNameSuffixAction* const Action, const TCHAR* const Suffix)
@@ -70,7 +70,7 @@ bool FRuleRangerRemoveNameSuffixActionErrorsWhenSuffixEmptyTest::RunTest(const F
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Report,
-        TEXT("/Game/Developers/RuleRangerTests/Mutation/Name/SuffixEmpty"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Mutation/Name/SuffixEmpty"),
         TEXT("SuffixEmptyMaterial"));
     if (TestNotNull(TEXT("RemoveNameSuffixAction should be created"), Action)
         && TestNotNull(TEXT("DataTable fixture should be created"), DataTable)
@@ -105,7 +105,7 @@ bool FRuleRangerRemoveNameSuffixActionSkipsCaseSensitiveMismatchesTest::RunTest(
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Report,
-        TEXT("/Game/Developers/RuleRangerTests/Mutation/Name/SuffixMismatch"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Mutation/Name/SuffixMismatch"),
         TEXT("MismatchMaterial_M"));
     if (TestNotNull(TEXT("RemoveNameSuffixAction should be created"), Action)
         && TestNotNull(TEXT("DataTable fixture should be created"), DataTable)
@@ -141,7 +141,7 @@ bool FRuleRangerRemoveNameSuffixActionWarnsInDryRunModeTest::RunTest(const FStri
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Report,
-        TEXT("/Game/Developers/RuleRangerTests/Mutation/Name/SuffixDryRun"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Mutation/Name/SuffixDryRun"),
         TEXT("DryRunMaterial_M"));
     if (TestNotNull(TEXT("RemoveNameSuffixAction should be created"), Action)
         && TestNotNull(TEXT("DataTable fixture should be created"), DataTable)
@@ -176,14 +176,14 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRuleRangerRemoveNameSuffixActionRenamesInSaveM
 bool FRuleRangerRemoveNameSuffixActionRenamesInSaveModeTest::RunTest(const FString&)
 {
     RuleRangerTests::FRuleFixture Fixture;
-    RuleRangerTests::DeleteAssetIfExists(TEXT("/Game/Developers/RuleRangerTests/Mutation/Name/SuffixSaveAsset"),
+    RuleRangerTests::DeleteAssetIfExists(TEXT("/Game/Developers/Tests/RuleRanger/Mutation/Name/SuffixSaveAsset"),
                                          TEXT("SuffixSaveAsset"));
     const auto Action = RuleRangerTests::NewTransientObject<URemoveNameSuffixAction>();
     const auto DataTable = RuleRangerRemoveNameSuffixActionTests::CreateDataTableFixture(
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Mutation/Name/SuffixSave"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Mutation/Name/SuffixSave"),
         TEXT("SuffixSaveAsset_SFX"));
     if (TestNotNull(TEXT("RemoveNameSuffixAction should be created"), Action)
         && TestNotNull(TEXT("DataTable fixture should be created"), DataTable)
@@ -223,7 +223,7 @@ bool FRuleRangerRemoveNameSuffixActionErrorsWhenRenameFailsTest::RunTest(const F
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Mutation/Name/SuffixFailure"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Mutation/Name/SuffixFailure"),
         TEXT("_M"));
     if (TestNotNull(TEXT("RemoveNameSuffixAction should be created"), Action)
         && TestNotNull(TEXT("DataTable fixture should be created"), DataTable)

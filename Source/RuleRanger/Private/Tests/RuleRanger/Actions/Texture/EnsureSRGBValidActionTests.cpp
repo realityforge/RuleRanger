@@ -56,7 +56,7 @@ bool FRuleRangerEnsureSRGBValidActionLogsInfoWhenAlreadyValidTest::RunTest(const
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/SRGBValid"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/SRGBValid"),
         TEXT("SRGBValidTexture"));
     if (TestNotNull(TEXT("EnsureSRGBValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))
@@ -97,7 +97,7 @@ bool FRuleRangerEnsureSRGBValidActionWarnsInDryRunModeTest::RunTest(const FStrin
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Report,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/SRGBDryRun"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/SRGBDryRun"),
         TEXT("SRGBDryRunTexture"));
     if (TestNotNull(TEXT("EnsureSRGBValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))
@@ -144,7 +144,7 @@ bool FRuleRangerEnsureSRGBValidActionAppliesFixInSaveModeTest::RunTest(const FSt
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/SRGBFix"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/SRGBFix"),
         TEXT("SRGBFixTexture"));
     if (TestNotNull(TEXT("EnsureSRGBValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))

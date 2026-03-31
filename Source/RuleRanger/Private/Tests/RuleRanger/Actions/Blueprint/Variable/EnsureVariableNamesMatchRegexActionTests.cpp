@@ -43,7 +43,7 @@ bool FRuleRangerEnsureVariableNamesMatchRegexActionErrorsForBlueprintVariablesTe
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureVariableNamesMatchRegexAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Variable/RegexBlueprint"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Variable/RegexBlueprint"),
                                       TEXT("BP_VariableRegexBlueprint"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -73,7 +73,7 @@ bool FRuleRangerEnsureVariableNamesMatchRegexActionErrorsForLocalVariablesTest::
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureVariableNamesMatchRegexAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Variable/RegexLocal"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Variable/RegexLocal"),
                                       TEXT("BP_VariableRegexLocal"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -116,7 +116,7 @@ bool FRuleRangerEnsureVariableNamesMatchRegexActionSupportsCaseInsensitiveMatche
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureVariableNamesMatchRegexAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Variable/RegexCaseInsensitive"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Variable/RegexCaseInsensitive"),
                                       TEXT("BP_VariableRegexCaseInsensitive"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)

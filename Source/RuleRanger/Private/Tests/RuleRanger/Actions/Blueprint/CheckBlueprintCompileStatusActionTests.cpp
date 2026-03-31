@@ -56,7 +56,7 @@ bool FRuleRangerCheckBlueprintCompileStatusActionErrorsForDirtyBlueprintsInRepor
 {
     const auto Action = RuleRangerTests::NewTransientObject<UCheckBlueprintCompileStatusAction>();
     const auto Blueprint = RuleRangerCheckBlueprintCompileStatusActionTests::CreateBlueprintFixture(
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/CompileStatus/DirtyReport"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/CompileStatus/DirtyReport"),
         TEXT("BP_DirtyReport"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -86,7 +86,7 @@ bool FRuleRangerCheckBlueprintCompileStatusActionCompilesDirtyBlueprintsInSaveMo
 {
     const auto Action = RuleRangerTests::NewTransientObject<UCheckBlueprintCompileStatusAction>();
     const auto Blueprint = RuleRangerCheckBlueprintCompileStatusActionTests::CreateBlueprintFixture(
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/CompileStatus/DirtySave"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/CompileStatus/DirtySave"),
         TEXT("BP_DirtySave"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -114,7 +114,7 @@ bool FRuleRangerCheckBlueprintCompileStatusActionHonorsUnknownPolicyTest::RunTes
 {
     const auto Action = RuleRangerTests::NewTransientObject<UCheckBlueprintCompileStatusAction>();
     const auto Blueprint = RuleRangerCheckBlueprintCompileStatusActionTests::CreateBlueprintFixture(
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/CompileStatus/Unknown"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/CompileStatus/Unknown"),
         TEXT("BP_Unknown"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -140,7 +140,7 @@ bool FRuleRangerCheckBlueprintCompileStatusActionErrorsForWarningsWhenConfigured
 {
     const auto Action = RuleRangerTests::NewTransientObject<UCheckBlueprintCompileStatusAction>();
     const auto Blueprint = RuleRangerCheckBlueprintCompileStatusActionTests::CreateBlueprintFixture(
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/CompileStatus/Warnings"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/CompileStatus/Warnings"),
         TEXT("BP_Warnings"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -166,7 +166,7 @@ bool FRuleRangerCheckBlueprintCompileStatusActionAcceptsWarningsWhenDisabledTest
 {
     const auto Action = RuleRangerTests::NewTransientObject<UCheckBlueprintCompileStatusAction>();
     const auto Blueprint = RuleRangerCheckBlueprintCompileStatusActionTests::CreateBlueprintFixture(
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/CompileStatus/WarningsDisabled"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/CompileStatus/WarningsDisabled"),
         TEXT("BP_WarningsDisabled"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)

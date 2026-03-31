@@ -34,7 +34,7 @@ bool FRuleRangerFullyRoughMaterialMatcherMatchesTrueSettingTest::RunTest(const F
 {
     const auto Matcher = RuleRangerTests::NewTransientObject<UFullyRoughMaterialMatcher>();
     const auto Material =
-        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/RuleRangerTests/Material/FullyRoughTrue"),
+        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/Tests/RuleRanger/Material/FullyRoughTrue"),
                                              TEXT("FullyRoughTrueMaterial"));
     if (TestNotNull(TEXT("FullyRoughMaterialMatcher should be created"), Matcher)
         && TestNotNull(TEXT("Material should be created"), Material))
@@ -56,7 +56,7 @@ bool FRuleRangerFullyRoughMaterialMatcherMatchesFalseSettingTest::RunTest(const 
 {
     const auto Matcher = RuleRangerTests::NewTransientObject<UFullyRoughMaterialMatcher>();
     const auto Material =
-        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/RuleRangerTests/Material/FullyRoughFalse"),
+        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/Tests/RuleRanger/Material/FullyRoughFalse"),
                                              TEXT("FullyRoughFalseMaterial"));
     if (TestNotNull(TEXT("FullyRoughMaterialMatcher should be created"), Matcher)
         && TestNotNull(TEXT("Material should be created"), Material))

@@ -33,7 +33,7 @@ bool FRuleRangerPathFolderMatcherMatchesExplicitFolderNamesTest::RunTest(const F
 {
     const auto Matcher = RuleRangerTests::NewTransientObject<UPathFolderMatcher>();
     const auto Object = RuleRangerTests::NewPackagedObject<URuleRangerAutomationTestObject>(
-        TEXT("/Game/RuleRangerTests/FolderRules/FolderAsset"),
+        TEXT("/Game/Developers/Tests/RuleRanger/FolderRules/FolderAsset"),
         TEXT("FolderAsset"));
     if (TestNotNull(TEXT("PathFolder matcher should be created"), Matcher)
         && TestNotNull(TEXT("Packaged object should be created"), Object))
@@ -61,7 +61,7 @@ bool FRuleRangerPathFolderMatcherHonorsRegexCaseSensitivityTest::RunTest(const F
 {
     const auto Matcher = RuleRangerTests::NewTransientObject<UPathFolderMatcher>();
     const auto Object = RuleRangerTests::NewPackagedObject<URuleRangerAutomationTestObject>(
-        TEXT("/Game/RuleRangerTests/rules_123/RegexAsset"),
+        TEXT("/Game/Developers/Tests/RuleRanger/rules_123/RegexAsset"),
         TEXT("RegexAsset"));
     if (TestNotNull(TEXT("PathFolder matcher should be created"), Matcher)
         && TestNotNull(TEXT("Packaged object should be created"), Object))

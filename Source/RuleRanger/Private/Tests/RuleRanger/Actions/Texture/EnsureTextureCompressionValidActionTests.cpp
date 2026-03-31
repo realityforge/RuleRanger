@@ -65,7 +65,7 @@ bool FRuleRangerEnsureTextureCompressionValidActionLogsInfoWhenAlreadyValidTest:
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/CompressionValid"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/CompressionValid"),
         TEXT("TextureCompressionValidTexture"));
     if (TestNotNull(TEXT("EnsureTextureCompressionValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))
@@ -109,7 +109,7 @@ bool FRuleRangerEnsureTextureCompressionValidActionErrorsWhenFixIsDisabledTest::
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/CompressionError"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/CompressionError"),
         TEXT("TextureCompressionErrorTexture"));
     if (TestNotNull(TEXT("EnsureTextureCompressionValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))
@@ -163,7 +163,7 @@ bool FRuleRangerEnsureTextureCompressionValidActionWarnsInDryRunModeTest::RunTes
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Report,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/CompressionDryRun"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/CompressionDryRun"),
         TEXT("TextureCompressionDryRunTexture"));
     if (TestNotNull(TEXT("EnsureTextureCompressionValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))
@@ -222,7 +222,7 @@ bool FRuleRangerEnsureTextureCompressionValidActionAppliesFirstConfiguredFixInSa
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/CompressionFix"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/CompressionFix"),
         TEXT("TextureCompressionFixTexture"));
     if (TestNotNull(TEXT("EnsureTextureCompressionValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))

@@ -48,7 +48,7 @@ bool FRuleRangerDataOnlyBlueprintMatcherMatchesDataOnlyBlueprintTest::RunTest(co
     const auto Matcher = RuleRangerTests::NewTransientObject<UDataOnlyBlueprintMatcher>();
     const auto Blueprint = RuleRangerDataOnlyBlueprintMatcherTests::CreateBlueprintFixture(
         URuleRangerAutomationBlueprintParentObject::StaticClass(),
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/Matcher/DataOnly"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Matcher/DataOnly"),
         TEXT("BP_DataOnlyMatcher"),
         false);
     if (TestNotNull(TEXT("Matcher should be created"), Matcher)
@@ -72,7 +72,7 @@ bool FRuleRangerDataOnlyBlueprintMatcherRejectsNonDataOnlyBlueprintTest::RunTest
     const auto Matcher = RuleRangerTests::NewTransientObject<UDataOnlyBlueprintMatcher>();
     const auto Blueprint = RuleRangerDataOnlyBlueprintMatcherTests::CreateBlueprintFixture(
         URuleRangerAutomationBlueprintParentObject::StaticClass(),
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/Matcher/NonDataOnly"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Matcher/NonDataOnly"),
         TEXT("BP_NonDataOnlyMatcher"),
         true);
     if (TestNotNull(TEXT("Matcher should be created"), Matcher)

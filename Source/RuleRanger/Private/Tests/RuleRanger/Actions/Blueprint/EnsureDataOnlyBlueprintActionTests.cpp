@@ -53,7 +53,7 @@ bool FRuleRangerEnsureDataOnlyBlueprintActionAcceptsDataOnlyBlueprintsTest::RunT
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureDataOnlyBlueprintAction>();
     const auto Blueprint = RuleRangerEnsureDataOnlyBlueprintActionTests::CreateBlueprintFixture(
         URuleRangerAutomationBlueprintParentObject::StaticClass(),
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/DataOnly/Accepts"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/DataOnly/Accepts"),
         TEXT("BP_DataOnlyAccepts"),
         false);
     RuleRangerTests::FRuleFixture Fixture;
@@ -82,7 +82,7 @@ bool FRuleRangerEnsureDataOnlyBlueprintActionErrorsForConfiguredTypesTest::RunTe
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureDataOnlyBlueprintAction>();
     const auto Blueprint = RuleRangerEnsureDataOnlyBlueprintActionTests::CreateBlueprintFixture(
         URuleRangerAutomationBlueprintParentObject::StaticClass(),
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/DataOnly/ObjectTypes"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/DataOnly/ObjectTypes"),
         TEXT("BP_DataOnlyObjectTypes"),
         true);
     RuleRangerTests::FRuleFixture Fixture;
@@ -117,11 +117,11 @@ bool FRuleRangerEnsureDataOnlyBlueprintActionErrorsForConfigDataTablesTest::RunT
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureDataOnlyBlueprintAction>();
     const auto Blueprint = RuleRangerEnsureDataOnlyBlueprintActionTests::CreateBlueprintFixture(
         URuleRangerAutomationBlueprintParentObject::StaticClass(),
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/DataOnly/ConfigTables"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/DataOnly/ConfigTables"),
         TEXT("BP_DataOnlyConfigTables"),
         true);
     const auto DataTable =
-        RuleRangerTests::NewDataTable(TEXT("/Game/Developers/RuleRangerTests/Blueprint/DataOnly/Table"),
+        RuleRangerTests::NewDataTable(TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/DataOnly/Table"),
                                       TEXT("DT_DataOnlyBlueprints"),
                                       FDataOnlyBlueprintEntry::StaticStruct());
     RuleRangerTests::FRuleFixture Fixture;
@@ -159,7 +159,7 @@ bool FRuleRangerEnsureDataOnlyBlueprintActionErrorsForMetadataTypesTest::RunTest
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureDataOnlyBlueprintAction>();
     const auto Blueprint = RuleRangerEnsureDataOnlyBlueprintActionTests::CreateBlueprintFixture(
         URuleRangerAutomationMetaDataOnlyBlueprintParentObject::StaticClass(),
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/DataOnly/Metadata"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/DataOnly/Metadata"),
         TEXT("BP_DataOnlyMetadata"),
         true);
     RuleRangerTests::FRuleFixture Fixture;

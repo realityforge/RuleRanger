@@ -53,7 +53,7 @@ bool FRuleRangerEnsureVariablesHaveCategoriesActionErrorsForBlueprintVariablesAb
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureVariablesHaveCategoriesAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Variable/CategoriesBlueprint"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Variable/CategoriesBlueprint"),
                                       TEXT("BP_VariableCategoriesBlueprint"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -89,7 +89,7 @@ bool FRuleRangerEnsureVariablesHaveCategoriesActionErrorsForLocalVariablesAboveT
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureVariablesHaveCategoriesAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Variable/CategoriesLocal"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Variable/CategoriesLocal"),
                                       TEXT("BP_VariableCategoriesLocal"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -134,7 +134,7 @@ bool FRuleRangerEnsureVariablesHaveCategoriesActionSkipsInstanceEditableChecksWh
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureVariablesHaveCategoriesAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Variable/CategoriesSkip"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Variable/CategoriesSkip"),
                                       TEXT("BP_VariableCategoriesSkip"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)

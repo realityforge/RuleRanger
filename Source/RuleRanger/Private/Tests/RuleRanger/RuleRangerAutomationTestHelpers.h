@@ -212,41 +212,101 @@ namespace RuleRangerTests
 
     inline FString GetRuleRangerTestContentRoot()
     {
-        return FPaths::Combine(FPaths::ProjectContentDir(), TEXT("Developers/RuleRangerTests"));
+        return FPaths::Combine(FPaths::ProjectContentDir(), TEXT("Developers/Tests/RuleRanger"));
     }
 
-    inline TArray<FString>& GetCreatedPackageDirectories()
+    inline const TCHAR* GetRuleRangerTestMountRoot()
     {
-        static TArray<FString> Directories;
-        return Directories;
+        return TEXT("/Game/Developers/Tests/RuleRanger");
     }
 
-    inline void CleanupCreatedPackageDirectories()
+    inline bool IsRuleRangerTestPackagePath(const FString& PackagePath)
     {
-        auto& Directories = GetCreatedPackageDirectories();
-        Directories.Sort([](const FString& Left, const FString& Right) { return Left.Len() > Right.Len(); });
-
-        for (const auto& Directory : Directories)
-        {
-            if (Directory.StartsWith(GetRuleRangerTestContentRoot()))
-            {
-                IFileManager::Get().DeleteDirectory(*Directory, false, true);
-            }
-        }
-
-        IFileManager::Get().DeleteDirectory(*GetRuleRangerTestContentRoot(), false, true);
-        Directories.Reset();
+        return PackagePath.StartsWith(GetRuleRangerTestMountRoot(), ESearchCase::CaseSensitive);
     }
 
-    struct FCreatedPackageDirectoryCleanupSentinel
+    struct FRuleRangerCreatedTestDirectory
     {
-        ~FCreatedPackageDirectoryCleanupSentinel() { CleanupCreatedPackageDirectories(); }
+        FString MountPath;
+        FString FileSystemPath;
     };
 
-    inline FCreatedPackageDirectoryCleanupSentinel& GetPackageDirectoryCleanupSentinel()
+    class FRuleRangerTestAssetCleanupRegistrar
     {
-        static FCreatedPackageDirectoryCleanupSentinel Sentinel;
-        return Sentinel;
+    public:
+        FRuleRangerTestAssetCleanupRegistrar()
+        {
+            auto& Framework = FAutomationTestFramework::Get();
+            OnTestEndHandle =
+                Framework.OnTestEndEvent.AddRaw(this, &FRuleRangerTestAssetCleanupRegistrar::HandleTestEnd);
+        }
+
+        ~FRuleRangerTestAssetCleanupRegistrar()
+        {
+            auto& Framework = FAutomationTestFramework::Get();
+            Framework.OnTestEndEvent.Remove(OnTestEndHandle);
+            CleanupRegisteredDirectories();
+        }
+
+        void RegisterDirectory(const FString& MountPath, const FString& FileSystemPath)
+        {
+            for (const auto& Directory : CreatedDirectories)
+            {
+                if (Directory.MountPath.Equals(MountPath, ESearchCase::CaseSensitive))
+                {
+                    return;
+                }
+            }
+
+            CreatedDirectories.Add({ MountPath, FileSystemPath });
+        }
+
+    private:
+        void CleanupRegisteredDirectories()
+        {
+            CreatedDirectories.Sort(
+                [](const FRuleRangerCreatedTestDirectory& Left, const FRuleRangerCreatedTestDirectory& Right) {
+                    return Left.FileSystemPath.Len() > Right.FileSystemPath.Len();
+                });
+
+            if (nullptr != GEditor)
+            {
+                if (auto* const Subsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>())
+                {
+                    const auto& AssetRegistry =
+                        FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
+                    for (const auto& Directory : CreatedDirectories)
+                    {
+                        TArray<FAssetData> Assets;
+                        if (AssetRegistry.GetAssetsByPath(FName(*Directory.MountPath), Assets, true, false))
+                        {
+                            for (const auto& Asset : Assets)
+                            {
+                                Subsystem->DeleteAsset(Asset.GetSoftObjectPath().ToString());
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (const auto& Directory : CreatedDirectories)
+            {
+                IFileManager::Get().DeleteDirectory(*Directory.FileSystemPath, false, true);
+            }
+
+            CreatedDirectories.Reset();
+        }
+
+        void HandleTestEnd(FAutomationTestBase*) { CleanupRegisteredDirectories(); }
+
+        FDelegateHandle OnTestEndHandle;
+        TArray<FRuleRangerCreatedTestDirectory> CreatedDirectories;
+    };
+
+    inline FRuleRangerTestAssetCleanupRegistrar& EnsureTestAssetCleanupRegistered()
+    {
+        static FRuleRangerTestAssetCleanupRegistrar Registrar;
+        return Registrar;
     }
 
     inline void EnsurePackageDirectoryExists(const TCHAR* const PackageName)
@@ -254,16 +314,16 @@ namespace RuleRangerTests
         if (nullptr != PackageName)
         {
             const FString PackageNameString(PackageName);
-            constexpr TCHAR GameRoot[] = TEXT("/Game/");
-            if (PackageNameString.StartsWith(GameRoot))
+            if (IsRuleRangerTestPackagePath(PackageNameString))
             {
+                constexpr TCHAR GameRoot[] = TEXT("/Game/");
                 const auto RelativePath = PackageNameString.RightChop(UE_ARRAY_COUNT(GameRoot) - 1);
                 const auto DirectoryPath = FPaths::GetPath(FPaths::Combine(FPaths::ProjectContentDir(), RelativePath));
                 if (!DirectoryPath.IsEmpty())
                 {
                     IFileManager::Get().MakeDirectory(*DirectoryPath, true);
-                    GetCreatedPackageDirectories().AddUnique(DirectoryPath);
-                    static_cast<void>(GetPackageDirectoryCleanupSentinel());
+                    EnsureTestAssetCleanupRegistered().RegisterDirectory(FPaths::GetPath(PackageNameString),
+                                                                         DirectoryPath);
                 }
             }
         }

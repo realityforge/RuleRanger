@@ -58,7 +58,7 @@ bool FRuleRangerSetMetadataTagsActionErrorsWhenKeyEmptyTest::RunTest(const FStri
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Report,
-        TEXT("/Game/Developers/RuleRangerTests/Mutation/Metadata/SetEmptyKey"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Mutation/Metadata/SetEmptyKey"),
         TEXT("SetEmptyKeyMaterial"));
     if (TestNotNull(TEXT("SetMetadataTagsAction should be created"), Action)
         && TestNotNull(TEXT("Material fixture should be created"), Material)
@@ -90,7 +90,7 @@ bool FRuleRangerSetMetadataTagsActionErrorsWhenValueEmptyTest::RunTest(const FSt
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Report,
-        TEXT("/Game/Developers/RuleRangerTests/Mutation/Metadata/SetEmptyValue"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Mutation/Metadata/SetEmptyValue"),
         TEXT("SetEmptyValueMaterial"));
     if (TestNotNull(TEXT("SetMetadataTagsAction should be created"), Action)
         && TestNotNull(TEXT("Material fixture should be created"), Material)
@@ -126,7 +126,7 @@ bool FRuleRangerSetMetadataTagsActionLogsInfoWhenValueAlreadyPresentTest::RunTes
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Mutation/Metadata/SetExisting"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Mutation/Metadata/SetExisting"),
         TEXT("SetExistingMaterial"));
     if (TestNotNull(TEXT("SetMetadataTagsAction should be created"), Action)
         && TestNotNull(TEXT("Material fixture should be created"), Material)
@@ -164,7 +164,7 @@ bool FRuleRangerSetMetadataTagsActionErrorsInDryRunModeTest::RunTest(const FStri
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Report,
-        TEXT("/Game/Developers/RuleRangerTests/Mutation/Metadata/SetDryRun"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Mutation/Metadata/SetDryRun"),
         TEXT("SetDryRunMaterial"));
     if (TestNotNull(TEXT("SetMetadataTagsAction should be created"), Action)
         && TestNotNull(TEXT("Material fixture should be created"), Material)
@@ -205,7 +205,7 @@ bool FRuleRangerSetMetadataTagsActionWritesMetadataInSaveModeTest::RunTest(const
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Mutation/Metadata/SetSave"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Mutation/Metadata/SetSave"),
         TEXT("SetSaveMaterial"));
     if (TestNotNull(TEXT("SetMetadataTagsAction should be created"), Action)
         && TestNotNull(TEXT("Material fixture should be created"), Material)

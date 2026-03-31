@@ -57,7 +57,7 @@ bool FRuleRangerEnsureNeverStreamValidActionLogsInfoWhenAlreadyValidTest::RunTes
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/NeverStreamValid"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/NeverStreamValid"),
         TEXT("NeverStreamValidTexture"));
     if (TestNotNull(TEXT("EnsureNeverStreamValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))
@@ -93,7 +93,7 @@ bool FRuleRangerEnsureNeverStreamValidActionWarnsInDryRunModeTest::RunTest(const
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Report,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/NeverStreamDryRun"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/NeverStreamDryRun"),
         TEXT("NeverStreamDryRunTexture"));
     if (TestNotNull(TEXT("EnsureNeverStreamValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))
@@ -133,7 +133,7 @@ bool FRuleRangerEnsureNeverStreamValidActionAppliesFixInSaveModeTest::RunTest(co
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/NeverStreamFix"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/NeverStreamFix"),
         TEXT("NeverStreamFixTexture"));
     if (TestNotNull(TEXT("EnsureNeverStreamValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))

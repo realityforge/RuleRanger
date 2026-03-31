@@ -37,7 +37,7 @@ bool FRuleRangerEnsureNoEmptyTickActionErrorsForEmptyTickNodesTest::RunTest(cons
 {
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureNoEmptyTickAction>();
     const auto Blueprint = RuleRangerEnsureNoEmptyTickActionTests::CreateActorBlueprint(
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/EmptyTick/Error"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/EmptyTick/Error"),
         TEXT("BP_EmptyTickError"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -72,7 +72,7 @@ bool FRuleRangerEnsureNoEmptyTickActionAcceptsLinkedTickNodesTest::RunTest(const
 {
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureNoEmptyTickAction>();
     const auto Blueprint = RuleRangerEnsureNoEmptyTickActionTests::CreateActorBlueprint(
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/EmptyTick/Linked"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/EmptyTick/Linked"),
         TEXT("BP_EmptyTickLinked"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -111,7 +111,7 @@ bool FRuleRangerEnsureNoEmptyTickActionSkipsGhostTickNodesTest::RunTest(const FS
 {
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureNoEmptyTickAction>();
     const auto Blueprint = RuleRangerEnsureNoEmptyTickActionTests::CreateActorBlueprint(
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/EmptyTick/Ghost"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/EmptyTick/Ghost"),
         TEXT("BP_EmptyTickGhost"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)

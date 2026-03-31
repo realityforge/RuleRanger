@@ -48,7 +48,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRuleRangerUtilitiesBlueprintHelpersRespectPare
 bool FRuleRangerUtilitiesBlueprintHelpersRespectParentTypesTest::RunTest(const FString&)
 {
     const auto Blueprint = RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                                         TEXT("/Game/Developers/RuleRangerTests/Utilities/Blueprint"),
+                                                         TEXT("/Game/Developers/Tests/RuleRanger/Utilities/Blueprint"),
                                                          TEXT("UtilityBlueprint"));
     if (TestNotNull(TEXT("Blueprint should be created"), Blueprint))
     {
@@ -78,7 +78,7 @@ bool FRuleRangerUtilitiesIsAbstractHandlesClassesAndBlueprintsTest::RunTest(cons
 {
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Utilities/AbstractBlueprint"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Utilities/AbstractBlueprint"),
                                       TEXT("AbstractUtilityBlueprint"));
     if (TestNotNull(TEXT("Blueprint should be created"), Blueprint))
     {

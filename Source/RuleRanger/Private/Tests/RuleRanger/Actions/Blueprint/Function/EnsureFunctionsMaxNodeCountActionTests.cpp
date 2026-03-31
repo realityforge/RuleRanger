@@ -35,7 +35,7 @@ bool FRuleRangerEnsureFunctionsMaxNodeCountActionErrorsWhenLimitExceededTest::Ru
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureFunctionsMaxNodeCountAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Function/NodeCountError"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Function/NodeCountError"),
                                       TEXT("BP_FunctionNodeCountError"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -75,7 +75,7 @@ bool FRuleRangerEnsureFunctionsMaxNodeCountActionAllowsGraphsWithinLimitTest::Ru
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureFunctionsMaxNodeCountAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Function/NodeCountOkay"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Function/NodeCountOkay"),
                                       TEXT("BP_FunctionNodeCountOkay"));
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
         && TestNotNull(TEXT("Blueprint should be created"), Blueprint)

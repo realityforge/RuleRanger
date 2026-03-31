@@ -34,7 +34,7 @@ bool FRuleRangerMetadataTagPresentMatchesPresentTagTest::RunTest(const FString&)
 
     const auto Matcher = RuleRangerTests::NewTransientObject<UMetadataTagPresent>();
     const auto Material =
-        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/RuleRangerTests/Metadata/Present"),
+        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/Tests/RuleRanger/Metadata/Present"),
                                              TEXT("MetadataTagPresentMaterial"));
     if (TestNotNull(TEXT("MetadataTagPresent should be created"), Matcher)
         && TestNotNull(TEXT("Material should be created"), Material)
@@ -60,7 +60,7 @@ bool FRuleRangerMetadataTagPresentRejectsMissingTagsTest::RunTest(const FString&
 
     const auto Matcher = RuleRangerTests::NewTransientObject<UMetadataTagPresent>();
     const auto Material =
-        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/RuleRangerTests/Metadata/PresentMissing"),
+        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/Tests/RuleRanger/Metadata/PresentMissing"),
                                              TEXT("MetadataTagMissingMaterial"));
     if (TestNotNull(TEXT("MetadataTagPresent should be created"), Matcher)
         && TestNotNull(TEXT("Material should be created"), Material)
@@ -82,7 +82,7 @@ bool FRuleRangerMetadataTagPresentRejectsNullObjectsAndNoneKeysTest::RunTest(con
 {
     const auto Matcher = RuleRangerTests::NewTransientObject<UMetadataTagPresent>();
     const auto Material =
-        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/RuleRangerTests/Metadata/PresentInvalid"),
+        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/Tests/RuleRanger/Metadata/PresentInvalid"),
                                              TEXT("MetadataTagPresentInvalidMaterial"));
     if (TestNotNull(TEXT("MetadataTagPresent should be created"), Matcher)
         && TestNotNull(TEXT("Material should be created"), Material))

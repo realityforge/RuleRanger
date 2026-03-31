@@ -48,7 +48,7 @@ bool FRuleRangerEnsureFunctionNamesMatchRegexActionErrorsForInvalidNamesTest::Ru
 {
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureFunctionNamesMatchRegexAction>();
     const auto Blueprint = RuleRangerEnsureFunctionNamesMatchRegexActionTests::CreateBlueprintFixture(
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/Function/RegexInvalid"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Function/RegexInvalid"),
         TEXT("BP_FunctionRegexInvalid"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -77,7 +77,7 @@ bool FRuleRangerEnsureFunctionNamesMatchRegexActionSupportsCaseInsensitiveMatche
 {
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureFunctionNamesMatchRegexAction>();
     const auto Blueprint = RuleRangerEnsureFunctionNamesMatchRegexActionTests::CreateBlueprintFixture(
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/Function/RegexCaseInsensitive"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Function/RegexCaseInsensitive"),
         TEXT("BP_FunctionRegexCaseInsensitive"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)

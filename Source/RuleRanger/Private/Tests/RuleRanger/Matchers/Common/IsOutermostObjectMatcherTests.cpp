@@ -25,7 +25,8 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 bool FRuleRangerIsOutermostObjectMatcherDistinguishesPackagesFromPackagedObjectsTest::RunTest(const FString&)
 {
     const auto Matcher = RuleRangerTests::NewTransientObject<UIsOutermostObjectMatcher>();
-    const auto Package = RuleRangerTests::NewTransientPackage(TEXT("/Game/RuleRangerTests/OutermostPackage"));
+    const auto Package =
+        RuleRangerTests::NewTransientPackage(TEXT("/Game/Developers/Tests/RuleRanger/OutermostPackage"));
     const auto Object = Package
         ? RuleRangerTests::NewTransientObject<URuleRangerAutomationTestObject>(Package, TEXT("OutermostAsset"))
         : nullptr;

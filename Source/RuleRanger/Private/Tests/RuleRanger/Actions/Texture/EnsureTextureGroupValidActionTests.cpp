@@ -63,7 +63,7 @@ bool FRuleRangerEnsureTextureGroupValidActionLogsInfoWhenAlreadyValidTest::RunTe
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/GroupValid"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/GroupValid"),
         TEXT("TextureGroupValidTexture"));
     if (TestNotNull(TEXT("EnsureTextureGroupValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))
@@ -105,7 +105,7 @@ bool FRuleRangerEnsureTextureGroupValidActionErrorsWhenFixIsDisabledTest::RunTes
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/GroupError"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/GroupError"),
         TEXT("TextureGroupErrorTexture"));
     if (TestNotNull(TEXT("EnsureTextureGroupValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))
@@ -160,7 +160,7 @@ bool FRuleRangerEnsureTextureGroupValidActionWarnsInDryRunModeTest::RunTest(cons
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Report,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/GroupDryRun"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/GroupDryRun"),
         TEXT("TextureGroupDryRunTexture"));
     if (TestNotNull(TEXT("EnsureTextureGroupValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))
@@ -218,7 +218,7 @@ bool FRuleRangerEnsureTextureGroupValidActionAppliesFirstConfiguredFixInSaveMode
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Texture/GroupFix"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Texture/GroupFix"),
         TEXT("TextureGroupFixTexture"));
     if (TestNotNull(TEXT("EnsureTextureGroupValidAction should be created"), Action)
         && TestNotNull(TEXT("Texture fixture should be created"), Texture))

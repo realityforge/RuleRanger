@@ -25,7 +25,7 @@ bool FRuleRangerEnsureFunctionsReturnActionErrorsWhenReturnNodeMissingTest::RunT
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureFunctionsReturnAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Function/ReturnMissing"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Function/ReturnMissing"),
                                       TEXT("BP_FunctionReturnMissing"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -66,7 +66,7 @@ bool FRuleRangerEnsureFunctionsReturnActionSkipsAnimGraphsTest::RunTest(const FS
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureFunctionsReturnAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Function/ReturnAnimGraph"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Function/ReturnAnimGraph"),
                                       TEXT("BP_FunctionReturnAnimGraph"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)

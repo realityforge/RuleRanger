@@ -56,7 +56,7 @@ bool FRuleRangerRemoveMetadataTagsActionErrorsWhenKeyEmptyTest::RunTest(const FS
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Report,
-        TEXT("/Game/Developers/RuleRangerTests/Mutation/Metadata/RemoveEmptyKey"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Mutation/Metadata/RemoveEmptyKey"),
         TEXT("RemoveEmptyKeyMaterial"));
     if (TestNotNull(TEXT("RemoveMetadataTagsAction should be created"), Action)
         && TestNotNull(TEXT("Material fixture should be created"), Material)
@@ -90,7 +90,7 @@ bool FRuleRangerRemoveMetadataTagsActionLogsInfoWhenKeyMissingTest::RunTest(cons
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Mutation/Metadata/RemoveMissing"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Mutation/Metadata/RemoveMissing"),
         TEXT("RemoveMissingMaterial"));
     if (TestNotNull(TEXT("RemoveMetadataTagsAction should be created"), Action)
         && TestNotNull(TEXT("Material fixture should be created"), Material)
@@ -122,7 +122,7 @@ bool FRuleRangerRemoveMetadataTagsActionErrorsInDryRunModeTest::RunTest(const FS
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Report,
-        TEXT("/Game/Developers/RuleRangerTests/Mutation/Metadata/RemoveDryRun"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Mutation/Metadata/RemoveDryRun"),
         TEXT("RemoveDryRunMaterial"));
     if (TestNotNull(TEXT("RemoveMetadataTagsAction should be created"), Action)
         && TestNotNull(TEXT("Material fixture should be created"), Material)
@@ -167,7 +167,7 @@ bool FRuleRangerRemoveMetadataTagsActionRemovesMetadataInSaveModeTest::RunTest(c
         *this,
         Fixture,
         ERuleRangerActionTrigger::AT_Save,
-        TEXT("/Game/Developers/RuleRangerTests/Mutation/Metadata/RemoveSave"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Mutation/Metadata/RemoveSave"),
         TEXT("RemoveSaveMaterial"));
     if (TestNotNull(TEXT("RemoveMetadataTagsAction should be created"), Action)
         && TestNotNull(TEXT("Material fixture should be created"), Material)

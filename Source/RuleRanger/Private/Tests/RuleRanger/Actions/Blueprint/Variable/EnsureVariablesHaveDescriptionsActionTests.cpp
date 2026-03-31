@@ -56,7 +56,7 @@ bool FRuleRangerEnsureVariablesHaveDescriptionsActionErrorsForMissingDescription
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureVariablesHaveDescriptionsAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Variable/DescriptionsMissing"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Variable/DescriptionsMissing"),
                                       TEXT("BP_VariableDescriptionsMissing"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -87,7 +87,7 @@ bool FRuleRangerEnsureVariablesHaveDescriptionsActionSkipsPrivateVariablesByDefa
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureVariablesHaveDescriptionsAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Variable/DescriptionsPrivate"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Variable/DescriptionsPrivate"),
                                       TEXT("BP_VariableDescriptionsPrivate"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -119,10 +119,10 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 bool FRuleRangerEnsureVariablesHaveDescriptionsActionSkipsTransientVariablesByDefaultTest::RunTest(const FString&)
 {
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureVariablesHaveDescriptionsAction>();
-    const auto Blueprint =
-        RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Variable/DescriptionsTransient"),
-                                      TEXT("BP_VariableDescriptionsTransient"));
+    const auto Blueprint = RuleRangerTests::NewBlueprint(
+        URuleRangerAutomationBlueprintParentObject::StaticClass(),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Variable/DescriptionsTransient"),
+        TEXT("BP_VariableDescriptionsTransient"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
         && TestNotNull(TEXT("Blueprint should be created"), Blueprint)
@@ -155,7 +155,7 @@ bool FRuleRangerEnsureVariablesHaveDescriptionsActionErrorsForLocalVariablesWhen
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureVariablesHaveDescriptionsAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Variable/DescriptionsLocal"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Variable/DescriptionsLocal"),
                                       TEXT("BP_VariableDescriptionsLocal"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)

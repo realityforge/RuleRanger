@@ -61,7 +61,7 @@ bool FRuleRangerEnsureSoundWaveSampleRateValidActionAcceptsDefaultSampleRateTest
 {
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureSoundWaveSampleRateValidAction>();
     const auto SoundWave =
-        RuleRangerTests::NewPackagedSoundWave(TEXT("/Game/Developers/RuleRangerTests/SoundWave/DefaultRate"),
+        RuleRangerTests::NewPackagedSoundWave(TEXT("/Game/Developers/Tests/RuleRanger/SoundWave/DefaultRate"),
                                               TEXT("DefaultRateSoundWave"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture)
@@ -117,7 +117,7 @@ bool FRuleRangerEnsureSoundWaveSampleRateValidActionRejectsInvalidRateTest::RunT
 {
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureSoundWaveSampleRateValidAction>();
     const auto SoundWave =
-        RuleRangerTests::NewPackagedSoundWave(TEXT("/Game/Developers/RuleRangerTests/SoundWave/InvalidRate"),
+        RuleRangerTests::NewPackagedSoundWave(TEXT("/Game/Developers/Tests/RuleRanger/SoundWave/InvalidRate"),
                                               TEXT("InvalidRateSoundWave"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture)

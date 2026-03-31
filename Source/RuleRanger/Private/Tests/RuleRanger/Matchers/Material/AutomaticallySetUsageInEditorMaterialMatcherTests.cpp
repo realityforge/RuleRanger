@@ -38,7 +38,7 @@ bool FRuleRangerAutomaticallySetUsageInEditorMaterialMatcherMatchesTrueSettingTe
 {
     const auto Matcher = RuleRangerTests::NewTransientObject<UAutomaticallySetUsageInEditorMaterialMatcher>();
     const auto Material =
-        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/RuleRangerTests/Material/AutoUsageTrue"),
+        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/Tests/RuleRanger/Material/AutoUsageTrue"),
                                              TEXT("AutoUsageTrueMaterial"));
     if (TestNotNull(TEXT("AutomaticallySetUsageInEditorMaterialMatcher should be created"), Matcher)
         && TestNotNull(TEXT("Material should be created"), Material))
@@ -60,7 +60,7 @@ bool FRuleRangerAutomaticallySetUsageInEditorMaterialMatcherMatchesFalseSettingT
 {
     const auto Matcher = RuleRangerTests::NewTransientObject<UAutomaticallySetUsageInEditorMaterialMatcher>();
     const auto Material =
-        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/RuleRangerTests/Material/AutoUsageFalse"),
+        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/Tests/RuleRanger/Material/AutoUsageFalse"),
                                              TEXT("AutoUsageFalseMaterial"));
     if (TestNotNull(TEXT("AutomaticallySetUsageInEditorMaterialMatcher should be created"), Matcher)
         && TestNotNull(TEXT("Material should be created"), Material))

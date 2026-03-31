@@ -35,12 +35,14 @@ bool FRuleRangerContentDirMatcherMatchesConfiguredDirectoryTest::RunTest(const F
 {
     const auto Matcher = RuleRangerTests::NewTransientObject<UContentDirMatcher>();
     const auto Object = RuleRangerTests::NewPackagedObject<URuleRangerAutomationTestObject>(
-        TEXT("/Game/RuleRangerTests/ContentDir/AssetPackage"),
+        TEXT("/Game/Developers/Tests/RuleRanger/ContentDir/AssetPackage"),
         TEXT("ContentDirAsset"));
     if (TestNotNull(TEXT("ContentDir matcher should be created"), Matcher)
         && TestNotNull(TEXT("Packaged object should be created"), Object))
     {
-        if (RuleRangerContentDirMatcherTests::SetDirectory(*this, Matcher, TEXT("/Game/RuleRangerTests/ContentDir")))
+        if (RuleRangerContentDirMatcherTests::SetDirectory(*this,
+                                                           Matcher,
+                                                           TEXT("/Game/Developers/Tests/RuleRanger/ContentDir")))
         {
             return TestTrue(TEXT("Objects under the configured content directory should match"), Matcher->Test(Object));
         }
@@ -62,12 +64,14 @@ bool FRuleRangerContentDirMatcherRejectsOtherDirectoriesTest::RunTest(const FStr
 {
     const auto Matcher = RuleRangerTests::NewTransientObject<UContentDirMatcher>();
     const auto Object = RuleRangerTests::NewPackagedObject<URuleRangerAutomationTestObject>(
-        TEXT("/Game/RuleRangerTests/ContentDir/AssetPackage"),
+        TEXT("/Game/Developers/Tests/RuleRanger/ContentDir/AssetPackage"),
         TEXT("ContentDirAsset"));
     if (TestNotNull(TEXT("ContentDir matcher should be created"), Matcher)
         && TestNotNull(TEXT("Packaged object should be created"), Object))
     {
-        if (RuleRangerContentDirMatcherTests::SetDirectory(*this, Matcher, TEXT("/Game/RuleRangerTests/OtherDir")))
+        if (RuleRangerContentDirMatcherTests::SetDirectory(*this,
+                                                           Matcher,
+                                                           TEXT("/Game/Developers/Tests/RuleRanger/OtherDir")))
         {
             return TestFalse(TEXT("Objects outside the configured content directory should not match"),
                              Matcher->Test(Object));

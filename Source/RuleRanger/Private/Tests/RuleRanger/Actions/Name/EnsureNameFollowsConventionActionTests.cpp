@@ -59,15 +59,15 @@ bool FRuleRangerEnsureNameFollowsConventionActionWarnsForPropertyTablesInDryRunT
     RuleRangerTests::FRuleFixture Fixture;
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureNameFollowsConventionAction>();
     const auto Table = RuleRangerEnsureNameFollowsConventionActionTests::CreateNameConventionTable(
-        TEXT("/Game/Developers/RuleRangerTests/Convention/Name/PropertyTable"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Convention/Name/PropertyTable"),
         TEXT("NameConventionPropertyTable"),
         UMaterial::StaticClass(),
         TEXT("M_"));
     const auto FirstMaterial =
-        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/RuleRangerTests/Convention/Name/PropertyFirst"),
+        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/Tests/RuleRanger/Convention/Name/PropertyFirst"),
                                              TEXT("BodyMaterial"));
     const auto SecondMaterial =
-        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/RuleRangerTests/Convention/Name/PropertySecond"),
+        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/Tests/RuleRanger/Convention/Name/PropertySecond"),
                                              TEXT("SurfaceMaterial"));
     const TArray<TObjectPtr<UDataTable>> Tables{ Table };
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture)
@@ -111,12 +111,12 @@ bool FRuleRangerEnsureNameFollowsConventionActionUsesConfigTablesTest::RunTest(c
     RuleRangerTests::FRuleFixture Fixture;
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureNameFollowsConventionAction>();
     const auto Table = RuleRangerEnsureNameFollowsConventionActionTests::CreateNameConventionTable(
-        TEXT("/Game/Developers/RuleRangerTests/Convention/Name/ConfigTable"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Convention/Name/ConfigTable"),
         TEXT("NameConventionConfigTable"),
         UMaterial::StaticClass(),
         TEXT("M_"));
     const auto Material =
-        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/RuleRangerTests/Convention/Name/ConfigAsset"),
+        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/Tests/RuleRanger/Convention/Name/ConfigAsset"),
                                              TEXT("ConfigDrivenMaterial"));
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture)
         && TestNotNull(TEXT("EnsureNameFollowsConventionAction should be created"), Action)
@@ -149,7 +149,7 @@ bool FRuleRangerEnsureNameFollowsConventionActionWarnsForPackagedObjectsWithoutC
     RuleRangerTests::FRuleFixture Fixture;
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureNameFollowsConventionAction>();
     const auto Material =
-        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/RuleRangerTests/Convention/Name/Missing"),
+        RuleRangerTests::NewPackagedMaterial(TEXT("/Game/Developers/Tests/RuleRanger/Convention/Name/Missing"),
                                              TEXT("MissingConventionMaterial"));
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture)
         && TestNotNull(TEXT("EnsureNameFollowsConventionAction should be created"), Action)

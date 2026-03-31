@@ -36,10 +36,10 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRuleRangerEnsureFunctionsHaveDescriptionsActio
 bool FRuleRangerEnsureFunctionsHaveDescriptionsActionErrorsForProtectedFunctionsTest::RunTest(const FString&)
 {
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureFunctionsHaveDescriptionsAction>();
-    const auto Blueprint =
-        RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Function/DescriptionsProtected"),
-                                      TEXT("BP_FunctionDescriptionsProtected"));
+    const auto Blueprint = RuleRangerTests::NewBlueprint(
+        URuleRangerAutomationBlueprintParentObject::StaticClass(),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Function/DescriptionsProtected"),
+        TEXT("BP_FunctionDescriptionsProtected"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
         && TestNotNull(TEXT("Blueprint should be created"), Blueprint))
@@ -75,7 +75,7 @@ bool FRuleRangerEnsureFunctionsHaveDescriptionsActionSkipsPrivateFunctionsByDefa
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureFunctionsHaveDescriptionsAction>();
     const auto Blueprint =
         RuleRangerTests::NewBlueprint(URuleRangerAutomationBlueprintParentObject::StaticClass(),
-                                      TEXT("/Game/Developers/RuleRangerTests/Blueprint/Function/DescriptionsPrivate"),
+                                      TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Function/DescriptionsPrivate"),
                                       TEXT("BP_FunctionDescriptionsPrivate"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)
@@ -110,7 +110,7 @@ bool FRuleRangerEnsureFunctionsHaveDescriptionsActionHonorsPrivateFunctionOptInT
     const auto Action = RuleRangerTests::NewTransientObject<UEnsureFunctionsHaveDescriptionsAction>();
     const auto Blueprint = RuleRangerTests::NewBlueprint(
         URuleRangerAutomationBlueprintParentObject::StaticClass(),
-        TEXT("/Game/Developers/RuleRangerTests/Blueprint/Function/DescriptionsPrivateOptIn"),
+        TEXT("/Game/Developers/Tests/RuleRanger/Blueprint/Function/DescriptionsPrivateOptIn"),
         TEXT("BP_FunctionDescriptionsPrivateOptIn"));
     RuleRangerTests::FRuleFixture Fixture;
     if (RuleRangerTests::CreateRuleFixture(*this, Fixture) && TestNotNull(TEXT("Action should be created"), Action)

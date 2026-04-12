@@ -62,6 +62,24 @@ public:
     RULERANGER_API static bool IsAbstract(const UClass* Class);
 
     /**
+     * Determines whether the specified UObject is a concrete type.
+     * This includes checks for both Blueprint-generated and native C++ classes.
+     *
+     * @param Object The UObject to check.
+     * @return true if the specified UObject is concrete, either as a Blueprint-generated type
+     *         or a native C++ class; false otherwise.
+     */
+    FORCEINLINE static bool IsConcrete(const UObject* Object) { return !IsAbstract(Object); }
+
+    /**
+     * Checks if the given UClass is concrete.
+     *
+     * @param Class The UClass to check.
+     * @return true if the class is concrete, false otherwise.
+     */
+    FORCEINLINE static bool IsConcrete(const UClass* Class) { return !IsAbstract(Class); }
+
+    /**
      * Collect the "parent" instances of an object into an objects array, starting with the passed in class and moving
      * to parent objects at the end of the list. This is to support the scenario where a MaterialInstance may have a
      * chain of parent Material instances before being parented by a Material.

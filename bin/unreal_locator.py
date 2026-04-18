@@ -19,14 +19,18 @@ import sys
 from pathlib import Path
 from typing import Iterable
 
+
 class UnrealError(Exception):
     """Base exception for Unreal helpers."""
+
 
 class UnrealHomeNotFound(UnrealError):
     pass
 
+
 class UnrealVersionNotFound(UnrealError):
     pass
+
 
 class UnrealCommandNotFound(UnrealError):
     pass
@@ -94,9 +98,7 @@ def find_unreal_home(uproject_path: Path) -> Path:
     if env_home:
         env_path = Path(env_home)
         if not env_path.exists():
-            raise UnrealHomeNotFound(
-                f"UNREAL_HOME environment variable points to non-existent path: {env_home}"
-            )
+            raise UnrealHomeNotFound(f"UNREAL_HOME environment variable points to non-existent path: {env_home}")
         return env_path
 
     # 3. derive from version
@@ -124,13 +126,13 @@ def get_unreal_commands(home: Path, commands: Iterable[str]) -> dict[str, Path]:
             if is_windows:
                 path = home / "Engine" / "Binaries" / "Win64" / "UnrealEditor.exe"
             else:  # macOS
-                path = (home / "Engine" / "Binaries" / "Mac" / "UnrealEditor.app" / "Contents" / "MacOS" / "UnrealEditor")
+                path = home / "Engine" / "Binaries" / "Mac" / "UnrealEditor.app" / "Contents" / "MacOS" / "UnrealEditor"
         elif cmd == "UnrealEditor-Cmd":
             if is_windows:
                 path = home / "Engine" / "Binaries" / "Win64" / "UnrealEditor-Cmd.exe"
             else:
                 # no real separate binary; mimic CLI version of UnrealEditor
-                path = (home / "Engine" / "Binaries" / "Mac" / "UnrealEditor.app" / "Contents" / "MacOS" / "UnrealEditor")
+                path = home / "Engine" / "Binaries" / "Mac" / "UnrealEditor.app" / "Contents" / "MacOS" / "UnrealEditor"
         else:
             raise UnrealCommandNotFound(f"Unknown command name requested: {cmd}")
 

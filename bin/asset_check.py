@@ -14,7 +14,6 @@
 
 import subprocess
 import argparse
-import json
 import os
 import glob
 import sys
@@ -25,9 +24,7 @@ from pathlib import Path
 parser = argparse.ArgumentParser(description="Rule Ranger Asset Checker")
 
 parser.add_argument("--verbose", action="store_true", help="Increase output verbosity")
-parser.add_argument(
-    "--staged-only", action="store_true", help="Only analyze staged assets"
-)
+parser.add_argument("--staged-only", action="store_true", help="Only analyze staged assets")
 parser.add_argument("--report", type=str, help="Path to the JSON report")
 parser.add_argument("--asset-path", type=str, help="Additional asset paths to analyze")
 parser.add_argument("files", type=str, nargs="*", help="The files to analyze")
@@ -74,14 +71,16 @@ try:
         # Modern git errors if the git directory owner and current user differ unless you pass safe.directory
         # so this script failed when running under some agents without setting safe.directory
         index_files = subprocess.check_output(
-            ["git",
-             "-c",
-             f"safe.directory={repo_root.as_posix()}",
-             "diff-index",
-             "--cached",
-             "--name-only",
-             "HEAD",
-             *args.files],
+            [
+                "git",
+                "-c",
+                f"safe.directory={repo_root.as_posix()}",
+                "diff-index",
+                "--cached",
+                "--name-only",
+                "HEAD",
+                *args.files,
+            ],
             universal_newlines=True,
         ).splitlines()
         for file in index_files:
@@ -89,15 +88,11 @@ try:
                 # File does not exist. Probably means that the index list
                 # includes deleted files. We just skip it
                 pass
-            elif file.startswith("Content/") and (
-                file.lower().endswith(".uasset") or file.lower().endswith(".umap")
-            ):
+            elif file.startswith("Content/") and (file.lower().endswith(".uasset") or file.lower().endswith(".umap")):
                 # Convert staged file paths into package names so the commandlet can resolve them precisely.
                 rel_path = file.split("Content/", 1)[-1]
                 rel_path_noext = os.path.splitext(rel_path)[0]
-                game_path = "/Game/" + rel_path_noext.replace("\\", "/").replace(
-                    "//", "/"
-                )
+                game_path = "/Game/" + rel_path_noext.replace("\\", "/").replace("//", "/")
                 asset_packages.append(game_path)
 
         if 0 != len(index_files) and 0 == len(asset_packages):
@@ -132,9 +127,7 @@ try:
 
     argfile_path = os.path.abspath(argfile.name)
     try:
-        subprocess.run(
-            [editor_cmd, uproject, f"-CmdLineFile={argfile_path}"], check=True
-        )
+        subprocess.run([editor_cmd, uproject, f"-CmdLineFile={argfile_path}"], check=True)
     finally:
         # Clean up response file
         os.remove(argfile_path)

@@ -19,7 +19,6 @@ import argparse
 import sys
 from pathlib import Path
 
-
 CANONICAL_HEADER = """/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

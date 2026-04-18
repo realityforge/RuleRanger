@@ -71,7 +71,17 @@ void UEnforceGameplayTagRemapPresentAction::Apply(URuleRangerProjectActionContex
                     }
 
                     Remaps.Add(MoveTemp(NewRemap));
-                    Settings->SaveConfig();
+                    if (!Settings->TryUpdateDefaultConfigFile())
+                    {
+                        ActionContext->Error(FText::Format(
+                            NSLOCTEXT(
+                                "RuleRanger",
+                                "GameplayTagRemapPresentCreateSaveFailed",
+                                "Added Gameplay Tag CategoryRemapping for '{0}' in memory, but failed to write '{1}' to disk."),
+                            FText::FromString(Name),
+                            FText::FromString(Settings->GetDefaultConfigFilename())));
+                        return;
+                    }
 
                     ActionContext->Info(
                         FText::Format(NSLOCTEXT("RuleRanger",
@@ -111,7 +121,17 @@ void UEnforceGameplayTagRemapPresentAction::Apply(URuleRangerProjectActionContex
                         }
                     }
 
-                    Settings->SaveConfig();
+                    if (!Settings->TryUpdateDefaultConfigFile())
+                    {
+                        ActionContext->Error(FText::Format(
+                            NSLOCTEXT(
+                                "RuleRanger",
+                                "GameplayTagRemapPresentUpdateSaveFailed",
+                                "Updated Gameplay Tag CategoryRemapping for '{0}' in memory, but failed to write '{1}' to disk."),
+                            FText::FromString(Name),
+                            FText::FromString(Settings->GetDefaultConfigFilename())));
+                        return;
+                    }
 
                     ActionContext->Info(FText::Format(NSLOCTEXT("RuleRanger",
                                                                 "AddedGameplayTagRemap",

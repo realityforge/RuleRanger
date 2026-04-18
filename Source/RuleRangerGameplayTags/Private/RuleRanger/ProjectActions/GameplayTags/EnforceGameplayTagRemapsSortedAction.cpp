@@ -46,7 +46,7 @@ void UEnforceGameplayTagRemapsSortedAction::Apply(URuleRangerProjectActionContex
     auto const Settings = GetMutableDefault<UGameplayTagsSettings>();
     if (IsValid(Settings))
     {
-        auto& Remaps = Settings->CategoryRemapping;
+        const auto& Remaps = Settings->CategoryRemapping;
 
         // Clean up whitespace-only entries and remove remaps that end up empty after cleaning.
         int32 EmptyRemovedCount = 0;
@@ -192,8 +192,17 @@ void UEnforceGameplayTagRemapsSortedAction::Apply(URuleRangerProjectActionContex
                     R.RemapCategories.Sort([](const FString& A, const FString& B) { return A < B; });
                 }
 
-                Remaps = MoveTemp(Unique);
-                Settings->SaveConfig();
+                Settings->CategoryRemapping = MoveTemp(Unique);
+                if (!Settings->TryUpdateDefaultConfigFile())
+                {
+                    ActionContext->Error(FText::Format(
+                        NSLOCTEXT(
+                            "RuleRanger",
+                            "GameplayTagsRemapsSortedSaveFailed",
+                            "Sorted Gameplay Tag CategoryRemapping in memory, but failed to write '{0}' to disk."),
+                        FText::FromString(Settings->GetDefaultConfigFilename())));
+                    return;
+                }
 
                 // Report changes
                 if (DuplicateCount > 0 || bUnsorted)

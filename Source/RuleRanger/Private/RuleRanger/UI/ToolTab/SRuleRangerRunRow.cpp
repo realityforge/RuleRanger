@@ -99,7 +99,7 @@ FReply SRuleRangerRunRow::OnMouseButtonDown(const FGeometry& MyGeometry, const F
 FReply SRuleRangerRunRow::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
 {
     const auto Key = InKeyEvent.GetKey();
-    if (EKeys::Enter == Key || EKeys::Virtual_Accept == Key)
+    if (EKeys::Enter == Key || EKeys::Virtual_Gamepad_Accept.GetVirtualKey() == Key)
     {
         if (const auto Pinned = OwnerListView.Pin())
         {

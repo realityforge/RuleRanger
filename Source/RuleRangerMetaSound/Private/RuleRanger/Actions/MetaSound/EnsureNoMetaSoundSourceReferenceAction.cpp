@@ -24,15 +24,12 @@ class IAssetRegistry;
 
 UEnsureNoMetaSoundSourceReferenceAction::UEnsureNoMetaSoundSourceReferenceAction()
 {
-#if WITH_RULERANGER_METASOUND_RULES
     AllowList.Add(UMetaSoundSource::StaticClass());
-#endif
 }
 
 bool UEnsureNoMetaSoundSourceReferenceAction::IsReferenceAllowed(const UObject* MetaSoundSource,
                                                                  const UObject* Other) const
 {
-#if WITH_RULERANGER_METASOUND_RULES
     // Allow if MetaSoundSource with bIsPreset = true
     if (CastChecked<UMetaSoundSource>(MetaSoundSource)->GetConstDocument().RootGraph.PresetOptions.bIsPreset)
     {
@@ -56,14 +53,10 @@ bool UEnsureNoMetaSoundSourceReferenceAction::IsReferenceAllowed(const UObject* 
         }
     }
     return false;
-#else
-    return true;
-#endif
 }
 
 void UEnsureNoMetaSoundSourceReferenceAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
-#if WITH_RULERANGER_METASOUND_RULES
     const auto PackageName = FSoftObjectPath(Object).GetAssetPath().GetPackageName();
     const auto& AssetRegistry = FAssetRegistryModule::GetRegistry();
 
@@ -119,7 +112,6 @@ void UEnsureNoMetaSoundSourceReferenceAction::Apply(URuleRangerActionContext* Ac
             }
         }
     }
-#endif
 }
 
 void UEnsureNoMetaSoundSourceReferenceAction::PreSave(const FObjectPreSaveContext SaveContext)

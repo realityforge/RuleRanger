@@ -144,7 +144,7 @@ static TSharedRef<FExtender> OnExtendForSelectedAssetsMenu(const TArray<FAssetDa
         SelectedPaths.Reserve(Assets.Num());
         for (const auto& Asset : Assets)
         {
-            SelectedPaths.Add(Asset.GetObjectPathString());
+            SelectedPaths.Add(Asset.GetSoftObjectPath().ToString());
         }
         auto Summarize = [](const auto& In, const auto MaxItems) {
             FString Out;

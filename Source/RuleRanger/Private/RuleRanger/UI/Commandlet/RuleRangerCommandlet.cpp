@@ -96,13 +96,7 @@ bool URuleRangerCommandlet::CollectAssetsFromPackageAllowlist(const TArray<FStri
             continue;
         }
 
-        for (const auto& Asset : PackageAssets)
-        {
-            if (Asset.IsTopLevelAsset() && !Asset.IsRedirector())
-            {
-                Assets.Add(Asset);
-            }
-        }
+        FRuleRangerUtilities::AddPackageRepresentativeAssets(PackageAssets, Assets);
     }
 
     return bAllPackagesResolved;
@@ -150,13 +144,7 @@ bool URuleRangerCommandlet::CollectAssetsFromPathAllowlist(const TArray<FString>
             continue;
         }
 
-        for (const auto& Asset : PathAssets)
-        {
-            if (Asset.IsTopLevelAsset() && !Asset.IsRedirector())
-            {
-                Assets.Add(Asset);
-            }
-        }
+        FRuleRangerUtilities::AddPackageRepresentativeAssets(PathAssets, Assets);
     }
 
     return bAllPathsResolved;

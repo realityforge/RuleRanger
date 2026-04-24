@@ -27,6 +27,10 @@ class URuleRangerCommandlet final : public UCommandlet, public IRuleRangerResult
 {
     GENERATED_BODY()
 
+#if WITH_DEV_AUTOMATION_TESTS
+    friend class FRuleRangerCommandletTestAccessor;
+#endif
+
     bool CollectAssetsFromPackageAllowlist(const TArray<FString>& AllowlistPackages, TArray<FAssetData>& Assets);
     bool CollectAssetsFromPathAllowlist(const TArray<FString>& AllowlistPaths, TArray<FAssetData>& Assets);
     void DeriveAllowlistPaths(const FString& Params, TArray<FString>& AllowlistPaths);

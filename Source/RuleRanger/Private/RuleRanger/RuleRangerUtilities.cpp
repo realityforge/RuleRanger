@@ -13,6 +13,7 @@
  */
 #include "RuleRanger/RuleRangerUtilities.h"
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetRegistry/IAssetRegistry.h"
 #include "AssetToolsModule.h"
 #include "IAssetTools.h"
 #include "Materials/MaterialInterface.h"
@@ -57,6 +58,27 @@ bool FRuleRangerUtilities::RenameAsset(UObject* Object, const FString& NewName)
         ensure(Object->GetPackage()->MarkPackageDirty());
     }
     return bSuccess;
+}
+
+void FRuleRangerUtilities::AddPackageRepresentativeAssets(const TArray<FAssetData>& CandidateAssets,
+                                                          TArray<FAssetData>& OutAssets)
+{
+    TMap<FName, TArray<const FAssetData*>> AssetsByPackage;
+    for (const auto& Asset : CandidateAssets)
+    {
+        if (Asset.IsValid() && !Asset.IsRedirector())
+        {
+            AssetsByPackage.FindOrAdd(Asset.PackageName).Add(&Asset);
+        }
+    }
+
+    for (const auto& Entry : AssetsByPackage)
+    {
+        if (const auto Representative = UE::AssetRegistry::GetMostImportantAsset(Entry.Value))
+        {
+            OutAssets.AddUnique(*Representative);
+        }
+    }
 }
 
 void FRuleRangerUtilities::CollectTypeHierarchy(const UObject* Object, TArray<UClass*>& Classes)

@@ -13,6 +13,7 @@
  */
 #pragma once
 
+#include "AssetRegistry/AssetData.h"
 #include "CoreMinimal.h"
 
 class UBlueprint;
@@ -25,6 +26,14 @@ public:
 
     /** Method to perform the rename of an asset. */
     RULERANGER_API static bool RenameAsset(UObject* Object, const FString& NewName);
+
+    /**
+     * Reduce raw asset-registry rows to one editor-facing representative asset per package.
+     * Redirectors
+     * are ignored and duplicates are suppressed in the output array.
+     */
+    RULERANGER_API static void AddPackageRepresentativeAssets(const TArray<FAssetData>& CandidateAssets,
+                                                              TArray<FAssetData>& OutAssets);
 
     /**
      * Add the types of an object into a classes array, starting with the most specific and moving to least specific at

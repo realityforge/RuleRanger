@@ -1009,19 +1009,13 @@ void URuleRangerEditorSubsystem::CollectAssetsFromPaths(const TArray<FString>& A
         }
         else if (EName::None != Asset.AssetName)
         {
-            Assets.Add(Asset);
+            Assets.AddUnique(Asset);
         }
         else
         {
             TArray<FAssetData> OutAssets;
             AssetRegistry.GetAssetsByPath(*AssetPath, OutAssets, true);
-            for (auto& OutAsset : OutAssets)
-            {
-                if (OutAsset.IsTopLevelAsset())
-                {
-                    Assets.Add(OutAsset);
-                }
-            }
+            FRuleRangerUtilities::AddPackageRepresentativeAssets(OutAssets, Assets);
         }
     }
 }

@@ -35,6 +35,7 @@
     #include "Misc/DataValidation.h"
     #include "Misc/Paths.h"
     #include "RuleRanger/Actions/Blueprint/EnsureDataOnlyBlueprintAction.h"
+    #include "RuleRanger/RuleRangerUtilities.h"
     #include "RuleRangerActionContext.h"
     #include "RuleRangerConfig.h"
     #include "RuleRangerProjectActionContext.h"
@@ -280,7 +281,9 @@ namespace RuleRangerTests
                         TArray<FAssetData> Assets;
                         if (AssetRegistry.GetAssetsByPath(FName(*Directory.MountPath), Assets, true, false))
                         {
-                            for (const auto& Asset : Assets)
+                            TArray<FAssetData> RepresentativeAssets;
+                            FRuleRangerUtilities::AddPackageRepresentativeAssets(Assets, RepresentativeAssets);
+                            for (const auto& Asset : RepresentativeAssets)
                             {
                                 Subsystem->DeleteAsset(Asset.GetSoftObjectPath().ToString());
                             }

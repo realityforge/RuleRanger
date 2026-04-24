@@ -51,6 +51,16 @@ reserved for runtime assets that ship with the plugin.
   critical code paths.
 - Error Handling: Implement robust error handling and provide clear feedback to users or logs when errors occur.
 
+## Asset Selection Invariant
+
+- Treat "one editor-facing representative asset per package" as the default RuleRanger asset-selection rule.
+- When expanding asset-registry rows returned from package/path queries, prefer the engine package-representative asset
+  selection APIs over ad hoc `IsTopLevelAsset()`, generated-class (`_C`) filtering, or other custom heuristics.
+- Keep commandlet, editor-tool, and test-helper asset collection behavior aligned so the same package resolves to the
+  same asset representation in all RuleRanger entry points.
+- It is still valid for actions and matchers to inspect `GeneratedClass`, `ParentClass`, or CDO state after an
+  editor-facing asset has been selected, when that is required to evaluate Blueprint-authored behavior.
+
 ## Coding Style & Naming Conventions
 
 - Follow Unreal Engine defaults: 4-space indentation, PascalCase types, Functions and Variables, `F[StructName]` for

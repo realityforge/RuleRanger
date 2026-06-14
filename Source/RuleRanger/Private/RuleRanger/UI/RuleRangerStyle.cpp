@@ -41,10 +41,17 @@ void FRuleRangerStyle::Initialize()
 
 void FRuleRangerStyle::Shutdown()
 {
-    UE_LOGFMT(LogRuleRanger, VeryVerbose, "FRuleRangerStyle::Shutdown: Deregistering StyleSet.");
-    FSlateStyleRegistry::UnRegisterSlateStyle(*StyleInstance);
-    ensure(StyleInstance.IsUnique());
-    StyleInstance.Reset();
+    if (StyleInstance.IsValid())
+    {
+        UE_LOGFMT(LogRuleRanger, VeryVerbose, "FRuleRangerStyle::Shutdown: Deregistering StyleSet.");
+        FSlateStyleRegistry::UnRegisterSlateStyle(*StyleInstance);
+        ensure(StyleInstance.IsUnique());
+        StyleInstance.Reset();
+    }
+    else
+    {
+        UE_LOGFMT(LogRuleRanger, VeryVerbose, "FRuleRangerStyle::Shutdown: Skipping as StyleSet is not valid.");
+    }
 }
 
 FName FRuleRangerStyle::GetStyleSetName()

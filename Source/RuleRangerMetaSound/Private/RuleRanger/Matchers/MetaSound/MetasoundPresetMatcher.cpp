@@ -18,7 +18,7 @@
 
 bool UMetasoundPresetMatcher::Test(UObject* Object) const
 {
-    if (Object->IsA(UMetaSoundSource::StaticClass()))
+    if (Object && Object->IsA(UMetaSoundSource::StaticClass()))
     {
         return CastChecked<UMetaSoundSource>(Object)->GetConstDocument().RootGraph.PresetOptions.bIsPreset;
     }

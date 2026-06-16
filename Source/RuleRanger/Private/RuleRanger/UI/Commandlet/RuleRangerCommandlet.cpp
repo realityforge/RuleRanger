@@ -112,6 +112,14 @@ bool URuleRangerCommandlet::CollectAssetsFromPathAllowlist(const TArray<FString>
     bool bAllPathsResolved = true;
     for (const auto& Path : AllowlistPaths)
     {
+        FText Reason;
+        if (!FPackageName::IsValidLongPackageName(Path, false, &Reason))
+        {
+            UE_LOGFMT(LogRuleRanger, Error, "Invalid staged content root {Path}: {Reason}", Path, Reason.ToString());
+            bAllPathsResolved = false;
+            continue;
+        }
+
         TArray<FAssetData> PathAssets;
         if (!Registry.GetAssetsByPath(*Path, PathAssets, /*bRecursive=*/true))
         {

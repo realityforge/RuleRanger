@@ -207,21 +207,31 @@ FDelegateHandle FRuleRangerContentBrowserExtensions::SelectedAssetsDelegateHandl
 
 void FRuleRangerContentBrowserExtensions::Initialize()
 {
-    auto& Module = FModuleManager::LoadModuleChecked<FContentBrowserModule>(TEXT("ContentBrowser"));
+    if (!SelectedPathsDelegateHandle.IsValid() || !SelectedAssetsDelegateHandle.IsValid())
+    {
+        auto& Module = FModuleManager::LoadModuleChecked<FContentBrowserModule>(TEXT("ContentBrowser"));
 
-    UE_LOGFMT(LogRuleRanger,
-              VeryVerbose,
-              "FRuleRangerContentBrowserExtensions::Initialize(): Registering ContentBrowser Extensions.");
-    SelectedPathsDelegate = FContentBrowserMenuExtender_SelectedPaths::CreateStatic(&OnExtendSelectedPathsMenu);
-    Module.GetAllPathViewContextMenuExtenders().Add(SelectedPathsDelegate);
-    SelectedPathsDelegateHandle = SelectedPathsDelegate.GetHandle();
-    check(SelectedPathsDelegateHandle.IsValid());
+        UE_LOGFMT(LogRuleRanger,
+                  VeryVerbose,
+                  "FRuleRangerContentBrowserExtensions::Initialize(): Registering ContentBrowser Extensions.");
+        SelectedPathsDelegate = FContentBrowserMenuExtender_SelectedPaths::CreateStatic(&OnExtendSelectedPathsMenu);
+        Module.GetAllPathViewContextMenuExtenders().Add(SelectedPathsDelegate);
+        SelectedPathsDelegateHandle = SelectedPathsDelegate.GetHandle();
+        check(SelectedPathsDelegateHandle.IsValid());
 
-    // Asset extenders
-    SelectedAssetsDelegate = FContentBrowserMenuExtender_SelectedAssets::CreateStatic(&OnExtendForSelectedAssetsMenu);
-    Module.GetAllAssetViewContextMenuExtenders().Add(SelectedAssetsDelegate);
-    SelectedAssetsDelegateHandle = SelectedAssetsDelegate.GetHandle();
-    check(SelectedAssetsDelegateHandle.IsValid());
+        // Asset extenders
+        SelectedAssetsDelegate =
+            FContentBrowserMenuExtender_SelectedAssets::CreateStatic(&OnExtendForSelectedAssetsMenu);
+        Module.GetAllAssetViewContextMenuExtenders().Add(SelectedAssetsDelegate);
+        SelectedAssetsDelegateHandle = SelectedAssetsDelegate.GetHandle();
+        check(SelectedAssetsDelegateHandle.IsValid());
+    }
+    else
+    {
+        UE_LOGFMT(LogRuleRanger,
+                  VeryVerbose,
+                  "FRuleRangerContentBrowserExtensions::Initialize(): Skipping registration as handles are valid.");
+    }
 }
 
 void FRuleRangerContentBrowserExtensions::Shutdown()

@@ -269,4 +269,9 @@ void FRuleRangerContentBrowserExtensions::Shutdown()
                       "Skipping deregister of Asset Asset ContextMenu ContentBrowser Extensions as handle is Invalid.");
         }
     }
+    else
+    {
+        SelectedPathsDelegateHandle.Reset();
+        SelectedAssetsDelegateHandle.Reset();
+    }
 }

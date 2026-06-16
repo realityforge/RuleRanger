@@ -43,6 +43,10 @@ public:
     static const FSlateBrush* GetWarningMessageBrush();
     static const FSlateBrush* GetErrorMessageBrush();
 
+#if WITH_DEV_AUTOMATION_TESTS
+    static bool IsInitializedForTest();
+#endif
+
 private:
     static TSharedRef<FSlateStyleSet> Create();
     static TSharedPtr<FSlateStyleSet> StyleInstance;

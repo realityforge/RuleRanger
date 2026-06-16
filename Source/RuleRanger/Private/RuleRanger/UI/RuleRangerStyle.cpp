@@ -131,3 +131,10 @@ const ISlateStyle& FRuleRangerStyle::Get()
 {
     return *StyleInstance;
 }
+
+#if WITH_DEV_AUTOMATION_TESTS
+bool FRuleRangerStyle::IsInitializedForTest()
+{
+    return StyleInstance.IsValid();
+}
+#endif

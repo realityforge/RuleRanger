@@ -32,7 +32,6 @@
 #include "ShaderCompiler.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerCommandlet)
-#include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerToolProjectResultHandler)
 
 static void WaitForShaders()
 {

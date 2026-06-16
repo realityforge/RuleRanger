@@ -240,7 +240,7 @@ void FRuleRangerContentBrowserExtensions::Shutdown()
             auto Target = SelectedPathsDelegateHandle;
             auto& Extenders = Module.GetAllPathViewContextMenuExtenders();
             Extenders.RemoveAll([&Target](const auto& Delegate) { return Delegate.GetHandle() == Target; });
-            Target.Reset();
+            SelectedPathsDelegateHandle.Reset();
         }
         else
         {

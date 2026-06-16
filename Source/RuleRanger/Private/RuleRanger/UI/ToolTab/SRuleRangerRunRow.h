@@ -32,6 +32,25 @@ public:
 
     void Construct(const FArguments& InArgs, const TSharedRef<STableViewBase>& InOwnerTable);
 
+#if WITH_DEV_AUTOMATION_TESTS
+    TSharedRef<SWidget> GenerateWidgetForColumnForTest(const FName& ColumnName)
+    {
+        return GenerateWidgetForColumn(ColumnName);
+    }
+
+    static const FSlateBrush* GetSeverityBrushForTest(const ERuleRangerToolSeverity Severity)
+    {
+        return GetSeverityBrush(Severity);
+    }
+
+    static FText GetSeverityTextForTest(const ERuleRangerToolSeverity Severity) { return GetSeverityText(Severity); }
+
+    static FSlateColor GetSeverityTextColorForTest(const ERuleRangerToolSeverity Severity)
+    {
+        return GetSeverityTextColor(Severity);
+    }
+#endif
+
 private:
     TSharedPtr<FRuleRangerMessageRow> Item;
     TWeakPtr<SListView<TSharedPtr<FRuleRangerMessageRow>>> OwnerListView;

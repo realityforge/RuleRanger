@@ -57,6 +57,27 @@ public:
     /** Constructs the widget. */
     void Construct(const FArguments& InArgs);
 
+#if WITH_DEV_AUTOMATION_TESTS
+    int32 GetRunCountForTest() const { return Runs.Num(); }
+
+    int32 GetActiveRunIndexForTest() const { return ActiveRunIndex; }
+
+    TSharedPtr<FRuleRangerRun> GetRunForTest(const int32 Index) const
+    {
+        return Runs.IsValidIndex(Index) ? Runs[Index] : nullptr;
+    }
+
+    void StartRunForTest(const FText& Title) { StartRun(Title); }
+
+    void RebuildRunsUIForTest() { RebuildRunsUI(); }
+
+    void RebuildRunContentsForTest() { RebuildRunContents(); }
+
+    void CloseRunAtForTest(const int32 Index) { CloseRunAt(Index); }
+
+    void ClearAllRunsForTest() { ClearAllRuns(); }
+#endif
+
 private:
     TArray<TSharedPtr<FRuleRangerRun>> Runs;
     int32 ActiveRunIndex{ INDEX_NONE };

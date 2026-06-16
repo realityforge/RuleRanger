@@ -51,6 +51,9 @@ class URuleRangerEditorSubsystem final : public UEditorSubsystem
 
     friend URuleRangerContentBrowserExtensions;
     friend URuleRangerEditorValidator;
+#if WITH_DEV_AUTOMATION_TESTS
+    friend class FRuleRangerEditorSubsystemTestAccessor;
+#endif
 
 public:
     /** Implement this for initialization of instances of the system */

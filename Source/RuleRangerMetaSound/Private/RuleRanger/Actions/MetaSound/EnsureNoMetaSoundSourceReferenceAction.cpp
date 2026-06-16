@@ -15,12 +15,53 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Logging/StructuredLog.h"
 #include "MetasoundSource.h"
+#include "Misc/PackageName.h"
+#include "RuleRanger/RuleRangerUtilities.h"
 #include "RuleRangerActionContext.h"
 #include "UObject/ObjectSaveContext.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(EnsureNoMetaSoundSourceReferenceAction)
 
 class IAssetRegistry;
+
+namespace RuleRanger::MetaSoundAction
+{
+    UObject* TryLoadPackageRepresentativeAsset(const FName PackageName)
+    {
+        if (PackageName.IsNone())
+        {
+            return nullptr;
+        }
+
+        const auto& AssetRegistry = FAssetRegistryModule::GetRegistry();
+        TArray<FAssetData> Assets;
+        if (AssetRegistry.GetAssetsByPackageName(PackageName, Assets, true))
+        {
+            TArray<FAssetData> RepresentativeAssets;
+            FRuleRangerUtilities::AddPackageRepresentativeAssets(Assets, RepresentativeAssets);
+            for (const auto& Asset : RepresentativeAssets)
+            {
+                if (UObject* const Object = Asset.GetAsset())
+                {
+                    return Object;
+                }
+            }
+        }
+
+        const FString PackageNameString = PackageName.ToString();
+        const FString ObjectPath =
+            FString::Printf(TEXT("%s.%s"), *PackageNameString, *FPackageName::GetShortName(PackageNameString));
+        return FSoftObjectPath(ObjectPath).TryLoad();
+    }
+
+    bool ShouldIgnorePackageDependency(const FName PackageName)
+    {
+        const FString PackageNameString = PackageName.ToString();
+        return PackageNameString.StartsWith(TEXT("/Script/"))
+            || PackageNameString.Contains(TEXT("/__ExternalActors__/"))
+            || PackageNameString.Contains(TEXT("/__ExternalObjects__/"));
+    }
+} // namespace RuleRanger::MetaSoundAction
 
 UEnsureNoMetaSoundSourceReferenceAction::UEnsureNoMetaSoundSourceReferenceAction()
 {
@@ -57,6 +98,11 @@ bool UEnsureNoMetaSoundSourceReferenceAction::IsReferenceAllowed(const UObject* 
 
 void UEnsureNoMetaSoundSourceReferenceAction::Apply(URuleRangerActionContext* ActionContext, UObject* Object)
 {
+    if (!Object)
+    {
+        return;
+    }
+
     const auto PackageName = FSoftObjectPath(Object).GetAssetPath().GetPackageName();
     const auto& AssetRegistry = FAssetRegistryModule::GetRegistry();
 
@@ -67,7 +113,7 @@ void UEnsureNoMetaSoundSourceReferenceAction::Apply(URuleRangerActionContext* Ac
 
         for (const auto Referencer : Referencers)
         {
-            const auto Ref = FSoftObjectPath(Referencer.ToString()).TryLoad();
+            const auto Ref = RuleRanger::MetaSoundAction::TryLoadPackageRepresentativeAsset(Referencer);
             if (Ref && !IsReferenceAllowed(Object, Ref))
             {
                 FFormatNamedArguments Arguments;
@@ -90,12 +136,9 @@ void UEnsureNoMetaSoundSourceReferenceAction::Apply(URuleRangerActionContext* Ac
 
         for (const auto Referencer : Dependencies)
         {
-            FString AssetPath = Referencer.ToString();
-            if (!AssetPath.StartsWith("/Script/") && !AssetPath.Contains("/__ExternalActors__/")
-                && !AssetPath.Contains("/__ExternalObjects__/"))
+            if (!RuleRanger::MetaSoundAction::ShouldIgnorePackageDependency(Referencer))
             {
-                FSoftObjectPath SoftObjectPath(AssetPath);
-                const auto Ref = SoftObjectPath.IsAsset() ? SoftObjectPath.TryLoad() : nullptr;
+                const auto Ref = RuleRanger::MetaSoundAction::TryLoadPackageRepresentativeAsset(Referencer);
                 if (Ref && Ref->IsA(UMetaSoundSource::StaticClass()) && !IsReferenceAllowed(Ref, Object))
                 {
                     FFormatNamedArguments Arguments;

@@ -26,17 +26,34 @@ FName FRuleRangerToolTab::GetTabName()
 
 void FRuleRangerToolTab::Initialize()
 {
-    FGlobalTabmanager::Get()
-        ->RegisterNomadTabSpawner(GetTabName(), FOnSpawnTab::CreateStatic([](const auto&) {
-                                      return SNew(SDockTab).TabRole(NomadTab)[SNew(SRuleRangerToolPanel)];
-                                  }))
-        .SetDisplayName(NSLOCTEXT("RuleRanger", "RuleRangerTool_DisplayName", "Rule Ranger"))
-        .SetTooltipText(NSLOCTEXT("RuleRanger", "RuleRangerTool_Tooltip", "Rule Ranger Tool window"))
-        .SetIcon(FRuleRangerStyle::GetScanIcon())
-        .SetMenuType(ETabSpawnerMenuType::Hidden);
+    const auto& Manager = FGlobalTabmanager::Get();
+    const auto TabName = GetTabName();
+    if (!Manager->HasTabSpawner(TabName))
+    {
+        Manager
+            ->RegisterNomadTabSpawner(TabName, FOnSpawnTab::CreateStatic([](const auto&) {
+                                          return SNew(SDockTab).TabRole(NomadTab)[SNew(SRuleRangerToolPanel)];
+                                      }))
+            .SetDisplayName(NSLOCTEXT("RuleRanger", "RuleRangerTool_DisplayName", "Rule Ranger"))
+            .SetTooltipText(NSLOCTEXT("RuleRanger", "RuleRangerTool_Tooltip", "Rule Ranger Tool window"))
+            .SetIcon(FRuleRangerStyle::GetScanIcon())
+            .SetMenuType(ETabSpawnerMenuType::Hidden);
+    }
 }
 
 void FRuleRangerToolTab::Shutdown()
 {
-    FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(GetTabName());
+    const auto& Manager = FGlobalTabmanager::Get();
+    const auto TabName = GetTabName();
+    if (Manager->HasTabSpawner(TabName))
+    {
+        Manager->UnregisterNomadTabSpawner(TabName);
+    }
 }
+
+#if WITH_DEV_AUTOMATION_TESTS
+bool FRuleRangerToolTab::IsRegisteredForTest()
+{
+    return FGlobalTabmanager::Get()->HasTabSpawner(GetTabName());
+}
+#endif

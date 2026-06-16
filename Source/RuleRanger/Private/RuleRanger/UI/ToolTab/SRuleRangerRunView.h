@@ -34,6 +34,48 @@ public:
 
     void Construct(const FArguments& InArgs);
 
+#if WITH_DEV_AUTOMATION_TESTS
+    int32 GetFilteredItemCountForTest() const { return FilteredItems.Num(); }
+
+    TSharedPtr<FRuleRangerMessageRow> GetFilteredItemForTest(const int32 Index) const
+    {
+        return FilteredItems.IsValidIndex(Index) ? FilteredItems[Index] : nullptr;
+    }
+
+    void RebuildFilteredForTest() { RebuildFiltered(); }
+
+    void SetSeverityFiltersForTest(const bool bInShowInfo, const bool bInShowWarning, const bool bInShowError)
+    {
+        bShowInfo = bInShowInfo;
+        bShowWarning = bInShowWarning;
+        bShowError = bInShowError;
+        RebuildFiltered();
+    }
+
+    void SetSearchQueryForTest(const FString& InSearchQuery)
+    {
+        SearchQuery = InSearchQuery;
+        RebuildFiltered();
+    }
+
+    void SetSortForTest(const FName& InSortColumnId, const EColumnSortMode::Type InSortMode)
+    {
+        SortColumnId = InSortColumnId;
+        SortMode = InSortMode;
+        SortFiltered();
+    }
+
+    TSharedRef<SWidget> BuildColumnsMenuForTest() { return BuildColumnsMenu(); }
+
+    TSharedPtr<SWidget> OpenContextMenuForTest() { return OnContextMenuOpening(); }
+
+    TSharedRef<ITableRow> GenerateRowForTest(TSharedPtr<FRuleRangerMessageRow> InItem,
+                                             const TSharedRef<STableViewBase>& OwnerTable) const
+    {
+        return OnGenerateRow(InItem, OwnerTable);
+    }
+#endif
+
 private:
     // Preferences (persisted between sessions)
     void LoadPreferences();

@@ -36,6 +36,8 @@
     #include "Misc/Paths.h"
     #include "RuleRanger/Actions/Blueprint/EnsureDataOnlyBlueprintAction.h"
     #include "RuleRanger/RuleRangerUtilities.h"
+    #include "RuleRanger/UI/RuleRangerDeveloperSettings.h"
+    #include "RuleRanger/UI/RuleRangerEditorSubsystem.h"
     #include "RuleRangerActionContext.h"
     #include "RuleRangerConfig.h"
     #include "RuleRangerProjectActionContext.h"
@@ -815,6 +817,49 @@ namespace RuleRangerTests
         FObjectPreSaveContext Context;
 
         FPreSaveContextHolder() : Context(Data) {}
+    };
+
+    struct FScopedRuleRangerDeveloperSettingsOverride
+    {
+        URuleRangerDeveloperSettings* Settings{ nullptr };
+        bool bOriginalAlwaysShowMessageLog{ false };
+        TArray<TSoftObjectPtr<URuleRangerConfig>> OriginalConfigs;
+
+        explicit FScopedRuleRangerDeveloperSettingsOverride(const TArray<TSoftObjectPtr<URuleRangerConfig>>& NewConfigs,
+                                                            const bool bAlwaysShowMessageLog = false)
+            : Settings(GetMutableDefault<URuleRangerDeveloperSettings>())
+        {
+            if (Settings)
+            {
+                bOriginalAlwaysShowMessageLog = Settings->bAlwaysShowMessageLog;
+                OriginalConfigs = Settings->Configs;
+                Settings->bAlwaysShowMessageLog = bAlwaysShowMessageLog;
+                Settings->Configs = NewConfigs;
+            }
+            MarkSubsystemCacheDirty();
+        }
+
+        ~FScopedRuleRangerDeveloperSettingsOverride()
+        {
+            if (Settings)
+            {
+                Settings->bAlwaysShowMessageLog = bOriginalAlwaysShowMessageLog;
+                Settings->Configs = OriginalConfigs;
+            }
+            MarkSubsystemCacheDirty();
+        }
+
+    private:
+        static void MarkSubsystemCacheDirty()
+        {
+            if (GEditor)
+            {
+                if (const auto Subsystem = GEditor->GetEditorSubsystem<URuleRangerEditorSubsystem>())
+                {
+                    Subsystem->MarkRuleSetConfigCacheDirty();
+                }
+            }
+        }
     };
 
     struct FRuleFixture

@@ -20,9 +20,13 @@
 #include "RuleRanger/Actions/Texture/Texture2DActionBase.h"
 #include "RuleRanger/Matchers/Common/EditorPropertyMatcherBase.h"
 #include "RuleRangerAction.h"
+#include "RuleRangerActionContext.h"
 #include "RuleRangerCommonContext.h"
 #include "RuleRangerMatcher.h"
 #include "RuleRangerProjectAction.h"
+#include "RuleRangerProjectActionContext.h"
+#include "RuleRangerProjectResultHandler.h"
+#include "RuleRangerResultHandler.h"
 #include "RuleRangerAutomationTestTypes.generated.h"
 
 UENUM()
@@ -209,9 +213,12 @@ public:
 
     int32 GetApplyCount() const { return ApplyCount; }
 
+    ERuleRangerActionTrigger GetLastTrigger() const { return LastTrigger; }
+
     virtual void Apply(URuleRangerActionContext* ActionContext, UObject* Object) override
     {
         ApplyCount++;
+        LastTrigger = ActionContext ? ActionContext->GetActionTrigger() : ERuleRangerActionTrigger::AT_Max;
 
         switch (Outcome)
         {
@@ -237,6 +244,7 @@ public:
 
 private:
     int32 ApplyCount{ 0 };
+    ERuleRangerActionTrigger LastTrigger{ ERuleRangerActionTrigger::AT_Max };
 };
 
 UCLASS(NotBlueprintable, DisplayName = "Automation Texture2D Action")
@@ -276,9 +284,12 @@ public:
 
     int32 GetApplyCount() const { return ApplyCount; }
 
+    ERuleRangerProjectActionTrigger GetLastTrigger() const { return LastTrigger; }
+
     virtual void Apply(URuleRangerProjectActionContext* ActionContext) override
     {
         ApplyCount++;
+        LastTrigger = ActionContext ? ActionContext->GetActionTrigger() : ERuleRangerProjectActionTrigger::AT_Max;
 
         switch (Outcome)
         {
@@ -302,6 +313,61 @@ public:
 
 private:
     int32 ApplyCount{ 0 };
+    ERuleRangerProjectActionTrigger LastTrigger{ ERuleRangerProjectActionTrigger::AT_Max };
+};
+
+UCLASS(NotBlueprintable)
+class URuleRangerAutomationCapturingResultHandler final : public UObject, public IRuleRangerResultHandler
+{
+    GENERATED_BODY()
+
+public:
+    int32 CallCount{ 0 };
+    ERuleRangerActionState LastState{ ERuleRangerActionState::AS_Max };
+    ERuleRangerActionTrigger LastTrigger{ ERuleRangerActionTrigger::AT_Max };
+    int32 LastWarningCount{ 0 };
+    int32 LastErrorCount{ 0 };
+    int32 LastFatalCount{ 0 };
+
+    virtual void OnRuleApplied(URuleRangerActionContext* InActionContext) override
+    {
+        ++CallCount;
+        if (InActionContext)
+        {
+            LastState = InActionContext->GetState();
+            LastTrigger = InActionContext->GetActionTrigger();
+            LastWarningCount = InActionContext->GetWarningMessages().Num();
+            LastErrorCount = InActionContext->GetErrorMessages().Num();
+            LastFatalCount = InActionContext->GetFatalMessages().Num();
+        }
+    }
+};
+
+UCLASS(NotBlueprintable)
+class URuleRangerAutomationCapturingProjectResultHandler final : public UObject, public IRuleRangerProjectResultHandler
+{
+    GENERATED_BODY()
+
+public:
+    int32 CallCount{ 0 };
+    ERuleRangerActionState LastState{ ERuleRangerActionState::AS_Max };
+    ERuleRangerProjectActionTrigger LastTrigger{ ERuleRangerProjectActionTrigger::AT_Max };
+    int32 LastWarningCount{ 0 };
+    int32 LastErrorCount{ 0 };
+    int32 LastFatalCount{ 0 };
+
+    virtual void OnProjectRuleApplied(URuleRangerProjectActionContext* Context) override
+    {
+        ++CallCount;
+        if (Context)
+        {
+            LastState = Context->GetState();
+            LastTrigger = Context->GetActionTrigger();
+            LastWarningCount = Context->GetWarningMessages().Num();
+            LastErrorCount = Context->GetErrorMessages().Num();
+            LastFatalCount = Context->GetFatalMessages().Num();
+        }
+    }
 };
 
 UCLASS(NotBlueprintable, DisplayName = "Automation Project Action Fallback")

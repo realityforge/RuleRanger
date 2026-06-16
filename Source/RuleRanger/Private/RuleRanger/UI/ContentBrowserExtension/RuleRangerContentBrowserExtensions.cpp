@@ -285,3 +285,22 @@ void FRuleRangerContentBrowserExtensions::Shutdown()
         SelectedAssetsDelegateHandle.Reset();
     }
 }
+
+#if WITH_DEV_AUTOMATION_TESTS
+TSharedRef<FExtender>
+FRuleRangerContentBrowserExtensions::CreateSelectedPathsMenuExtenderForTest(const TArray<FString>& Paths)
+{
+    return OnExtendSelectedPathsMenu(Paths);
+}
+
+TSharedRef<FExtender>
+FRuleRangerContentBrowserExtensions::CreateSelectedAssetsMenuExtenderForTest(const TArray<FAssetData>& Assets)
+{
+    return OnExtendForSelectedAssetsMenu(Assets);
+}
+
+bool FRuleRangerContentBrowserExtensions::AreExtendersRegisteredForTest()
+{
+    return SelectedPathsDelegateHandle.IsValid() && SelectedAssetsDelegateHandle.IsValid();
+}
+#endif

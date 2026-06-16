@@ -25,8 +25,11 @@ int32 FRuleRangerToolsMenu::OwnerToken = 0;
 
 void FRuleRangerToolsMenu::Initialize()
 {
-    RegisterHandle = UToolMenus::RegisterStartupCallback(
-        FSimpleMulticastDelegate::FDelegate::CreateStatic(&FRuleRangerToolsMenu::RegisterMenus));
+    if (!RegisterHandle.IsValid())
+    {
+        RegisterHandle = UToolMenus::RegisterStartupCallback(
+            FSimpleMulticastDelegate::FDelegate::CreateStatic(&FRuleRangerToolsMenu::RegisterMenus));
+    }
     if (UToolMenus::Get())
     {
         RegisterMenus();
@@ -48,6 +51,11 @@ void FRuleRangerToolsMenu::Shutdown()
 
 void FRuleRangerToolsMenu::RegisterMenus()
 {
+    if (const auto ToolMenus = UToolMenus::Get())
+    {
+        ToolMenus->UnregisterOwner(&OwnerToken);
+    }
+
     FToolMenuOwnerScoped OwnerScoped(&OwnerToken);
 
     if (const auto ToolsMenu = UToolMenus::Get()->ExtendMenu("MainFrame.MainMenu.Tools"))
@@ -63,6 +71,13 @@ void FRuleRangerToolsMenu::RegisterMenus()
                            FRuleRangerStyle::GetScanIcon());
     }
 }
+
+#if WITH_DEV_AUTOMATION_TESTS
+void FRuleRangerToolsMenu::FillRuleRangerSubMenuForTest(UToolMenu* Menu)
+{
+    FillRuleRangerSubMenu(Menu);
+}
+#endif
 
 void FRuleRangerToolsMenu::FillRuleRangerSubMenu(UToolMenu* Menu)
 {

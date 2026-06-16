@@ -16,6 +16,9 @@
 #include "ContentBrowserDelegates.h"
 #include "CoreMinimal.h"
 
+class FExtender;
+struct FAssetData;
+
 /** The class responsible for managing MessageLog categories used in RuleRanger plugin. */
 class FRuleRangerContentBrowserExtensions final
 {
@@ -23,6 +26,14 @@ public:
     static void Initialize();
 
     static void Shutdown();
+
+#if WITH_DEV_AUTOMATION_TESTS
+    static TSharedRef<FExtender> CreateSelectedPathsMenuExtenderForTest(const TArray<FString>& Paths);
+
+    static TSharedRef<FExtender> CreateSelectedAssetsMenuExtenderForTest(const TArray<FAssetData>& Assets);
+
+    static bool AreExtendersRegisteredForTest();
+#endif
 
 private:
     // Delegate called when extending ContextBrowser SelectedPaths Context menu

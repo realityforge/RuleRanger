@@ -14,26 +14,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RuleRangerMetaSoundAutomationTestTypes.generated.h"
 
-class UToolMenu;
-
-/**
- * Registers the Rule Ranger submenu under the Tools menu with actions to scan/fix configured content.
- */
-class FRuleRangerToolsMenu
+UCLASS(NotBlueprintable)
+class URuleRangerMetaSoundReferenceObject final : public UObject
 {
+    GENERATED_BODY()
+
 public:
-    static void Initialize();
-    static void Shutdown();
-
-#if WITH_DEV_AUTOMATION_TESTS
-    static void FillRuleRangerSubMenuForTest(UToolMenu* Menu);
-#endif
-
-private:
-    static FDelegateHandle RegisterHandle;
-    static int32 OwnerToken;
-
-    static void RegisterMenus();
-    static void FillRuleRangerSubMenu(UToolMenu* Menu);
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<UObject> Reference{ nullptr };
 };

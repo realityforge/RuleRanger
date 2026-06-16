@@ -29,4 +29,8 @@ public:
 
     /** The unique tab name for the RuleRanger Tool. */
     static FName GetTabName();
+
+#if WITH_DEV_AUTOMATION_TESTS
+    static bool IsRegisteredForTest();
+#endif
 };

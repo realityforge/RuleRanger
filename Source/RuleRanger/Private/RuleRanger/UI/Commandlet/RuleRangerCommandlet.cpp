@@ -153,7 +153,7 @@ bool URuleRangerCommandlet::CollectAssetsFromPathAllowlist(const TArray<FString>
 void URuleRangerCommandlet::DeriveAllowlistPaths(const FString& Params, TArray<FString>& AllowlistPaths)
 {
     FString PathsParam;
-    if (FParse::Value(*Params, TEXT("paths="), PathsParam))
+    if (FParse::Value(*Params, TEXT("paths="), PathsParam, false))
     {
         PathsParam.ParseIntoArray(AllowlistPaths, TEXT(","), true);
     }
@@ -163,7 +163,7 @@ void URuleRangerCommandlet::DeriveAllowlistPaths(const FString& Params, TArray<F
 void URuleRangerCommandlet::DeriveAllowlistPackages(const FString& Params, TArray<FString>& AllowlistPackages)
 {
     FString PackagesParam;
-    if (FParse::Value(*Params, TEXT("packages="), PackagesParam))
+    if (FParse::Value(*Params, TEXT("packages="), PackagesParam, false))
     {
         PackagesParam.ParseIntoArray(AllowlistPackages, TEXT(","), true);
     }

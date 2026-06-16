@@ -22,6 +22,7 @@
 #include "RuleRanger/UI/RuleRangerDeveloperSettings.h"
 #include "RuleRanger/UI/RuleRangerEditorSubsystem.h"
 #include "RuleRangerActionContext.h"
+#include "RuleRangerConfig.h"
 #include "RuleRangerLogging.h"
 #include "RuleRangerProjectActionContext.h"
 // ReSharper disable 2 CppUnusedIncludeDirective
@@ -360,75 +361,93 @@ void URuleRangerCommandlet::ExecuteProjectRules(const bool bFix)
         return;
     }
 
+    TArray<TWeakObjectPtr<URuleRangerConfig>> Configs;
+    for (const auto& SoftConfig : DevSettings->Configs)
+    {
+        if (const auto Config = SoftConfig.LoadSynchronous())
+        {
+            Configs.Add(Config);
+        }
+        else
+        {
+            UE_LOGFMT(LogRuleRanger, Error, "RuleRangerCommandlet: Invalid RuleRangerConfig skipped");
+        }
+    }
+
+    ExecuteProjectRulesForConfigs(Configs, bFix);
+}
+
+void URuleRangerCommandlet::ExecuteProjectRulesForConfigs(
+    const TConstArrayView<TWeakObjectPtr<URuleRangerConfig>> Configs,
+    const bool bFix)
+{
     // Single reusable project action context
     const auto ProjectContext =
         NewObject<URuleRangerProjectActionContext>(this, URuleRangerProjectActionContext::StaticClass());
 
-    RuleRanger::Traversal::TraverseProjectRulesForSoftConfigs(
-        DevSettings->Configs,
-        [&, bFix](auto Config, auto RuleSet, auto Rule) {
-            // Apply the rule
-            const auto Trigger =
-                bFix ? ERuleRangerProjectActionTrigger::AT_Fix : ERuleRangerProjectActionTrigger::AT_Report;
+    RuleRanger::Traversal::TraverseProjectRulesForConfigs(Configs, [&, bFix](auto Config, auto RuleSet, auto Rule) {
+        // Apply the rule
+        const auto Trigger =
+            bFix ? ERuleRangerProjectActionTrigger::AT_Fix : ERuleRangerProjectActionTrigger::AT_Report;
 
-            ProjectContext->ResetContext(Config, RuleSet, Rule, Trigger);
-            Rule->Apply(ProjectContext);
+        ProjectContext->ResetContext(Config, RuleSet, Rule, Trigger);
+        Rule->Apply(ProjectContext);
 
-            // Aggregate messages into counts and JSON results
-            const auto Fatals = ProjectContext->GetFatalMessages().Num();
-            const auto Errors = ProjectContext->GetErrorMessages().Num();
-            const auto Warnings = ProjectContext->GetWarningMessages().Num();
+        // Aggregate messages into counts and JSON results
+        const auto Fatals = ProjectContext->GetFatalMessages().Num();
+        const auto Errors = ProjectContext->GetErrorMessages().Num();
+        const auto Warnings = ProjectContext->GetWarningMessages().Num();
 
-            NumFatals += Fatals;
-            NumErrors += Errors;
-            NumWarnings += Warnings;
-            ++NumProjectRulesScanned;
+        NumFatals += Fatals;
+        NumErrors += Errors;
+        NumWarnings += Warnings;
+        ++NumProjectRulesScanned;
 
-            if (Warnings > 0 || Errors > 0 || Fatals > 0)
+        if (Warnings > 0 || Errors > 0 || Fatals > 0)
+        {
+            auto Result = MakeShared<FJsonObject>();
+            Result->SetStringField(TEXT("RuleName"), Rule->GetName());
+            Result->SetStringField(TEXT("RulePath"), Rule->GetPathName());
+            Result->SetStringField(TEXT("RuleSetPath"), RuleSet->GetPathName());
+
+            if (Errors > 0 || Fatals > 0)
             {
-                auto Result = MakeShared<FJsonObject>();
-                Result->SetStringField(TEXT("RuleName"), Rule->GetName());
-                Result->SetStringField(TEXT("RulePath"), Rule->GetPathName());
-                Result->SetStringField(TEXT("RuleSetPath"), RuleSet->GetPathName());
-
-                if (Errors > 0 || Fatals > 0)
+                TArray<TSharedPtr<FJsonValue>> ErrorsJson;
+                for (const auto& Msg : ProjectContext->GetErrorMessages())
                 {
-                    TArray<TSharedPtr<FJsonValue>> ErrorsJson;
-                    for (const auto& Msg : ProjectContext->GetErrorMessages())
-                    {
-                        ErrorsJson.Add(MakeShared<FJsonValueString>(Msg.ToString()));
-                    }
-                    for (const auto& Msg : ProjectContext->GetFatalMessages())
-                    {
-                        ErrorsJson.Add(MakeShared<FJsonValueString>(Msg.ToString()));
-                    }
-                    Result->SetArrayField(TEXT("Errors"), ErrorsJson);
+                    ErrorsJson.Add(MakeShared<FJsonValueString>(Msg.ToString()));
                 }
-
-                if (Warnings > 0)
+                for (const auto& Msg : ProjectContext->GetFatalMessages())
                 {
-                    TArray<TSharedPtr<FJsonValue>> WarningsJson;
-                    for (const auto& Msg : ProjectContext->GetWarningMessages())
-                    {
-                        WarningsJson.Add(MakeShared<FJsonValueString>(Msg.ToString()));
-                    }
-                    Result->SetArrayField(TEXT("Warnings"), WarningsJson);
+                    ErrorsJson.Add(MakeShared<FJsonValueString>(Msg.ToString()));
                 }
-
-                ProjectRuleResults.Add(MakeShared<FJsonValueObject>(Result));
+                Result->SetArrayField(TEXT("Errors"), ErrorsJson);
             }
 
-            const auto State = ProjectContext->GetState();
-            ProjectContext->ClearContext();
-
-            if (ERuleRangerActionState::AS_Fatal == State)
+            if (Warnings > 0)
             {
-                return false; // stop processing
+                TArray<TSharedPtr<FJsonValue>> WarningsJson;
+                for (const auto& Msg : ProjectContext->GetWarningMessages())
+                {
+                    WarningsJson.Add(MakeShared<FJsonValueString>(Msg.ToString()));
+                }
+                Result->SetArrayField(TEXT("Warnings"), WarningsJson);
             }
-            else if (bFix && ERuleRangerActionState::AS_Error == State && !Rule->bContinueOnError)
-            {
-                return false; // stop processing on error in fix mode if rule disallows continue
-            }
-            return true;
-        });
+
+            ProjectRuleResults.Add(MakeShared<FJsonValueObject>(Result));
+        }
+
+        const auto State = ProjectContext->GetState();
+        ProjectContext->ClearContext();
+
+        if (ERuleRangerActionState::AS_Fatal == State)
+        {
+            return false; // stop processing
+        }
+        else if (bFix && ERuleRangerActionState::AS_Error == State && !Rule->bContinueOnError)
+        {
+            return false; // stop processing on error in fix mode if rule disallows continue
+        }
+        return true;
+    });
 }

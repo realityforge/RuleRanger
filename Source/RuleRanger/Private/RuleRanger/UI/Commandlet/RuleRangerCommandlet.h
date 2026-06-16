@@ -37,6 +37,7 @@ class URuleRangerCommandlet final : public UCommandlet, public IRuleRangerResult
     void DeriveAllowlistPackages(const FString& Params, TArray<FString>& AllowlistPackages);
     void ResetState();
     void ExecuteProjectRules(bool bFix);
+    void ExecuteProjectRulesForConfigs(TConstArrayView<TWeakObjectPtr<URuleRangerConfig>> Configs, bool bFix);
 
     FAssetData CurrentAsset;
     int32 NumErrors{ 0 };

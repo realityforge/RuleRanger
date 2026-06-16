@@ -18,7 +18,7 @@
 #include "RuleRangerProjectRule.h"
 #include "RuleRangerRuleSet.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerToolResultHandler)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(RuleRangerToolProjectResultHandler)
 
 void URuleRangerToolProjectResultHandler::Init(const TWeakPtr<FRuleRangerRun>& InRun)
 {

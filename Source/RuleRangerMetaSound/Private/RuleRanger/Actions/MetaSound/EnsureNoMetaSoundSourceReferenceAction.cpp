@@ -16,6 +16,7 @@
 #include "Logging/StructuredLog.h"
 #include "MetasoundSource.h"
 #include "Misc/PackageName.h"
+#include "RuleRanger/MetaSound/MetaSoundPresetUtilities.h"
 #include "RuleRanger/RuleRangerUtilities.h"
 #include "RuleRangerActionContext.h"
 #include "UObject/ObjectSaveContext.h"
@@ -71,15 +72,15 @@ UEnsureNoMetaSoundSourceReferenceAction::UEnsureNoMetaSoundSourceReferenceAction
 bool UEnsureNoMetaSoundSourceReferenceAction::IsReferenceAllowed(const UObject* MetaSoundSource,
                                                                  const UObject* Other) const
 {
-    // Allow if MetaSoundSource with bIsPreset = true
-    if (CastChecked<UMetaSoundSource>(MetaSoundSource)->GetConstDocument().RootGraph.PresetOptions.bIsPreset)
+    // Allow if the referenced MetaSoundSource is a preset.
+    if (RuleRanger::MetaSound::IsPreset(CastChecked<UMetaSoundSource>(MetaSoundSource)))
     {
         return true;
     }
     if (const auto OtherMetaSoundSource = Cast<UMetaSoundSource>(Other))
     {
         // This means that the referencing object is a preset derived from this MetaSoundSource which is fine
-        if (OtherMetaSoundSource->GetConstDocument().RootGraph.PresetOptions.bIsPreset)
+        if (RuleRanger::MetaSound::IsPreset(OtherMetaSoundSource))
         {
             return true;
         }

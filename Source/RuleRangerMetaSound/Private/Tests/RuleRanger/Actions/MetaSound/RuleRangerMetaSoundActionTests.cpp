@@ -14,6 +14,7 @@
 #if WITH_DEV_AUTOMATION_TESTS && WITH_EDITOR
 
     #include "AssetRegistry/AssetRegistryModule.h"
+    #include "DocumentTemplates/MetasoundFrontendPresetTemplate.h"
     #include "HAL/FileManager.h"
     #include "MetasoundSource.h"
     #include "Misc/AutomationTest.h"
@@ -285,7 +286,19 @@ namespace RuleRangerMetaSoundTests
 
     void SetPreset(UMetaSoundSource* const Source, const bool bIsPreset)
     {
+        auto& Document = Source->GetDocumentChecked();
+        if (bIsPreset)
+        {
+            Document.Template = TInstancedStruct<FMetaSoundFrontendPresetTemplate>::Make();
+        }
+        else
+        {
+            Document.Template.Reset();
+        }
+
+        PRAGMA_DISABLE_DEPRECATION_WARNINGS
         Source->GetDocumentChecked().RootGraph.PresetOptions.bIsPreset = bIsPreset;
+        PRAGMA_ENABLE_DEPRECATION_WARNINGS
     }
 
     UMetaSoundSource* NewTransientMetaSoundSource(const TCHAR* const Name,

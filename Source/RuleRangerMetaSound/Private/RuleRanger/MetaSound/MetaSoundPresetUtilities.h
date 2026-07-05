@@ -11,20 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "MetasoundPresetMatcher.h"
-#include "MetasoundSource.h"
-#include "RuleRanger/MetaSound/MetaSoundPresetUtilities.h"
+#pragma once
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(MetasoundPresetMatcher)
+class UMetaSoundSource;
 
-bool UMetasoundPresetMatcher::Test(UObject* Object) const
+namespace RuleRanger::MetaSound
 {
-    if (Object && Object->IsA(UMetaSoundSource::StaticClass()))
-    {
-        return RuleRanger::MetaSound::IsPreset(CastChecked<UMetaSoundSource>(Object));
-    }
-    else
-    {
-        return false;
-    }
+    bool IsPreset(const UMetaSoundSource* Source);
 }
